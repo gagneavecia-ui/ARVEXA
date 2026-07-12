@@ -1762,37 +1762,71 @@
   });
 
   // ================================================================
-  // 12. UPDATE UI
-  // ================================================================
-  function updateUI(data) {
-    if (!data) return;
-    
-    const prenom = data.prenom || '';
-    const displayName = prenom || 'Investisseur';
+// 12. UPDATE UI
+// ================================================================
+function updateUI(data) {
+  if (!data) return;
+  
+  const prenom = data.prenom || '';
+  const displayName = prenom || 'Investisseur';
 
-    userNameEl.textContent = displayName;
-    userAvatarEl.textContent = displayName.charAt(0).toUpperCase();
+  userNameEl.textContent = displayName;
+  userAvatarEl.textContent = displayName.charAt(0).toUpperCase();
 
-    menuAvatar.textContent = displayName.charAt(0).toUpperCase();
-    menuUsername.textContent = displayName;
-    menuUseremail.textContent = data.email || 'email@email.com';
+  menuAvatar.textContent = displayName.charAt(0).toUpperCase();
+  menuUsername.textContent = displayName;
+  menuUseremail.textContent = data.email || 'email@email.com';
 
-    const balance = data.balance || 0;
-    statBalanceEl.textContent = `${balance.toLocaleString('fr-FR')} FCFA`;
+  const balance = data.balance || 0;
+  statBalanceEl.textContent = `${balance.toLocaleString('fr-FR')} FCFA`;
 
-    const totalRevenus = data.gainsTotal || data.totalRevenus || 0;
-    statRevenueEl.textContent = `${totalRevenus.toLocaleString('fr-FR')} FCFA`;
+  const totalRevenus = data.gainsTotal || data.totalRevenus || 0;
+  statRevenueEl.textContent = `${totalRevenus.toLocaleString('fr-FR')} FCFA`;
 
-    const investCount = data.investments ? data.investments.filter(i => i.status === 'active').length : 0;
-    statInvestmentsEl.textContent = investCount;
+  const investCount = data.investments ? data.investments.filter(i => i.status === 'active').length : 0;
+  statInvestmentsEl.textContent = investCount;
 
-    const referralsCount = data.referralsCount || 0;
-    statReferralsEl.textContent = referralsCount;
+  const referralsCount = data.referralsCount || 0;
+  statReferralsEl.textContent = referralsCount;
 
-    checkAdminButton(currentUser);
-    localStorage.setItem('ARVEXA_user_data', JSON.stringify(data));
+  // ============================================================
+  // 🔥 CALCUL DU POURCENTAGE DYNAMIQUE
+  // ============================================================
+  let dailyReturn = 0;
+  if (data.investments && data.investments.length > 0) {
+    const activeInvests = data.investments.filter(i => i.status === 'active');
+    if (activeInvests.length > 0) {
+      const totalReturn = activeInvests.reduce((sum, inv) => sum + (inv.dailyReturn || 0), 0);
+      dailyReturn = totalReturn / activeInvests.length;
+    }
   }
 
+  const displayPercent = dailyReturn > 0 ? (dailyReturn / 10).toFixed(1) : '0';
+
+  // ============================================================
+  // 🔥 MISE À JOUR DU POURCENTAGE DANS LE FOOTER
+  // ============================================================
+  const statFooter = document.querySelector('.main-stat-footer');
+  if (statFooter) {
+    const span = statFooter.querySelector('span:last-child');
+    if (span) {
+      if (parseFloat(displayPercent) > 0) {
+        span.innerHTML = `
+          <i class="fas fa-arrow-up"></i> +${displayPercent}% par jour
+        `;
+        span.style.color = 'var(--success)';
+      } else {
+        span.innerHTML = `
+          <i class="fas fa-minus"></i> 0% par jour
+        `;
+        span.style.color = 'var(--text-muted)';
+      }
+    }
+  }
+
+  checkAdminButton(currentUser);
+  localStorage.setItem('ARVEXA_user_data', JSON.stringify(data));
+}
   // ================================================================
   // 13. FORCE CHECK & CREDIT GAINS
   // ================================================================
