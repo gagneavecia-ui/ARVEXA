@@ -579,99 +579,114 @@
       transform: translateX(2px);
     }
 
-    /* ===== TESTIMONIALS ===== */
-    .testimonials-section { margin: 8px 0 24px; }
-    .testimonials-scroll {
-      display: flex;
-      gap: 12px;
-      overflow-x: auto;
-      scroll-snap-type: x mandatory;
-      padding-bottom: 8px;
-      margin-bottom: 14px;
-    }
-    .testimonials-scroll::-webkit-scrollbar { height: 2px; }
-    .testimonials-scroll::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); border-radius: 10px; }
-    .testimonials-scroll::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; opacity: 0.2; }
-    .testimonial-compact {
-      min-width: 260px;
+    /* ===== ACTUALITÉS ARVEXA - CARTE FIXE ===== */
+    .actualites-section { margin: 8px 0 24px; }
+    
+    .actu-card {
       background: rgba(20, 20, 20, 0.4);
       backdrop-filter: blur(10px);
       border: 1px solid rgba(184, 134, 11, 0.03);
       border-radius: 16px;
-      padding: 14px;
-      scroll-snap-align: start;
-      animation: fadeInUp 1s ease-out;
+      padding: 18px 20px;
+      transition: var(--transition);
+      min-height: 120px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
     }
-    .testimonial-compact-stars {
-      color: var(--accent);
-      font-size: 9px;
-      letter-spacing: 1px;
-      margin-bottom: 8px;
-      opacity: 0.4;
+    .actu-card:hover {
+      border-color: rgba(184, 134, 11, 0.06);
+      background: rgba(20, 20, 20, 0.6);
     }
-    .testimonial-compact-text {
-      font-size: 11px;
-      color: var(--text-dim);
-      line-height: 1.5;
-      margin-bottom: 10px;
-      font-style: italic;
-      font-weight: 300;
-    }
-    .testimonial-compact-author {
+    
+    .actu-card-header {
       display: flex;
       align-items: center;
       gap: 10px;
+      margin-bottom: 10px;
     }
-    .testimonial-compact-avatar {
-      width: 28px; height: 28px;
-      background: var(--accent);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
+    .actu-badge {
+      display: inline-block;
+      font-size: 9px;
       font-weight: 600;
-      color: var(--bg-dark);
+      padding: 2px 12px;
+      border-radius: 20px;
+      background: rgba(184, 134, 11, 0.08);
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      flex-shrink: 0;
     }
-    .testimonial-compact-info strong {
-      font-size: 11px;
-      display: block;
-      color: var(--text-light);
-      font-weight: 500;
-    }
-    .testimonial-compact-info span {
+    .actu-badge.promotion { background: rgba(45, 125, 90, 0.08); color: var(--success); }
+    .actu-badge.astuce { background: rgba(184, 134, 11, 0.05); color: #D4A017; }
+    .actu-badge.update { background: rgba(26, 58, 42, 0.15); color: #4A7A6A; }
+    
+    .actu-date {
       font-size: 9px;
       color: var(--text-muted);
-      font-weight: 300;
+      opacity: 0.5;
+      margin-left: auto;
+      flex-shrink: 0;
     }
-    .testimonials-see-all {
+    
+    .actu-text {
+      font-size: 13px;
+      color: var(--text-light);
+      line-height: 1.6;
+      font-weight: 400;
+      flex: 1;
+    }
+    
+    .actu-card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255,255,255,0.03);
+    }
+    .actu-counter {
+      font-size: 10px;
+      color: var(--text-muted);
+      opacity: 0.4;
+    }
+    
+    .actu-nav-buttons {
+      display: flex;
+      gap: 6px;
+    }
+    .actu-nav-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 1px solid rgba(184, 134, 11, 0.06);
+      background: rgba(10, 10, 10, 0.3);
+      color: var(--text-dim);
+      cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      padding: 12px 20px;
-      margin-top: 4px;
-      background: rgba(184, 134, 11, 0.02);
-      border: 1px solid rgba(184, 134, 11, 0.04);
-      border-radius: 12px;
-      color: var(--text-dim);
-      text-decoration: none;
-      font-size: 12px;
-      font-weight: 400;
       transition: var(--transition);
-      cursor: pointer;
+      font-size: 11px;
     }
-    .testimonials-see-all:active { transform: scale(0.97); }
-    .testimonials-see-all:hover {
-      background: rgba(184, 134, 11, 0.04);
-      border-color: rgba(184, 134, 11, 0.06);
+    .actu-nav-btn:active { transform: scale(0.92); }
+    .actu-nav-btn:hover {
+      border-color: rgba(184, 134, 11, 0.12);
       color: var(--text-light);
-      gap: 12px;
+      background: rgba(10, 10, 10, 0.5);
     }
-    .testimonials-see-all i { transition: var(--transition); }
-    .testimonials-see-all:hover i { transform: translateX(3px); }
+    .actu-nav-btn:disabled {
+      opacity: 0.2;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .actu-nav-btn:disabled:hover {
+      border-color: rgba(184, 134, 11, 0.06);
+      color: var(--text-dim);
+      background: rgba(10, 10, 10, 0.3);
+    }
 
-       /* ===== FOOTER ===== */
+      /* ===== FOOTER ===== */
     .footer {
       border-top: 1px solid rgba(184, 134, 11, 0.03);
       padding: 28px 0 16px;
@@ -780,7 +795,7 @@
       border-left: 1px solid rgba(184, 134, 11, 0.03);
       padding: 20px 0;
       transform: translateX(100%);
-      transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);  /* Ressort */
+      transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
       display: flex;
       flex-direction: column;
       overflow-y: auto;
@@ -791,7 +806,6 @@
       transform: translateX(0);
     }
 
-    /* Animation des liens en cascade */
     .menu-link {
       opacity: 0;
       transform: translateX(30px);
@@ -801,7 +815,6 @@
       opacity: 1;
       transform: translateX(0);
     }
-    /* Délais pour chaque lien */
     .menu-overlay.active .menu-link:nth-child(1) { transition-delay: 0.05s; }
     .menu-overlay.active .menu-link:nth-child(2) { transition-delay: 0.09s; }
     .menu-overlay.active .menu-link:nth-child(3) { transition-delay: 0.13s; }
@@ -938,6 +951,50 @@
     }
 
     /* ============================================================
+       TOAST
+       ============================================================ */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(120px);
+      max-width: 90%;
+      width: 400px;
+      padding: 14px 20px;
+      border-radius: 14px;
+      font-size: 13px;
+      font-weight: 500;
+      transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      z-index: 9999;
+      text-align: center;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      pointer-events: none;
+    }
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+    }
+    .toast.success {
+      background: #0D2A1F;
+      border: 1px solid #2D7D5A;
+      color: #2D7D5A;
+    }
+    .toast.error {
+      background: #2A0D0D;
+      border: 1px solid #8A3A3A;
+      color: #8A3A3A;
+    }
+    .toast.warning {
+      background: #2A1A0D;
+      border: 1px solid #B8860B;
+      color: #B8860B;
+    }
+    .toast.info {
+      background: #0D1A2A;
+      border: 1px solid #4A7A8A;
+      color: #4A7A8A;
+    }
+
+    /* ============================================================
        RESPONSIVE
        ============================================================ */
     @media (max-width: 550px) {
@@ -950,6 +1007,8 @@
       .formation-card-horizontal { height: 110px; }
       .formation-horiz-img-wrap { width: 80px; min-width: 80px; }
       .logo-text { font-size: 16px; }
+      .actu-card { padding: 14px 16px; }
+      .actu-text { font-size: 12px; }
     }
     @media (min-width: 768px) {
       .container { max-width: 700px; padding: 28px 24px 60px; }
@@ -982,13 +1041,6 @@
       }
       .formation-horiz-img { height: 110px; }
       .formation-horiz-content { padding: 10px 14px; height: auto; }
-      .testimonials-scroll {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 14px;
-        overflow-x: visible;
-      }
-      .testimonial-compact { min-width: auto; }
     }
     @media (min-width: 1280px) {
       .container { max-width: 1200px; padding: 44px 40px 100px; }
@@ -1037,8 +1089,8 @@
       <a href="investir.html" class="menu-link">
         <i class="fas fa-chart-line"></i> Investir
       </a>
-      <a href="vendre.html" class="menu-link">
-        <i class="fas fa-upload"></i> Vendre
+      <a href="parrainage.html" class="menu-link">
+        <i class="fas fa-users"></i> Parrainage
       </a>
       <a href="recharger.html" class="menu-link">
         <i class="fas fa-plus-circle"></i> Recharger
@@ -1131,7 +1183,7 @@
     </div>
   </div>
 
-  <!-- ===== FORMATIONS - NOUVEAUX NOMS ET IMAGES ===== -->
+  <!-- ===== FORMATIONS ===== -->
   <div class="section-header">
     <div class="section-header-left">
       <div class="section-subtitle">Apprendre simplement</div>
@@ -1140,8 +1192,7 @@
   </div>
 
   <div class="formations-list-horizontal">
-    <!-- Formation 1 : "Pourquoi économiser ?" -->
-    <a href="boutique.html" class="formation-card-horizontal formation-link">
+    <a href="#" class="formation-card-horizontal formation-link" onclick="showComingSoon(event)">
       <div class="formation-horiz-img-wrap">
         <img src="https://images.pexels.com/photos/4386367/pexels-photo-4386367.jpeg?auto=compress&cs=tinysrgb&w=200&h=240&fit=crop" alt="Économiser" class="formation-horiz-img" loading="lazy">
         <span class="formation-horiz-badge">Débutant</span>
@@ -1156,8 +1207,7 @@
       </div>
     </a>
 
-    <!-- Formation 2 : "Faire grossir son argent" -->
-    <a href="boutique.html" class="formation-card-horizontal formation-link">
+    <a href="#" class="formation-card-horizontal formation-link" onclick="showComingSoon(event)">
       <div class="formation-horiz-img-wrap">
         <img src="https://images.pexels.com/photos/5849577/pexels-photo-5849577.jpeg?auto=compress&cs=tinysrgb&w=200&h=240&fit=crop" alt="Investir" class="formation-horiz-img" loading="lazy">
         <span class="formation-horiz-badge">Débutant</span>
@@ -1180,18 +1230,18 @@
     <span class="section-divider-line"></span>
   </div>
 
-  <!-- ===== SERVICES AVEC "VOIR TOUT" ===== -->
+  <!-- ===== SERVICES ===== -->
   <div class="section-header">
     <div class="section-header-left">
       <div class="section-subtitle">Services</div>
       <h2 class="section-title">Solutions <span>financières</span></h2>
     </div>
-    <a href="activites.html" class="section-link" id="allServicesLink">
+    <a href="#" class="section-link" onclick="showComingSoon(event)">
       Voir tout <i class="fas fa-arrow-right"></i>
     </a>
   </div>
-
-  <div class="services-list">
+  
+   <div class="services-list">
     <a href="investir.html" class="service-item">
       <div class="service-icon gold"><i class="fas fa-chart-line"></i></div>
       <div class="service-content">
@@ -1201,7 +1251,7 @@
       <div class="service-arrow"><i class="fas fa-chevron-right"></i></div>
     </a>
 
-    <a href="vendre.html" class="service-item">
+    <a href="#" class="service-item" onclick="showComingSoon(event)">
       <div class="service-icon green"><i class="fas fa-hand-holding-usd"></i></div>
       <div class="service-content">
         <div class="service-title">Vendre</div>
@@ -1220,57 +1270,37 @@
     </a>
   </div>
 
-  <!-- ===== TESTIMONIALS ===== -->
-  <div class="testimonials-section">
+  <!-- ===== ACTUALITÉS ARVEXA - CARTE FIXE AVEC NAVIGATION ===== -->
+  <div class="actualites-section">
     <div class="section-header">
       <div class="section-header-left">
-        <div class="section-subtitle">Témoignages</div>
-        <h2 class="section-title">Ce que nos <span>membres</span> disent</h2>
+        <div class="section-subtitle">Actualités</div>
+        <h2 class="section-title">Dernières <span>annonces</span></h2>
       </div>
     </div>
 
-    <div class="testimonials-scroll">
-      <div class="testimonial-compact">
-        <div class="testimonial-compact-stars">★★★★★</div>
-        <p class="testimonial-compact-text">"ARVEXA a transformé ma façon d'investir. Les rendements sont réguliers et le service est impeccable."</p>
-        <div class="testimonial-compact-author">
-          <div class="testimonial-compact-avatar">A</div>
-          <div class="testimonial-compact-info">
-            <strong>Amadou T.</strong>
-            <span>Investisseur certifié</span>
-          </div>
+    <div class="actu-card" id="actuCard">
+      <div>
+        <div class="actu-card-header">
+          <span class="actu-badge" id="actuBadge">📢 Nouveau</span>
+          <span class="actu-date" id="actuDate">Il y a 2 jours</span>
         </div>
+        <p class="actu-text" id="actuText">
+          Bienvenue sur ARVEXA ! Commencez votre parcours d'investissement dès aujourd'hui.
+        </p>
       </div>
-
-      <div class="testimonial-compact">
-        <div class="testimonial-compact-stars">★★★★★</div>
-        <p class="testimonial-compact-text">"Je parraine mes amis et je gagne des bonus. C'est simple, rapide et vraiment rentable."</p>
-        <div class="testimonial-compact-author">
-          <div class="testimonial-compact-avatar">F</div>
-          <div class="testimonial-compact-info">
-            <strong>Fatimata S.</strong>
-            <span>Membre premium</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="testimonial-compact">
-        <div class="testimonial-compact-stars">★★★★★</div>
-        <p class="testimonial-compact-text">"Les retraits sont rapides et l'équipe ARVEXA est toujours réactive. Je recommande à 100%."</p>
-        <div class="testimonial-compact-author">
-          <div class="testimonial-compact-avatar">I</div>
-          <div class="testimonial-compact-info">
-            <strong>Ibrahim D.</strong>
-            <span>Investisseur actif</span>
-          </div>
+      <div class="actu-card-footer">
+        <span class="actu-counter" id="actuCounter">1 / 5</span>
+        <div class="actu-nav-buttons">
+          <button class="actu-nav-btn" id="actuPrevBtn" disabled>
+            <i class="fas fa-chevron-left"></i>
+          </button>
+          <button class="actu-nav-btn" id="actuNextBtn">
+            <i class="fas fa-chevron-right"></i>
+          </button>
         </div>
       </div>
     </div>
-
-    <a href="avis.html" class="testimonials-see-all">
-      <span>Lire tous les témoignages</span>
-      <i class="fas fa-arrow-right"></i>
-    </a>
   </div>
 
   <!-- ===== FOOTER ===== -->
@@ -1283,7 +1313,6 @@
       <a href="#" class="social-link"><i class="fab fa-whatsapp"></i></a>
       <a href="#" class="social-link"><i class="fab fa-telegram"></i></a>
       <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
-      <!-- BOUTON ADMIN -->
       <a href="#" class="social-link admin-link" id="adminLockBtn" style="display: none;">
         <i class="fas fa-lock"></i>
       </a>
@@ -1292,6 +1321,9 @@
   </footer>
 
 </main>
+
+<!-- ===== TOAST ===== -->
+<div class="toast" id="toast"></div>
 
 <!-- ===== IMPORTS ===== -->
 <script type="importmap">
@@ -1313,16 +1345,30 @@
     setPersistence,
     browserLocalPersistence
   } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
-  import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+  import { 
+    getFirestore, 
+    doc, 
+    getDoc, 
+    onSnapshot, 
+    updateDoc, 
+    setDoc,
+    collection,
+    query,
+    where,
+    getDocs,
+    orderBy
+  } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
+  // ===== FIREBASE CONFIG =====
   const firebaseConfig = {
-    apiKey: "AIzaSyDEjj2oAg7ZL8HvdkSWliShxydgq_BPxzs",
-    authDomain: "brickshare-d35b3.firebaseapp.com",
-    projectId: "brickshare-d35b3",
-    storageBucket: "brickshare-d35b3.firebasestorage.app",
-    messagingSenderId: "613227362818",
-    appId: "1:613227362818:web:c4de1ad3372c16d8d3051b"
-  };
+  apiKey: "AIzaSyBEbYuuUlNCLMBUHClv4UnyownNHw2q3_g",
+  authDomain: "nexgen-39043.firebaseapp.com",
+  projectId: "nexgen-39043",
+  storageBucket: "nexgen-39043.firebasestorage.app",
+  messagingSenderId: "619390144325",
+  appId: "1:619390144325:web:35d96b125501e4e8b1782c",
+  measurementId: "G-HC2Q5DNKDR"
+};
 
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
@@ -1330,7 +1376,7 @@
 
   setPersistence(auth, browserLocalPersistence);
 
-  // ===== DOM =====
+  // ===== DOM ELEMENTS =====
   const userNameEl = document.getElementById('userName');
   const userAvatarEl = document.getElementById('userAvatar');
   const statBalanceEl = document.getElementById('statBalance');
@@ -1338,8 +1384,8 @@
   const statInvestmentsEl = document.getElementById('statInvestments');
   const statReferralsEl = document.getElementById('statReferrals');
 
+  // Menu
   const menuOverlay = document.getElementById('menuOverlay');
-  const menuSidebar = document.getElementById('menuSidebar');
   const menuBtn = document.getElementById('menuBtn');
   const menuCloseBtn = document.getElementById('menuCloseBtn');
   const menuBackdrop = document.getElementById('menuBackdrop');
@@ -1348,16 +1394,226 @@
   const menuUseremail = document.getElementById('menuUseremail');
   const menuLogoutBtn = document.getElementById('menuLogoutBtn');
 
+  // Actualités
+  const actuText = document.getElementById('actuText');
+  const actuBadge = document.getElementById('actuBadge');
+  const actuDate = document.getElementById('actuDate');
+  const actuCounter = document.getElementById('actuCounter');
+  const actuPrevBtn = document.getElementById('actuPrevBtn');
+  const actuNextBtn = document.getElementById('actuNextBtn');
+
   const adminLockBtn = document.getElementById('adminLockBtn');
+  const toast = document.getElementById('toast');
 
   let currentUser = null;
   let userData = null;
   let unsubscribeUser = null;
+  let unsubscribeActualites = null;
+
+  // ===== DONNÉES DES ACTUALITÉS (PAR DÉFAUT) =====
+  const defaultActualites = [
+    {
+      id: 'default_1',
+      badge: '📢 Bienvenue',
+      badgeClass: '',
+      text: 'Bienvenue sur ARVEXA ! Commencez votre parcours d\'investissement dès aujourd\'hui.',
+      date: new Date().toISOString(),
+      timestamp: Date.now()
+    },
+    {
+      id: 'default_2',
+      badge: '💡 Astuce',
+      badgeClass: 'astuce',
+      text: 'Réinvestissez vos gains mensuels pour profiter des intérêts composés et booster vos revenus.',
+      date: new Date(Date.now() - 86400000).toISOString(),
+      timestamp: Date.now() - 86400000
+    },
+    {
+      id: 'default_3',
+      badge: '🎉 Promotion',
+      badgeClass: 'promotion',
+      text: 'Bonus de 500 FCFA offert pour tout nouveau parrainage valide jusqu\'au 31 mars 2026.',
+      date: new Date(Date.now() - 172800000).toISOString(),
+      timestamp: Date.now() - 172800000
+    },
+    {
+      id: 'default_4',
+      badge: '📢 Nouveau',
+      badgeClass: '',
+      text: 'Nouveau plan d\'investissement "Performance" disponible à partir de 150 000 FCFA avec un rendement de 18%.',
+      date: new Date(Date.now() - 259200000).toISOString(),
+      timestamp: Date.now() - 259200000
+    },
+    {
+      id: 'default_5',
+      badge: '✅ Mise à jour',
+      badgeClass: 'update',
+      text: 'L\'application ARVEXA est désormais plus rapide avec des temps de chargement réduits de 40%.',
+      date: new Date(Date.now() - 432000000).toISOString(),
+      timestamp: Date.now() - 432000000
+    }
+  ];
+
+  let actualites = [];
+  let currentActuIndex = 0;
 
   // ================================================================
-  // MENU - OUVERTURE / FERMETURE
+  // 1. TOAST
   // ================================================================
+  function showToast(message, type = 'info') {
+    toast.textContent = message;
+    toast.className = `toast ${type}`;
+    setTimeout(() => toast.classList.add('show'), 50);
+    setTimeout(() => toast.classList.remove('show'), 4000);
+  }
+
+  // ================================================================
+  // 2. SHOW COMING SOON
+  // ================================================================
+  window.showComingSoon = function(e) {
+    if (e) e.preventDefault();
+    showToast('📢 Cette fonctionnalité sera bientôt disponible !', 'info');
+  };
+
+  // ================================================================
+  // 3. FORMATER LA DATE
+  // ================================================================
+  function formatDate(dateStr) {
+    if (!dateStr) return 'Date inconnue';
+    try {
+      const date = new Date(dateStr);
+      const now = new Date();
+      const diff = now - date;
+      
+      if (diff < 60000) return 'À l\'instant';
+      if (diff < 3600000) return `Il y a ${Math.floor(diff / 60000)} min`;
+      if (diff < 86400000) return `Il y a ${Math.floor(diff / 3600000)}h`;
+      if (diff < 172800000) return 'Hier';
+      if (diff < 604800000) return `Il y a ${Math.floor(diff / 86400000)} jours`;
+      return date.toLocaleDateString('fr-FR');
+    } catch {
+      return 'Date inconnue';
+    }
+  }
+
+  // ================================================================
+  // 4. AFFICHER UNE ACTUALITÉ
+  // ================================================================
+  function displayActu(index) {
+    if (!actualites.length) {
+      actuText.textContent = 'Aucune actualité pour le moment. Revenez plus tard !';
+      actuBadge.textContent = '📢 Info';
+      actuBadge.className = 'actu-badge';
+      actuDate.textContent = '';
+      actuCounter.textContent = '0 / 0';
+      actuPrevBtn.disabled = true;
+      actuNextBtn.disabled = true;
+      return;
+    }
+
+    const actu = actualites[index];
+    if (!actu) return;
+
+    actuText.textContent = actu.text || 'Pas de contenu';
+    actuBadge.textContent = actu.badge || '📢 Info';
+    actuBadge.className = 'actu-badge' + (actu.badgeClass ? ` ${actu.badgeClass}` : '');
+    actuDate.textContent = formatDate(actu.date || actu.createdAt);
+    actuCounter.textContent = `${index + 1} / ${actualites.length}`;
+    
+    actuPrevBtn.disabled = index === 0;
+    actuNextBtn.disabled = index === actualites.length - 1;
+  }
+
+  // ================================================================
+  // 5. NAVIGATION ACTUALITÉS
+  // ================================================================
+  function nextActu() {
+    if (currentActuIndex < actualites.length - 1) {
+      currentActuIndex++;
+      displayActu(currentActuIndex);
+    }
+  }
+
+  function prevActu() {
+    if (currentActuIndex > 0) {
+      currentActuIndex--;
+      displayActu(currentActuIndex);
+    }
+  }
+
+  actuNextBtn.addEventListener('click', nextActu);
+  actuPrevBtn.addEventListener('click', prevActu);
+
+  // ================================================================
+  // 6. CHARGER LES ACTUALITÉS DEPUIS FIRESTORE
+  // ================================================================
+  function loadActualites() {
+    if (unsubscribeActualites) {
+      unsubscribeActualites();
+      unsubscribeActualites = null;
+    }
+
+    const q = query(
+      collection(db, 'actualites'),
+      orderBy('timestamp', 'desc')
+    );
+
+    unsubscribeActualites = onSnapshot(q, (snapshot) => {
+      const data = [];
+      snapshot.forEach(doc => {
+        const docData = doc.data();
+        data.push({
+          id: doc.id,
+          ...docData,
+          badgeClass: docData.badgeClass || '',
+          timestamp: docData.timestamp || docData.createdAt || Date.now()
+        });
+      });
+
+      // Si pas d'actualités dans Firestore, utiliser les défauts
+      if (data.length === 0) {
+        actualites = defaultActualites;
+      } else {
+        actualites = data;
+      }
+
+      currentActuIndex = 0;
+      displayActu(0);
+    }, (error) => {
+      console.error('Erreur chargement actualités:', error);
+      actualites = defaultActualites;
+      currentActuIndex = 0;
+      displayActu(0);
+    });
+  }
+
+  // ================================================================
+  // 7. SWIPE POUR LE MENU
+  // ================================================================
+  let touchStartX = 0;
+  let touchStartY = 0;
+  let isSwiping = false;
+  let swipeThreshold = 50;
   let isMenuOpen = false;
+
+  const formationsList = document.querySelector('.formations-list-horizontal');
+
+  function isTouchOnExcludedElement(x, y) {
+    const element = document.elementFromPoint(x, y);
+    if (!element) return false;
+    
+    let current = element;
+    while (current && current !== document.body) {
+      if (current === formationsList) {
+        return true;
+      }
+      if (current.closest && current.closest('.formations-list-horizontal')) {
+        return true;
+      }
+      current = current.parentElement;
+    }
+    return false;
+  }
 
   function openMenu() {
     if (isMenuOpen) return;
@@ -1373,6 +1629,47 @@
     document.body.style.overflow = '';
   }
 
+  document.addEventListener('touchstart', (e) => {
+    const touch = e.changedTouches[0];
+    touchStartX = touch.screenX;
+    touchStartY = touch.screenY;
+    isSwiping = false;
+  }, { passive: true });
+
+  document.addEventListener('touchmove', (e) => {
+    if (!e.cancelable) return;
+    
+    const touch = e.changedTouches[0];
+    const deltaX = touch.screenX - touchStartX;
+    const deltaY = touch.screenY - touchStartY;
+
+    if (Math.abs(deltaY) > Math.abs(deltaX)) return;
+
+    if (isTouchOnExcludedElement(touch.clientX, touch.clientY)) {
+      return;
+    }
+
+    if (Math.abs(deltaX) > 20) {
+      isSwiping = true;
+      e.preventDefault();
+    }
+  }, { passive: false });
+
+  document.addEventListener('touchend', (e) => {
+    if (!isSwiping) return;
+    const deltaX = e.changedTouches[0].screenX - touchStartX;
+
+    if (deltaX < -swipeThreshold && !isMenuOpen) {
+      openMenu();
+    } else if (deltaX > swipeThreshold && isMenuOpen) {
+      closeMenu();
+    }
+    isSwiping = false;
+  }, { passive: true });
+
+  // ================================================================
+  // 8. MENU (clics)
+  // ================================================================
   menuBtn.addEventListener('click', (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -1394,38 +1691,7 @@
   });
 
   // ================================================================
-  // SWIPE
-  // ================================================================
-  let touchStartX = 0;
-  let touchStartY = 0;
-  let isSwiping = false;
-  const swipeThreshold = 50;
-
-  document.addEventListener('touchstart', (e) => {
-    touchStartX = e.changedTouches[0].screenX;
-    touchStartY = e.changedTouches[0].screenY;
-    isSwiping = false;
-  }, { passive: true });
-
-  document.addEventListener('touchmove', (e) => {
-    const deltaX = e.changedTouches[0].screenX - touchStartX;
-    const deltaY = e.changedTouches[0].screenY - touchStartY;
-    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 20) {
-      isSwiping = true;
-      e.preventDefault();
-    }
-  }, { passive: false });
-
-  document.addEventListener('touchend', (e) => {
-    if (!isSwiping) return;
-    const deltaX = e.changedTouches[0].screenX - touchStartX;
-    if (deltaX < -swipeThreshold && !isMenuOpen) openMenu();
-    else if (deltaX > swipeThreshold && isMenuOpen) closeMenu();
-    isSwiping = false;
-  }, { passive: true });
-
-  // ================================================================
-  // ADMIN
+  // 9. ADMIN BUTTON
   // ================================================================
   function checkAdminButton(user) {
     if (!adminLockBtn) return;
@@ -1442,7 +1708,7 @@
   }
 
   // ================================================================
-  // LOGOUT
+  // 10. DÉCONNEXION
   // ================================================================
   menuLogoutBtn.addEventListener('click', async (e) => {
     e.preventDefault();
@@ -1450,18 +1716,24 @@
       try {
         await signOut(auth);
         localStorage.removeItem('ARVEXA_current_user');
-        window.location.href = 'login.html';
+        localStorage.removeItem('ARVEXA_user_data');
+        showToast('✅ Déconnexion réussie', 'success');
+        setTimeout(() => {
+          window.location.href = 'login.html';
+        }, 500);
       } catch (error) {
         console.error('Erreur déconnexion:', error);
+        showToast('❌ Erreur lors de la déconnexion', 'error');
       }
     }
   });
 
   // ================================================================
-  // UPDATE UI
+  // 11. UPDATE UI AVEC STATISTIQUES RÉELLES
   // ================================================================
   function updateUI(data) {
     if (!data) return;
+    
     const prenom = data.prenom || '';
     const displayName = prenom || 'Investisseur';
 
@@ -1474,47 +1746,188 @@
 
     const balance = data.balance || 0;
     statBalanceEl.textContent = `${balance.toLocaleString('fr-FR')} FCFA`;
-    statRevenueEl.textContent = `${(balance * 0.3).toLocaleString('fr-FR')} FCFA`;
-    statInvestmentsEl.textContent = Math.floor(balance / 5000);
-    statReferralsEl.textContent = Math.floor(Math.random() * 5);
+
+    const totalRevenus = data.totalRevenus || 0;
+    statRevenueEl.textContent = `${totalRevenus.toLocaleString('fr-FR')} FCFA`;
+
+    const totalInvestis = data.totalInvestis || 0;
+    statInvestmentsEl.textContent = totalInvestis;
+
+    const referralsCount = data.referralsCount || 0;
+    statReferralsEl.textContent = referralsCount;
 
     checkAdminButton(currentUser);
+    localStorage.setItem('ARVEXA_user_data', JSON.stringify(data));
   }
 
   // ================================================================
-  // AUTH
+  // 12. CHARGER LES STATISTIQUES RÉELLES
   // ================================================================
-  onAuthStateChanged(auth, (user) => {
+  async function loadRealStats(userId) {
+    try {
+      const investQ = query(
+        collection(db, 'investissements'),
+        where('userId', '==', userId),
+        where('statut', '==', 'active')
+      );
+      const investSnap = await getDocs(investQ);
+      const investCount = investSnap.size;
+
+      const txQ = query(
+        collection(db, 'transactions'),
+        where('userId', '==', userId),
+        where('type', 'in', ['gain', 'revenu', 'profit'])
+      );
+      const txSnap = await getDocs(txQ);
+      let totalRevenue = 0;
+      txSnap.forEach(doc => {
+        totalRevenue += doc.data().montant || 0;
+      });
+
+      const refQ = query(
+        collection(db, 'users'),
+        where('referredBy', '==', userId)
+      );
+      const refSnap = await getDocs(refQ);
+      const refCount = refSnap.size;
+
+      const userRef = doc(db, 'users', userId);
+      await updateDoc(userRef, {
+        totalInvestis: investCount,
+        totalRevenus: totalRevenue,
+        referralsCount: refCount
+      });
+
+      return { investCount, totalRevenue, refCount };
+    } catch (error) {
+      console.error('Erreur chargement stats:', error);
+      return null;
+    }
+  }
+
+  // ================================================================
+  // 13. AUTH
+  // ================================================================
+  onAuthStateChanged(auth, async (user) => {
     if (user) {
       currentUser = user;
       localStorage.setItem('ARVEXA_current_user', user.uid);
+
       const userRef = doc(db, 'users', user.uid);
 
-      getDoc(userRef).then((docSnap) => {
-        if (docSnap.exists()) {
-          const data = docSnap.data();
-          userData = data;
-          updateUI(data);
-        }
-      }).catch(() => {});
+            try {
+        const docSnap = await getDoc(userRef);
 
-      if (unsubscribeUser) unsubscribeUser();
-      unsubscribeUser = onSnapshot(userRef, (docSnap) => {
-        if (docSnap.exists()) {
-          const data = docSnap.data();
-          userData = data;
-          updateUI(data);
+        if (!docSnap.exists()) {
+          const newUser = {
+            uid: user.uid,
+            email: user.email || '',
+            prenom: user.displayName?.split(' ')[0] || 'Investisseur',
+            nom: user.displayName?.split(' ').slice(1).join(' ') || '',
+            fullName: user.displayName || 'Investisseur',
+            balance: 0,
+            totalDepots: 0,
+            totalRetraits: 0,
+            totalInvestis: 0,
+            totalRevenus: 0,
+            referralsCount: 0,
+            referralEarnings: 0,
+            referralCode: `ARV-${Date.now().toString(36).toUpperCase()}-${user.uid.substring(0, 4).toUpperCase()}`,
+            photoURL: user.photoURL || '',
+            status: 'active',
+            role: 'user',
+            createdAt: new Date().toISOString(),
+            lastLogin: new Date().toISOString()
+          };
+          await setDoc(userRef, newUser);
+          userData = newUser;
+          console.log('✅ Compte utilisateur créé');
+        } else {
+          userData = docSnap.data();
+          await updateDoc(userRef, {
+            lastLogin: new Date().toISOString()
+          });
+          console.log('✅ Utilisateur chargé');
+          await loadRealStats(user.uid);
         }
-      }, (error) => console.error('Erreur Firestore:', error));
+
+        localStorage.setItem('ARVEXA_user_data', JSON.stringify(userData));
+        updateUI(userData);
+
+        if (unsubscribeUser) unsubscribeUser();
+        unsubscribeUser = onSnapshot(userRef, (docSnap) => {
+          if (docSnap.exists()) {
+            userData = docSnap.data();
+            updateUI(userData);
+            localStorage.setItem('ARVEXA_user_data', JSON.stringify(userData));
+          }
+        });
+
+        checkAdminButton(user);
+
+        // Charger les actualités
+        loadActualites();
+
+      } catch (error) {
+        console.error('❌ Erreur Firestore:', error);
+        const cached = localStorage.getItem('ARVEXA_user_data');
+        if (cached) {
+          userData = JSON.parse(cached);
+          updateUI(userData);
+          showToast('⚠️ Données en cache - Connexion limitée', 'warning');
+        } else {
+          showToast('❌ Erreur de chargement des données', 'error');
+        }
+        // Quand même charger les actualités
+        loadActualites();
+      }
 
     } else {
-      const savedUid = localStorage.getItem('ARVEXA_current_user');
-      if (!savedUid) window.location.href = 'login.html';
+      currentUser = null;
+      userData = null;
+      if (unsubscribeUser) {
+        unsubscribeUser();
+        unsubscribeUser = null;
+      }
+      if (unsubscribeActualites) {
+        unsubscribeActualites();
+        unsubscribeActualites = null;
+      }
+      localStorage.removeItem('ARVEXA_current_user');
+      localStorage.removeItem('ARVEXA_user_data');
+
+      const currentPath = window.location.pathname;
+      if (!currentPath.includes('login.html') && 
+          !currentPath.includes('register.html') &&
+          !currentPath.includes('confiance.html')) {
+        window.location.href = 'login.html';
+      }
     }
   });
 
   // ================================================================
-  // NAVIGATION
+  // 14. GESTION EN LIGNE/HORS LIGNE
+  // ================================================================
+  window.addEventListener('online', () => {
+    showToast('📶 Connexion Internet rétablie', 'success');
+    if (currentUser) {
+      const userRef = doc(db, 'users', currentUser.uid);
+      getDoc(userRef).then(docSnap => {
+        if (docSnap.exists()) {
+          userData = docSnap.data();
+          updateUI(userData);
+        }
+      });
+    }
+    loadActualites();
+  });
+
+  window.addEventListener('offline', () => {
+    showToast('📶 Connexion Internet perdue', 'error');
+  });
+
+  // ================================================================
+  // 15. NAVIGATION
   // ================================================================
   document.getElementById('userProfileBtn').addEventListener('click', (e) => {
     e.preventDefault();
@@ -1526,26 +1939,26 @@
     window.location.href = 'index.html';
   });
 
-  document.querySelectorAll('.formation-link').forEach(link => {
-    link.addEventListener('click', (e) => {
-      e.preventDefault();
-      window.location.href = 'boutique.html';
-    });
-  });
-
   // ================================================================
-  // SERVICE WORKER
+  // 16. SERVICE WORKER
   // ================================================================
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/sw.js')
-        .then(reg => console.log('Service Worker enregistré'))
-        .catch(err => console.log('Erreur Service Worker:', err));
+      fetch('/sw.js')
+        .then(response => {
+          if (response.ok) {
+            navigator.serviceWorker.register('/sw.js')
+              .then(reg => console.log('✅ Service Worker enregistré'))
+              .catch(err => console.log('⚠️ Service Worker erreur:', err));
+          } else {
+            console.log('ℹ️ Service Worker non disponible');
+          }
+        })
+        .catch(() => console.log('ℹ️ Service Worker non disponible'));
     });
   }
 
-  console.log("🌿 ARVEXA - Menu fluide + formations simplifiées");
+  console.log("🚀 ARVEXA - Page d'accueil avec Actualités ARVEXA (carte fixe)");
 </script>
-
 </body>
 </html>

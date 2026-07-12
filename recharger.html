@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+  <meta name="theme-color" content="#0A0A0A">
+  <meta name="description" content="ARVEXA - Recharger votre portefeuille">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3135/3135715.png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <style>
+    /* ===== ROOT ===== */
+    :root {
+      --primary: #1A3A2A;
+      --primary-dark: #0A1A12;
+      --primary-light: #2A5A3A;
+      --accent: #B8860B;
+      --accent-dim: rgba(184, 134, 11, 0.08);
+      --success: #2D7D5A;
+      --danger: #8A3A3A;
+      --bg-dark: #0A0A0A;
+      --bg-surface: #141414;
+      --bg-card: rgba(20, 20, 20, 0.7);
+      --text-light: #F5F0E8;
+      --text-dim: #8A8A7A;
+      --text-muted: #5A5A4A;
+      --card-border: rgba(184, 134, 11, 0.06);
+      --glass-bg: rgba(26, 58, 42, 0.15);
+      --glass-border: rgba(184, 134, 11, 0.04);
+      --transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+      --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      --radius: 16px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Inter', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-light);
+      font-size: 14px;
+      line-height: 1.6;
+      min-height: 100vh;
+      overflow-x: hidden;
+      padding-bottom: 80px;
+      opacity: 0;
+      animation: pageFadeIn 0.5s ease forwards;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    @keyframes pageFadeIn {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+
+    /* ===== BACKGROUND ===== */
+    .gradient-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -2;
+      background: radial-gradient(ellipse 40% 30% at 30% 20%, rgba(26, 58, 42, 0.08) 0%, transparent 70%),
+                  linear-gradient(180deg, #0A0A0A 0%, #060606 100%);
+      pointer-events: none;
+    }
+
+    /* ===== HEADER ===== */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 5%;
+      background: rgba(10, 10, 10, 0.95);
+      backdrop-filter: blur(8px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 1px solid rgba(184, 134, 11, 0.04);
+      width: 100%;
+      max-width: 100%;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+      color: var(--text-light);
+      font-size: clamp(16px, 2.5vw, 22px);
+      font-weight: 700;
+      font-family: 'Playfair Display', 'Georgia', serif;
+      letter-spacing: 2px;
+    }
+    .logo span {
+      color: var(--accent);
+      font-style: italic;
+    }
+
+    .back-btn {
+      width: clamp(32px, 4vw, 40px);
+      height: clamp(32px, 4vw, 40px);
+      background: rgba(26, 58, 42, 0.15);
+      border: 1px solid rgba(184, 134, 11, 0.04);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-light);
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s, border-color 0.2s;
+      flex-shrink: 0;
+    }
+    .back-btn:active {
+      transform: scale(0.94);
+      background: rgba(184, 134, 11, 0.08);
+    }
+    .back-btn i {
+      font-size: clamp(14px, 1.8vw, 18px);
+    }
+
+    .header-placeholder {
+      width: clamp(32px, 4vw, 40px);
+      flex-shrink: 0;
+    }
+
+    /* ===== CONTAINER ===== */
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 16px 5% 40px;
+      width: 100%;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* ===== CARD ===== */
+    .card {
+      background: rgba(20, 20, 20, 0.7);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(184, 134, 11, 0.06);
+      border-radius: var(--radius);
+      padding: clamp(16px, 3vw, 24px);
+      margin-bottom: 18px;
+      box-shadow: var(--shadow);
+      transition: border-color 0.2s;
+      width: 100%;
+      overflow: hidden;
+    }
+    .card:hover {
+      border-color: rgba(184, 134, 11, 0.08);
+    }
+
+    /* ===== ID CARD ===== */
+    .id-card {
+      text-align: center;
+      padding: clamp(12px, 2vw, 20px);
+    }
+    .id-card-label {
+      font-size: clamp(10px, 1.2vw, 12px);
+      font-weight: 500;
+      color: #5A5A4A;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 4px;
+    }
+    .id-card-number {
+      font-family: 'Playfair Display', 'Georgia', serif;
+      font-size: clamp(24px, 5vw, 40px);
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 2px;
+      padding: clamp(8px, 1.5vw, 14px);
+      background: rgba(184, 134, 11, 0.04);
+      border-radius: 12px;
+      border: 1px dashed rgba(184, 134, 11, 0.12);
+      margin-top: 4px;
+      word-break: break-all;
+      overflow-wrap: break-word;
+    }
+    .id-card-copy {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 12px;
+      color: var(--accent);
+      font-size: clamp(11px, 1.2vw, 13px);
+      font-weight: 500;
+      cursor: pointer;
+      background: none;
+      border: none;
+      transition: color 0.2s, background 0.2s;
+      padding: 6px 14px;
+      border-radius: 30px;
+      background: rgba(184, 134, 11, 0.04);
+      border: 1px solid rgba(184, 134, 11, 0.04);
+    }
+    .id-card-copy:active {
+      transform: scale(0.96);
+      background: rgba(184, 134, 11, 0.08);
+    }
+    .id-card-copy.copied {
+      color: var(--success);
+      border-color: var(--success);
+    }
+
+    /* ===== INSTRUCTIONS ===== */
+    .instructions-card h3 {
+      font-size: clamp(15px, 2vw, 18px);
+      font-family: 'Playfair Display', 'Georgia', serif;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-light);
+    }
+    .instructions-card h3 i {
+      color: var(--accent);
+    }
+    .step-list {
+      list-style: none;
+      padding: 0;
+    }
+    .step-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: clamp(10px, 1.5vw, 14px);
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+      font-size: clamp(12px, 1.2vw, 14px);
+      color: #8A8A7A;
+      line-height: 1.5;
+    }
+    .step-list li:last-child {
+      border-bottom: none;
+    }
+    .step-number {
+      width: clamp(24px, 3vw, 28px);
+      height: clamp(24px, 3vw, 28px);
+      min-width: clamp(24px, 3vw, 28px);
+      background: rgba(184, 134, 11, 0.06);
+      border: 1px solid rgba(184, 134, 11, 0.1);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: clamp(10px, 1.2vw, 12px);
+      font-weight: 600;
+      color: var(--accent);
+      font-family: 'Playfair Display', serif;
+      flex-shrink: 0;
+    }
+    .step-highlight {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    /* ===== FORM ===== */
+    .form-label {
+      font-size: clamp(12px, 1.2vw, 14px);
+      font-weight: 500;
+      color: var(--text-light);
+      display: block;
+      margin-bottom: 6px;
+    }
+    .form-label i {
+      color: var(--accent);
+      margin-right: 6px;
+    }
+
+    .input-group {
+      display: flex;
+      align-items: center;
+      background: rgba(10, 10, 10, 0.5);
+      border: 1px solid rgba(184, 134, 11, 0.06);
+      border-radius: 12px;
+      padding: 0 clamp(10px, 1.5vw, 16px);
+      transition: border-color 0.2s, box-shadow 0.2s;
+      width: 100%;
+    }
+    .input-group:focus-within {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(184, 134, 11, 0.06);
+    }
+    .input-group .currency {
+      color: var(--accent);
+      font-weight: 700;
+      font-size: clamp(16px, 2vw, 20px);
+      margin-right: 8px;
+      flex-shrink: 0;
+    }
+    .input-group input {
+      width: 100%;
+      min-width: 0;
+      padding: clamp(12px, 1.8vw, 16px) 0;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text-light);
+      font-size: clamp(18px, 3vw, 24px);
+      font-weight: 600;
+      font-family: 'Playfair Display', 'Georgia', serif;
+    }
+    .input-group input::placeholder {
+      color: #5A5A4A;
+      font-weight: 400;
+      font-size: clamp(14px, 1.8vw, 18px);
+      font-family: 'Inter', sans-serif;
+    }
+    .input-group input::-webkit-outer-spin-button,
+    .input-group input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    .input-group input[type=number] {
+      -moz-appearance: textfield;
+    }
+
+    /* ===== CALCUL ===== */
+    .calculation-box {
+      background: rgba(184, 134, 11, 0.02);
+      border: 1px solid rgba(184, 134, 11, 0.04);
+      border-radius: 12px;
+      padding: clamp(12px, 1.5vw, 16px);
+      margin-top: 14px;
+      transition: border-color 0.3s;
+    }
+    .calculation-box.has-value {
+      border-color: rgba(184, 134, 11, 0.12);
+      background: rgba(184, 134, 11, 0.04);
+    }
+    .calc-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 4px 0;
+      font-size: clamp(12px, 1.2vw, 14px);
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+    .calc-row .label {
+      color: #8A8A7A;
+    }
+    .calc-row .value {
+      font-weight: 600;
+      text-align: right;
+    }
+    .calc-row .value.primary {
+      color: var(--accent);
+    }
+    .calc-row .value.success {
+      color: var(--success);
+    }
+    .calc-row .value.danger {
+      color: var(--danger);
+    }
+    .calc-divider {
+      border: none;
+      border-top: 1px solid rgba(255, 255, 255, 0.04);
+      margin: 8px 0;
+    }
+    .calc-total {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 0 0;
+      font-size: clamp(15px, 1.8vw, 18px);
+      font-weight: 700;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+    .calc-total .label {
+      color: var(--text-light);
+    }
+    .calc-total .value {
+      color: var(--success);
+      font-size: clamp(18px, 2.5vw, 24px);
+      font-family: 'Playfair Display', 'Georgia', serif;
+      text-align: right;
+    }
+
+    /* ===== PAYMENT METHODS ===== */
+    .payment-methods {
+      margin-bottom: 20px;
+      width: 100%;
+    }
+    .payment-methods .title {
+      font-size: clamp(12px, 1.2vw, 14px);
+      font-weight: 500;
+      color: var(--text-light);
+      margin-bottom: 12px;
+      display: block;
+    }
+    .payment-methods .title i {
+      color: var(--accent);
+      margin-right: 6px;
+    }
+    .payment-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: clamp(8px, 1.2vw, 12px);
+      justify-content: flex-start;
+    }
+    .payment-item {
+      background: rgba(20, 20, 20, 0.7);
+      border: 1px solid rgba(184, 134, 11, 0.06);
+      border-radius: 12px;
+      padding: clamp(6px, 1vw, 10px) clamp(10px, 1.5vw, 16px);
+      display: flex;
+      align-items: center;
+      gap: clamp(6px, 1vw, 10px);
+      transition: border-color 0.2s, background 0.2s;
+      flex: 0 1 auto;
+      min-width: 0;
+    }
+    .payment-item:active {
+      transform: scale(0.97);
+    }
+    .payment-item img {
+      height: clamp(18px, 2.5vw, 28px);
+      width: auto;
+      max-width: 60px;
+      object-fit: contain;
+      flex-shrink: 0;
+    }
+    .payment-item .name {
+      font-size: clamp(10px, 1vw, 12px);
+      font-weight: 400;
+      color: #8A8A7A;
+      white-space: nowrap;
+    }
+
+    /* ===== WHATSAPP BUTTON ===== */
+    .btn-whatsapp {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      padding: clamp(12px, 1.8vw, 16px);
+      background: #25D366;
+      color: #FFF;
+      border: none;
+      border-radius: 12px;
+      font-size: clamp(14px, 1.6vw, 17px);
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+      text-decoration: none;
+      font-family: 'Inter', sans-serif;
+    }
+    .btn-whatsapp:active {
+      transform: scale(0.97);
+    }
+    .btn-whatsapp:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .btn-whatsapp i {
+      font-size: clamp(18px, 2vw, 24px);
+    }
+
+    /* ===== ADMIN NOTE ===== */
+    .admin-note {
+      background: rgba(45, 125, 90, 0.04);
+      border: 1px solid rgba(45, 125, 90, 0.08);
+      border-radius: 12px;
+      padding: clamp(10px, 1.5vw, 14px) clamp(14px, 2vw, 20px);
+      font-size: clamp(11px, 1vw, 13px);
+      color: #8A8A7A;
+      text-align: center;
+      line-height: 1.6;
+      width: 100%;
+    }
+    .admin-note i {
+      color: var(--success);
+      margin-right: 6px;
+    }
+
+    /* ===== TOAST ===== */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(120px);
+      max-width: 90%;
+      width: 400px;
+      padding: 14px 20px;
+      border-radius: 14px;
+      font-size: clamp(12px, 1.2vw, 14px);
+      font-weight: 500;
+      transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      z-index: 999;
+      text-align: center;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      pointer-events: none;
+    }
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+    }
+    .toast.success {
+      background: #0D2A1F;
+      border: 1px solid #2D7D5A;
+      color: #2D7D5A;
+    }
+    .toast.error {
+      background: #2A0D0D;
+      border: 1px solid #8A3A3A;
+      color: #8A3A3A;
+    }
+    .toast.warning {
+      background: #2A1A0D;
+      border: 1px solid #B8860B;
+      color: #B8860B;
+    }
+
+    /* ============================================================
+       RESPONSIVE
+       ============================================================ */
+    @media (max-width: 400px) {
+      .container { padding: 12px 4%; }
+      .card { padding: 14px; border-radius: 14px; }
+      .id-card-number { font-size: 20px; padding: 8px; }
+      .payment-grid { gap: 6px; }
+      .payment-item { padding: 4px 10px; }
+      .payment-item .name { font-size: 9px; }
+      .payment-item img { height: 16px; }
+      .btn-whatsapp { font-size: 13px; padding: 12px; }
+    }
+
+    @media (min-width: 401px) and (max-width: 600px) {
+      .container { padding: 16px 5%; }
+      .card { padding: 18px; }
+      .id-card-number { font-size: 26px; }
+      .payment-grid { gap: 8px; }
+      .payment-item { padding: 6px 12px; }
+      .payment-item img { height: 20px; }
+      .payment-item .name { font-size: 10px; }
+    }
+
+    @media (min-width: 601px) and (max-width: 900px) {
+      .container { max-width: 700px; padding: 24px 5%; }
+      .card { padding: 24px 28px; border-radius: 18px; }
+      .id-card-number { font-size: 34px; }
+      .payment-grid { gap: 12px; }
+      .payment-item { padding: 8px 16px; }
+      .payment-item img { height: 24px; }
+      .payment-item .name { font-size: 12px; }
+    }
+
+    @media (min-width: 901px) {
+      .container { max-width: 800px; padding: 32px 5%; }
+      .card { padding: 30px 36px; border-radius: 20px; margin-bottom: 24px; }
+      .id-card-number { font-size: 42px; padding: 16px; }
+      .payment-grid { gap: 14px; }
+      .payment-item { padding: 10px 20px; border-radius: 14px; }
+      .payment-item img { height: 28px; }
+      .payment-item .name { font-size: 13px; }
+      .btn-whatsapp { padding: 18px; font-size: 18px; border-radius: 14px; }
+      .btn-whatsapp i { font-size: 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== BACKGROUND ===== -->
+<div class="gradient-bg"></div>
+
+<!-- ===== HEADER ===== -->
+<header class="header">
+  <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i></a>
+  <a href="index.html" class="logo">ARVE<span>XA</span></a>
+  <div class="header-placeholder"></div>
+</header>
+
+<!-- ===== MAIN ===== -->
+<main class="container">
+
+  <!-- ID CARD -->
+  <div class="card id-card">
+    <div class="id-card-label"><i class="fas fa-id-card"></i> VOTRE ID UNIQUE</div>
+    <div class="id-card-number" id="userIdDisplay">CHARGEMENT...</div>
+    <button class="id-card-copy" id="copyIdBtn">
+      <i class="fas fa-copy"></i> Copier mon ID
+    </button>
+  </div>
+
+  <!-- INSTRUCTIONS -->
+  <div class="card instructions-card">
+    <h3><i class="fas fa-info-circle"></i> Recharge en 3 étapes</h3>
+    <ol class="step-list">
+      <li>
+        <span class="step-number">1</span>
+        <span>Saisissez le montant que vous souhaitez recharger</span>
+      </li>
+      <li>
+        <span class="step-number">2</span>
+        <span>Envoyez le paiement via l'un des moyens ci-dessous avec votre <span class="step-highlight">ID</span> en référence</span>
+      </li>
+      <li>
+        <span class="step-number">3</span>
+        <span>Votre compte sera crédité dans les <span class="step-highlight">15-30 minutes</span> après validation par l'admin</span>
+      </li>
+    </ol>
+  </div>
+
+  <!-- MONTANT -->
+  <div class="card">
+    <label class="form-label"><i class="fas fa-coins"></i> Montant à recharger</label>
+    <div class="input-group">
+      <span class="currency">F</span>
+      <input type="number" id="amountInput" placeholder="Ex: 5000" min="100" step="100">
+    </div>
+
+    <!-- CALCUL -->
+    <div class="calculation-box" id="calculationBox">
+      <div class="calc-row">
+        <span class="label">Montant envoyé</span>
+        <span class="value primary" id="calcSent">0 F</span>
+      </div>
+      <div class="calc-row">
+        <span class="label">Frais de traitement (10%)</span>
+        <span class="value danger" id="calcFee">0 F</span>
+      </div>
+      <hr class="calc-divider">
+      <div class="calc-total">
+        <span class="label">💰 Vous recevrez</span>
+        <span class="value" id="calcReceived">0 F</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- MOYENS DE PAIEMENT -->
+  <div class="payment-methods">
+    <span class="title"><i class="fas fa-credit-card"></i> Moyens de paiement acceptés</span>
+    <div class="payment-grid">
+      <div class="payment-item">
+        <img src="images2.png" alt="Orange Money" loading="lazy">
+        <span class="name">Orange Money</span>
+      </div>
+      <div class="payment-item">
+        <img src="images.png" alt="Wave" loading="lazy">
+        <span class="name">Wave</span>
+      </div>
+      <div class="payment-item">
+        <img src="images3.png" alt="Moov Money" loading="lazy">
+        <span class="name">Moov Money</span>
+      </div>
+      <div class="payment-item">
+        <img src="images1.png" alt="Airtel Money" loading="lazy">
+        <span class="name">Airtel Money</span>
+      </div>
+      <div class="payment-item">
+        <img src="images4.png" alt="MyNita" loading="lazy">
+        <span class="name">MyNita</span>
+      </div>
+      <div class="payment-item">
+        <img src="images5.png" alt="AmanaTa" loading="lazy">
+        <span class="name">AmanaTa</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- WHATSAPP BUTTON -->
+  <a href="#" class="btn-whatsapp" id="whatsappBtn" target="_blank">
+    <i class="fab fa-whatsapp"></i>
+    Envoyer la demande via WhatsApp
+  </a>
+
+  <!-- NOTE -->
+  <div class="admin-note">
+    <i class="fas fa-shield-alt"></i>
+    Toute demande est traitée manuellement par l'administrateur.
+    <strong>Conservez votre reçu de paiement</strong>.
+  </div>
+
+</main>
+
+<!-- ===== TOAST ===== -->
+<div class="toast" id="toast"></div>
+
+<!-- ============================================================ -->
+<!-- ===== IMPORTS ===== -->
+<script type="importmap">
+  {
+    "imports": {
+      "firebase/app": "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js",
+      "firebase/auth": "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js",
+      "firebase/firestore": "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js"
+    }
+  }
+</script>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+import { 
+  getAuth, 
+  onAuthStateChanged, 
+  signOut,
+  setPersistence,
+  browserLocalPersistence
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+import { 
+  getFirestore, 
+  doc, 
+  getDoc, 
+  onSnapshot, 
+  updateDoc, 
+  setDoc,
+  addDoc,
+  collection,
+  query,
+  where,
+  getDocs,
+  orderBy,
+  enableIndexedDbPersistence
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+
+// ================================================================
+// FIREBASE CONFIG - NEXGEN
+// ================================================================
+const firebaseConfig = {
+  apiKey: "AIzaSyBEbYuuUlNCLMBUHClv4UnyownNHw2q3_g",
+  authDomain: "nexgen-39043.firebaseapp.com",
+  projectId: "nexgen-39043",
+  storageBucket: "nexgen-39043.firebasestorage.app",
+  messagingSenderId: "619390144325",
+  appId: "1:619390144325:web:35d96b125501e4e8b1782c",
+  measurementId: "G-HC2Q5DNKDR"
+};
+
+// ================================================================
+// INITIALISATION UNIQUE
+// ================================================================
+
+// 1. App
+const app = initializeApp(firebaseConfig);
+
+// 2. Auth
+const auth = getAuth(app);
+setPersistence(auth, browserLocalPersistence);
+
+// 3. Firestore (SANS configuration de cache pour éviter l'erreur)
+const db = getFirestore(app);
+
+// 4. Persistance (optionnel)
+enableIndexedDbPersistence(db)
+  .then(() => console.log('✅ Persistance activée'))
+  .catch((err) => {
+    if (err.code === 'failed-precondition') {
+      console.warn('⚠️ Persistance non disponible (onglet ouvert multiple)');
+    } else if (err.code === 'unimplemented') {
+      console.warn('⚠️ Persistance non supportée');
+    } else {
+      console.warn('⚠️ Erreur persistance:', err.message);
+    }
+  });
+  
+  // ================================================================
+  // ===== ÉLÉMENTS DOM =====
+  // ================================================================
+  const userIdDisplay = document.getElementById('userIdDisplay');
+  const copyIdBtn = document.getElementById('copyIdBtn');
+  const amountInput = document.getElementById('amountInput');
+  const calcSent = document.getElementById('calcSent');
+  const calcFee = document.getElementById('calcFee');
+  const calcReceived = document.getElementById('calcReceived');
+  const whatsappBtn = document.getElementById('whatsappBtn');
+  const toast = document.getElementById('toast');
+
+  let currentUserId = null;
+  let currentAuthUser = null;
+  let userData = null;
+
+  // ================================================================
+  // ===== CONSTANTES =====
+  // ================================================================
+  const WHATSAPP_NUMBER = "22798064667";
+  const FRAIS_POURCENTAGE = 10; // 10%
+  const MONTANT_MIN = 100;
+  const MONTANT_MAX = 1000000;
+
+  // ================================================================
+  // ===== TOAST =====
+  // ================================================================
+  function showToast(message, type = 'success') {
+    toast.textContent = message;
+    toast.className = `toast ${type}`;
+    setTimeout(() => toast.classList.add('show'), 50);
+    setTimeout(() => toast.classList.remove('show'), 4000);
+  }
+
+  // ================================================================
+  // ===== GÉNÉRATION D'ID UNIQUE =====
+  // ================================================================
+  function generateCustomerId() {
+    // Format: ARV-XXXXX-XXXXX
+    const prefix = 'ARV';
+    const timestamp = Date.now().toString(36).toUpperCase();
+    const random = Math.random().toString(36).substring(2, 7).toUpperCase();
+    return `${prefix}-${timestamp}-${random}`;
+  }
+
+  // ================================================================
+  // ===== OBTENIR L'ID UTILISATEUR =====
+  // ================================================================
+  async function getUserId(user) {
+    if (!user) return null;
+
+    try {
+      const userRef = doc(db, 'users', user.uid);
+      const userSnap = await getDoc(userRef);
+      
+      if (userSnap.exists()) {
+        const data = userSnap.data();
+        // Utiliser l'ID existant ou en générer un nouveau
+        const existingId = data.id || data.customerId;
+        if (existingId) {
+          return existingId;
+        }
+        
+        // Générer un nouvel ID
+        const newId = generateCustomerId();
+        await updateDoc(userRef, {
+          id: newId,
+          customerId: newId
+        });
+        return newId;
+      } else {
+        // Créer le document utilisateur avec un ID
+        const newId = generateCustomerId();
+        const newUser = {
+          uid: user.uid,
+          email: user.email || '',
+          prenom: user.displayName?.split(' ')[0] || 'Investisseur',
+          id: newId,
+          customerId: newId,
+          balance: 0,
+          status: 'active',
+          role: 'user',
+          createdAt: new Date().toISOString(),
+          lastLogin: new Date().toISOString()
+        };
+        await setDoc(userRef, newUser);
+        return newId;
+      }
+    } catch (error) {
+      console.warn('⚠️ Erreur Firestore, ID local utilisé:', error);
+      // Fallback: générer un ID local
+      return generateCustomerId();
+    }
+  }
+
+  // ================================================================
+  // ===== AFFICHER L'ID =====
+  // ================================================================
+  async function displayUserId(user) {
+    if (!user) {
+      window.location.href = 'login.html';
+      return;
+    }
+
+    currentAuthUser = user;
+    const id = await getUserId(user);
+    currentUserId = id;
+    userIdDisplay.textContent = id || 'ID indisponible';
+    
+    // Charger les données utilisateur
+    try {
+      const userRef = doc(db, 'users', user.uid);
+      const userSnap = await getDoc(userRef);
+      if (userSnap.exists()) {
+        userData = userSnap.data();
+      }
+    } catch (error) {
+      console.warn('⚠️ Erreur chargement données:', error);
+    }
+  }
+
+  // ================================================================
+  // ===== COPIER L'ID =====
+  // ================================================================
+  copyIdBtn.addEventListener('click', async () => {
+    const id = userIdDisplay.textContent;
+    if (!id || id === 'CHARGEMENT...') return;
+
+    try {
+      await navigator.clipboard.writeText(id);
+      copyIdBtn.innerHTML = '<i class="fas fa-check"></i> ID copié !';
+      copyIdBtn.classList.add('copied');
+      showToast('✅ ID copié dans le presse-papier', 'success');
+      
+      setTimeout(() => {
+        copyIdBtn.innerHTML = '<i class="fas fa-copy"></i> Copier mon ID';
+        copyIdBtn.classList.remove('copied');
+      }, 3000);
+    } catch {
+      // Fallback pour les navigateurs sans clipboard
+      const textarea = document.createElement('textarea');
+      textarea.value = id;
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+      showToast('✅ ID copié !', 'success');
+    }
+  });
+
+  // ================================================================
+  // ===== CALCUL DES FRAIS =====
+  // ================================================================
+  function calculateFees() {
+    const amount = parseInt(amountInput.value) || 0;
+    const fee = Math.round(amount * FRAIS_POURCENTAGE / 100);
+    const received = amount - fee;
+
+    calcSent.textContent = amount.toLocaleString('fr-FR') + ' F';
+    calcFee.textContent = fee.toLocaleString('fr-FR') + ' F';
+    calcReceived.textContent = received.toLocaleString('fr-FR') + ' F';
+
+    const box = document.getElementById('calculationBox');
+    if (amount > 0) {
+      box.classList.add('has-value');
+    } else {
+      box.classList.remove('has-value');
+    }
+
+    updateWhatsAppLink(amount);
+  }
+
+  // ================================================================
+  // ===== METTRE À JOUR LE LIEN WHATSAPP =====
+  // ================================================================
+  function updateWhatsAppLink(amount) {
+    const amountValue = amount || parseInt(amountInput.value) || 0;
+    
+    if (amountValue < MONTANT_MIN) {
+      whatsappBtn.disabled = true;
+      whatsappBtn.style.opacity = '0.5';
+      whatsappBtn.textContent = `💰 Minimum ${MONTANT_MIN} FCFA`;
+      return;
+    }
+
+    if (amountValue > MONTANT_MAX) {
+      whatsappBtn.disabled = true;
+      whatsappBtn.style.opacity = '0.5';
+      whatsappBtn.textContent = `⚠️ Maximum ${MONTANT_MAX.toLocaleString('fr-FR')} FCFA`;
+      return;
+    }
+
+    whatsappBtn.disabled = false;
+    whatsappBtn.style.opacity = '1';
+    whatsappBtn.innerHTML = `<i class="fab fa-whatsapp"></i> Envoyer la demande via WhatsApp`;
+    
+    const fee = Math.round(amountValue * FRAIS_POURCENTAGE / 100);
+    const net = amountValue - fee;
+    const message = `Bonjour ARVEXA, je souhaite recharger mon compte de ${amountValue.toLocaleString('fr-FR')} FCFA (frais ${fee} FCFA, net reçu ${net.toLocaleString('fr-FR')} FCFA). Mon ID est : ${currentUserId}`;
+    whatsappBtn.href = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+  }
+
+  // ================================================================
+  // ===== ENVOI VIA WHATSAPP =====
+  // ================================================================
+  whatsappBtn.addEventListener('click', async (event) => {
+    event.preventDefault();
+
+    const amount = parseInt(amountInput.value, 10) || 0;
+    if (!currentAuthUser || !currentUserId) {
+      showToast('⚠️ Veuillez vous reconnecter pour poursuivre.', 'error');
+      return;
+    }
+
+    if (amount < MONTANT_MIN) {
+      showToast(`⚠️ Le montant minimum est de ${MONTANT_MIN} FCFA.`, 'error');
+      return;
+    }
+
+    if (amount > MONTANT_MAX) {
+      showToast(`⚠️ Le montant maximum est de ${MONTANT_MAX.toLocaleString('fr-FR')} FCFA.`, 'error');
+      return;
+    }
+
+    try {
+      const fee = Math.round(amount * FRAIS_POURCENTAGE / 100);
+      const net = amount - fee;
+
+      // Enregistrer la demande dans Firestore
+      await addDoc(collection(db, 'depots'), {
+        userId: currentAuthUser.uid,
+        displayId: currentUserId,
+        userName: userData?.prenom || userData?.fullName || 'Utilisateur',
+        userEmail: userData?.email || currentAuthUser.email,
+        montant: amount,
+        frais: fee,
+        net: net,
+        date: new Date().toISOString().split('T')[0],
+        timestamp: new Date().toISOString(),
+        statut: 'en_attente',
+        type: 'recharge',
+        source: 'whatsapp',
+        paymentMethod: 'whatsapp'
+      });
+
+      showToast(`✅ Demande de recharge de ${amount.toLocaleString('fr-FR')} FCFA enregistrée.`, 'success');
+      
+      // Ouvrir WhatsApp
+      window.open(whatsappBtn.href, '_blank', 'noopener,noreferrer');
+      
+      // Réinitialiser le montant
+      amountInput.value = '';
+      calculateFees();
+      
+    } catch (error) {
+      console.error('❌ Erreur enregistrement recharge:', error);
+      showToast('❌ Erreur lors de l\'enregistrement de la recharge.', 'error');
+    }
+  });
+
+  // ================================================================
+  // ===== ÉVÉNEMENTS =====
+  // ================================================================
+  amountInput.addEventListener('input', calculateFees);
+
+  // ================================================================
+  // ===== AUTH =====
+  // ================================================================
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      await displayUserId(user);
+      localStorage.setItem('ARVEXA_current_user', user.uid);
+    } else {
+      const savedUid = localStorage.getItem('ARVEXA_current_user');
+      if (savedUid) {
+        // Attendre un peu pour voir si la connexion se rétablit
+        setTimeout(() => {
+          if (!auth.currentUser) {
+            window.location.href = 'login.html';
+          }
+        }, 2000);
+      } else {
+        window.location.href = 'login.html';
+      }
+    }
+  });
+
+  console.log("💰 ARVEXA - Page Recharger (version corrigée)");
+</script>
+</body>
+</html>
