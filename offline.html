@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ARVEXA - Hors ligne</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #0A0A0A;
+      color: #F5F0E8;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 20px;
+    }
+    .offline-container {
+      max-width: 400px;
+      padding: 40px 30px;
+      background: rgba(20, 20, 20, 0.8);
+      border-radius: 16px;
+      border: 1px solid rgba(184, 134, 11, 0.06);
+    }
+    .offline-icon {
+      font-size: 64px;
+      margin-bottom: 20px;
+      display: block;
+      opacity: 0.5;
+    }
+    h1 {
+      font-family: 'Georgia', serif;
+      font-size: 24px;
+      color: #B8860B;
+      margin-bottom: 12px;
+    }
+    p {
+      color: #8A8A7A;
+      font-size: 14px;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+    .btn-retry {
+      padding: 12px 30px;
+      background: #B8860B;
+      border: none;
+      border-radius: 12px;
+      color: #0A0A0A;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-retry:hover {
+      background: #9A7209;
+    }
+    .btn-retry:active {
+      transform: scale(0.97);
+    }
+  </style>
+</head>
+<body>
+  <div class="offline-container">
+    <span class="offline-icon">📶</span>
+    <h1>Vous êtes hors ligne</h1>
+    <p>Une connexion Internet est nécessaire pour accéder à ARVEXA.<br>Vérifiez votre connexion et réessayez.</p>
+    <button class="btn-retry" onclick="location.reload()">🔄 Réessayer</button>
+  </div>
+</body>
+</html>
