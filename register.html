@@ -1,0 +1,1377 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+  <meta name="theme-color" content="#0A0A0A">
+  <meta name="description" content="ARVEXA - Créer votre compte">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3135/3135715.png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <style>
+    /* ===== ROOT ===== */
+    :root {
+      --primary: #1A3A2A;
+      --primary-dark: #0A1A12;
+      --primary-light: #2A5A3A;
+      --accent: #B8860B;
+      --accent-dim: rgba(184, 134, 11, 0.08);
+      --success: #2D7D5A;
+      --bg-dark: #0A0A0A;
+      --bg-surface: #141414;
+      --bg-card: rgba(20, 20, 20, 0.7);
+      --text-light: #F5F0E8;
+      --text-dim: #8A8A7A;
+      --text-muted: #5A5A4A;
+      --card-border: rgba(184, 134, 11, 0.06);
+      --glass-bg: rgba(26, 58, 42, 0.15);
+      --glass-border: rgba(184, 134, 11, 0.04);
+      --transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+      --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      --radius: 16px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Inter', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-light);
+      font-size: 14px;
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* ===== BACKGROUND ===== */
+    .gradient-bg {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: -2;
+      background: radial-gradient(ellipse 40% 30% at 30% 20%, rgba(26, 58, 42, 0.12) 0%, transparent 70%),
+                  radial-gradient(ellipse 30% 20% at 70% 80%, rgba(184, 134, 11, 0.02) 0%, transparent 60%),
+                  linear-gradient(180deg, #0A0A0A 0%, #060606 100%);
+    }
+
+    .glow {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: -1;
+      opacity: 0.15;
+      animation: glowMove 10s ease-in-out infinite alternate;
+    }
+    .glow-1 { width: 350px; height: 350px; background: rgba(26,58,42,0.15); top: -80px; right: -80px; }
+    .glow-2 { width: 200px; height: 200px; background: rgba(184,134,11,0.03); bottom: 0; left: 0; animation-delay: -4s; }
+    .glow-3 { width: 250px; height: 250px; background: rgba(26,58,42,0.08); top: 40%; left: 50%; transform: translate(-50%,-50%); animation-delay: -8s; }
+    @keyframes glowMove {
+      0% { transform: translate(0,0) scale(1); }
+      100% { transform: translate(30px,-20px) scale(1.1); }
+    }
+
+    /* ===== HEADER ===== */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 5%;
+      background: rgba(10, 10, 10, 0.95);
+      backdrop-filter: blur(12px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 1px solid var(--glass-border);
+    }
+
+    .logo-text {
+      font-size: 18px;
+      font-weight: 700;
+      font-family: 'Playfair Display', 'Georgia', serif;
+      letter-spacing: 2px;
+      color: var(--text-light);
+      text-decoration: none;
+    }
+    .logo-text span {
+      color: var(--accent);
+      font-style: italic;
+    }
+
+    .login-link {
+      color: var(--text-dim);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 400;
+      padding: 6px 14px;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 30px;
+      transition: var(--transition);
+    }
+    .login-link:active {
+      transform: scale(0.96);
+    }
+
+    /* ===== CONTAINER ===== */
+    .container {
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 20px 16px 40px;
+      width: 100%;
+      flex: 1;
+    }
+
+    /* ===== CARD ===== */
+    .register-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(14px);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 28px 22px;
+      animation: fadeInUp 0.6s ease-out;
+      box-shadow: var(--shadow);
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .register-header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    .register-header h1 {
+      font-size: 26px;
+      font-weight: 700;
+      font-family: 'Playfair Display', 'Georgia', serif;
+      color: var(--text-light);
+    }
+    .register-header h1 span {
+      color: var(--accent);
+      font-style: italic;
+    }
+    .register-header p {
+      color: var(--text-dim);
+      font-size: 13px;
+      font-weight: 300;
+      margin-top: 4px;
+    }
+
+    /* ===== MESSAGES ===== */
+    .message-banner {
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      animation: fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .message-banner.error {
+      background: rgba(184, 134, 11, 0.1);
+      border: 1px solid rgba(184, 134, 11, 0.2);
+      color: var(--accent);
+    }
+    .message-banner.success {
+      background: rgba(45, 125, 90, 0.1);
+      border: 1px solid rgba(45, 125, 90, 0.2);
+      color: var(--success);
+    }
+    .message-banner.warning {
+      background: rgba(184, 134, 11, 0.08);
+      border: 1px solid rgba(184, 134, 11, 0.15);
+      color: #D4A017;
+    }
+    .hidden { display: none; }
+
+    /* ===== FORM ===== */
+    .form-group {
+      margin-bottom: 18px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+    }
+
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      background: rgba(10, 10, 10, 0.6);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      transition: var(--transition);
+    }
+    .input-wrapper:focus-within {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(184, 134, 11, 0.08);
+    }
+    .input-wrapper .icon-left {
+      position: absolute;
+      left: 14px;
+      color: var(--text-muted);
+      font-size: 14px;
+      pointer-events: none;
+      z-index: 2;
+    }
+    .input-wrapper input,
+    .input-wrapper select {
+      width: 100%;
+      padding: 12px 14px 12px 44px;
+      background: transparent;
+      border: none;
+      color: var(--text-light);
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+    }
+    .input-wrapper input::placeholder {
+      color: var(--text-muted);
+      opacity: 0.5;
+    }
+    .input-wrapper .toggle-password {
+      position: absolute;
+      right: 14px;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 14px;
+      z-index: 2;
+    }
+    .input-wrapper .toggle-password:hover {
+      color: var(--accent);
+    }
+
+    /* ===== ROW 2 COLS ===== */
+    .row-2cols {
+      display: flex;
+      gap: 14px;
+    }
+    .row-2cols .form-group {
+      flex: 1;
+    }
+
+    /* ===== COUNTRY SELECTOR ===== */
+    .country-selector {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px 12px 44px;
+      background: rgba(10, 10, 10, 0.6);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: var(--transition);
+      position: relative;
+    }
+    .country-selector:active {
+      transform: scale(0.98);
+    }
+    .country-selector:focus-within {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(184, 134, 11, 0.08);
+    }
+    .country-selector .icon-left {
+      position: absolute;
+      left: 14px;
+      color: var(--text-muted);
+      font-size: 14px;
+      pointer-events: none;
+      z-index: 2;
+    }
+    .country-selector-display {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+    }
+    .country-selector-display .flag {
+      font-size: 22px;
+    }
+    .country-selector-display .name {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-light);
+    }
+    .country-selector .arrow {
+      color: var(--text-muted);
+      font-size: 12px;
+      transition: var(--transition);
+    }
+
+    /* ===== PHONE WITH INDICATIF ===== */
+    .phone-wrapper {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      background: rgba(10, 10, 10, 0.6);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      transition: var(--transition);
+      padding-right: 4px;
+    }
+    .phone-wrapper:focus-within {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(184, 134, 11, 0.08);
+    }
+    .phone-wrapper select {
+      padding: 12px 8px 12px 14px;
+      background: transparent;
+      border: none;
+      color: var(--accent);
+      font-weight: 600;
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+      min-width: 70px;
+      appearance: none;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23B8860B' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
+      background-repeat: no-repeat;
+      background-position: right 4px center;
+      background-size: 12px;
+      padding-right: 22px;
+    }
+    .phone-wrapper select option {
+      background: var(--bg-dark);
+      color: var(--text-light);
+    }
+    .phone-wrapper input {
+      flex: 1;
+      padding: 12px 14px 12px 6px;
+      background: transparent;
+      border: none;
+      color: var(--text-light);
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+      min-width: 0;
+    }
+    .phone-wrapper input::placeholder {
+      color: var(--text-muted);
+      opacity: 0.5;
+    }
+
+    /* ===== REFERRAL ===== */
+    .referral-wrapper {
+      background: rgba(184, 134, 11, 0.03);
+      border: 1px solid rgba(184, 134, 11, 0.06);
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-bottom: 18px;
+    }
+    .referral-wrapper .referral-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--accent);
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+    .referral-wrapper .referral-label i {
+      color: var(--accent);
+    }
+    .referral-wrapper .input-wrapper {
+      background: rgba(10, 10, 10, 0.4);
+    }
+    .referral-wrapper .input-wrapper input {
+      padding-left: 14px;
+    }
+    .referral-info {
+      font-size: 11px;
+      margin-top: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .referral-info.valid { color: var(--success); }
+    .referral-info.invalid { color: #D4A017; }
+    .referral-info i { font-size: 11px; }
+
+    /* ===== SOCIAL BUTTONS ===== */
+    .social-divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 22px 0 18px;
+    }
+    .social-divider::before,
+    .social-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      opacity: 0.15;
+    }
+    .social-divider span {
+      color: var(--text-muted);
+      font-size: 11px;
+      font-weight: 300;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .social-btn {
+      width: 100%;
+      padding: 12px;
+      background: rgba(10, 10, 10, 0.6);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      color: var(--text-light);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-family: inherit;
+    }
+    .social-btn:active {
+      transform: scale(0.98);
+    }
+    .social-btn:hover {
+      border-color: rgba(184, 134, 11, 0.15);
+      background: rgba(10, 10, 10, 0.8);
+    }
+    .social-btn.google {
+      color: #EA4335;
+    }
+    .social-btn.google i {
+      font-size: 18px;
+    }
+
+    /* ===== SUBMIT ===== */
+    .submit-btn {
+      width: 100%;
+      padding: 14px;
+      background: var(--accent);
+      border: none;
+      border-radius: 12px;
+      color: var(--bg-dark);
+      font-weight: 700;
+      font-size: 15px;
+      cursor: pointer;
+      transition: var(--transition);
+      font-family: inherit;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 6px;
+    }
+    .submit-btn:active {
+      transform: scale(0.97);
+    }
+    .submit-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .submit-btn .loader {
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      border: 2px solid var(--bg-dark);
+      border-radius: 50%;
+      border-top-color: transparent;
+      animation: spin 0.6s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .login-footer {
+      text-align: center;
+      margin-top: 22px;
+      font-size: 13px;
+      color: var(--text-dim);
+    }
+    .login-footer a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    /* ============================================================
+       COUNTRY MODAL
+       ============================================================ */
+    .country-modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(3, 3, 5, 0.96);
+      backdrop-filter: blur(16px);
+      z-index: 2000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .country-modal-overlay.show {
+      opacity: 1;
+      visibility: visible;
+    }
+    .country-modal {
+      background: var(--bg-card);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(184, 134, 11, 0.15);
+      border-radius: var(--radius);
+      width: 100%;
+      max-width: 380px;
+      max-height: 80vh;
+      overflow: hidden;
+      transform: scale(0.9);
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .country-modal-overlay.show .country-modal {
+      transform: scale(1);
+    }
+    .country-modal-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--glass-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .country-modal-header h3 {
+      font-size: 18px;
+      font-weight: 700;
+      font-family: 'Playfair Display', 'Georgia', serif;
+      color: var(--text-light);
+    }
+    .country-modal-header h3 span {
+      color: var(--accent);
+      font-style: italic;
+    }
+    .country-modal-close {
+      width: 34px; height: 34px;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: var(--transition);
+      color: var(--text-dim);
+    }
+    .country-modal-close:active {
+      transform: scale(0.94);
+    }
+    .country-modal-search {
+      padding: 12px 20px;
+      border-bottom: 1px solid var(--glass-border);
+    }
+    .country-modal-search input {
+      width: 100%;
+      padding: 12px 16px;
+      background: rgba(10, 10, 10, 0.6);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      color: var(--text-light);
+      font-size: 13px;
+      font-family: inherit;
+      outline: none;
+    }
+    .country-modal-search input:focus {
+      border-color: var(--accent);
+    }
+    .country-modal-list {
+      padding: 8px 8px 16px;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    .country-modal-list::-webkit-scrollbar {
+      width: 3px;
+    }
+    .country-modal-list::-webkit-scrollbar-track {
+      background: rgba(255,255,255,0.02);
+      border-radius: 10px;
+    }
+    .country-modal-list::-webkit-scrollbar-thumb {
+      background: var(--accent);
+      border-radius: 10px;
+      opacity: 0.3;
+    }
+    .country-option {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: var(--transition);
+      margin-bottom: 2px;
+    }
+    .country-option:active {
+      background: rgba(184, 134, 11, 0.06);
+      transform: scale(0.98);
+    }
+    .country-option.selected {
+      background: rgba(184, 134, 11, 0.08);
+      border: 1px solid rgba(184, 134, 11, 0.12);
+    }
+    .country-option-flag {
+      font-size: 22px;
+    }
+    .country-option-name {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-light);
+    }
+    .country-option-code {
+      margin-left: auto;
+      font-size: 12px;
+      color: var(--accent);
+      font-family: monospace;
+      opacity: 0.7;
+    }
+
+    /* ============================================================
+       RESPONSIVE
+       ============================================================ */
+    @media (max-width: 480px) {
+      .row-2cols {
+        flex-direction: column;
+        gap: 0;
+      }
+      .register-card {
+        padding: 20px 16px;
+      }
+      .register-header h1 {
+        font-size: 22px;
+      }
+      .phone-wrapper select {
+        min-width: 60px;
+        font-size: 13px;
+      }
+      .country-modal {
+        max-width: 100%;
+        margin: 10px;
+        border-radius: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== NETTOYAGE CACHE AU CHARGEMENT ===== -->
+<script>
+  console.log("🧹 Nettoyage du cache au chargement de register.html");
+  sessionStorage.clear();
+</script>
+
+<!-- ===== BACKGROUND ===== -->
+<div class="gradient-bg"></div>
+<div class="glow glow-1"></div>
+<div class="glow glow-2"></div>
+<div class="glow glow-3"></div>
+
+<!-- ===== HEADER ===== -->
+<header class="header">
+  <a href="index.html" class="logo-text">ARVE<span>XA</span></a>
+  <a href="login.html" class="login-link"><i class="fas fa-sign-in-alt"></i> Connexion</a>
+</header>
+
+<!-- ===== MAIN ===== -->
+<main class="container">
+  <div class="register-card">
+    <div class="register-header">
+      <h1>Créer un <span>compte</span></h1>
+      <p>Rejoignez ARVEXA et commencez à investir</p>
+    </div>
+
+    <!-- MESSAGE BANNER -->
+    <div id="messageBanner" class="message-banner hidden">
+      <i id="messageIcon" class="fas fa-info-circle"></i>
+      <span id="messageText"></span>
+    </div>
+
+    <!-- FORM -->
+    <form id="registerForm">
+      <!-- Nom & Prénom -->
+      <div class="row-2cols">
+        <div class="form-group">
+          <label>Nom</label>
+          <div class="input-wrapper">
+            <i class="fas fa-user icon-left"></i>
+            <input type="text" id="nom" placeholder="Votre nom" autocomplete="off">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Prénom</label>
+          <div class="input-wrapper">
+            <i class="fas fa-user icon-left"></i>
+            <input type="text" id="prenom" placeholder="Votre prénom" autocomplete="off">
+          </div>
+        </div>
+      </div>
+
+      <!-- Email -->
+      <div class="form-group">
+        <label>Email</label>
+        <div class="input-wrapper">
+          <i class="fas fa-envelope icon-left"></i>
+          <input type="email" id="email" placeholder="exemple@email.com" autocomplete="off">
+        </div>
+      </div>
+
+      <!-- Pays avec modal -->
+      <div class="form-group">
+        <label>Pays</label>
+        <div class="country-selector" id="countrySelector">
+          <i class="fas fa-globe-africa icon-left"></i>
+          <div class="country-selector-display">
+            <span class="flag" id="selectedCountryFlag">🇳🇪</span>
+            <span class="name" id="selectedCountryName">Niger</span>
+          </div>
+          <i class="fas fa-chevron-down arrow"></i>
+        </div>
+        <input type="hidden" id="pays" value="Niger">
+      </div>
+
+      <!-- Téléphone -->
+      <div class="form-group">
+        <label>Téléphone</label>
+        <div class="phone-wrapper">
+          <select id="indicatif">
+            <option value="+227">+227</option>
+            <option value="+229">+229</option>
+            <option value="+223">+223</option>
+            <option value="+226">+226</option>
+            <option value="+221">+221</option>
+            <option value="+225">+225</option>
+            <option value="+228">+228</option>
+            <option value="+224">+224</option>
+            <option value="+233">+233</option>
+            <option value="+237">+237</option>
+            <option value="+234">+234</option>
+            <option value="+235">+235</option>
+          </select>
+          <input type="tel" id="telephone" placeholder="Numéro (ex: 90123456)" autocomplete="off">
+        </div>
+      </div>
+
+      <!-- Mot de passe -->
+      <div class="form-group">
+        <label>Mot de passe</label>
+        <div class="input-wrapper">
+          <i class="fas fa-lock icon-left"></i>
+          <input type="password" id="password" placeholder="Minimum 6 caractères">
+          <i class="fas fa-eye toggle-password" id="togglePassword"></i>
+        </div>
+      </div>
+
+      <!-- Confirmation -->
+      <div class="form-group">
+        <label>Confirmer le mot de passe</label>
+        <div class="input-wrapper">
+          <i class="fas fa-lock icon-left"></i>
+          <input type="password" id="confirmPassword" placeholder="Répétez le mot de passe">
+        </div>
+      </div>
+
+      <!-- Code de parrainage -->
+      <div class="referral-wrapper">
+        <div class="referral-label">
+          <i class="fas fa-gift"></i> Code de parrainage (optionnel)
+        </div>
+        <div class="input-wrapper">
+          <input type="text" id="referralCode" placeholder="Code de votre parrain" autocomplete="off">
+        </div>
+        <div id="referralInfo" class="referral-info" style="display: none;">
+          <i class="fas fa-spinner fa-spin"></i>
+          <span id="referralMessage">Vérification...</span>
+        </div>
+      </div>
+
+      <!-- Bouton inscription -->
+      <button type="submit" class="submit-btn" id="registerBtn">
+        <i class="fas fa-user-plus"></i> Créer mon compte
+      </button>
+
+      <!-- Divider social -->
+      <div class="social-divider">
+        <span>ou</span>
+      </div>
+
+      <!-- Google button -->
+      <button type="button" class="social-btn google" id="googleBtn">
+        <i class="fab fa-google"></i> S'inscrire avec Google
+      </button>
+    </form>
+
+    <div class="login-footer">
+      Déjà membre ? <a href="login.html">Connectez-vous</a>
+    </div>
+  </div>
+</main>
+
+<!-- ===== COUNTRY MODAL ===== -->
+<div class="country-modal-overlay" id="countryModal">
+  <div class="country-modal">
+    <div class="country-modal-header">
+      <h3>Sélectionnez votre <span>pays</span></h3>
+      <div class="country-modal-close" id="closeCountryModalBtn">
+        <i class="fas fa-times"></i>
+      </div>
+    </div>
+    <div class="country-modal-search">
+      <input type="text" id="countrySearch" placeholder="🔍 Rechercher un pays..." autocomplete="off">
+    </div>
+    <div class="country-modal-list" id="countryList"></div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- ===== IMPORTS ===== -->
+<script type="importmap">
+  {
+    "imports": {
+      "firebase/app": "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js",
+      "firebase/auth": "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js",
+      "firebase/firestore": "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js"
+    }
+  }
+</script>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+  import { 
+    getAuth, 
+    createUserWithEmailAndPassword,
+    signInWithPopup,
+    GoogleAuthProvider,
+    sendEmailVerification,
+    setPersistence,
+    browserLocalPersistence,
+    onAuthStateChanged
+  } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+  import { 
+    getFirestore, 
+    doc, 
+    setDoc, 
+    getDoc, 
+    collection, 
+    query, 
+    where, 
+    getDocs,
+    updateDoc
+  } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+
+  // ===== FIREBASE CONFIG (NexGen) =====
+  const firebaseConfig = {
+    apiKey: "AIzaSyBEbYuuUlNCLMBUHClv4UnyownNHw2q3_g",
+    authDomain: "nexgen-39043.firebaseapp.com",
+    projectId: "nexgen-39043",
+    storageBucket: "nexgen-39043.firebasestorage.app",
+    messagingSenderId: "619390144325",
+    appId: "1:619390144325:web:35d96b125501e4e8b1782c",
+    measurementId: "G-HC2Q5DNKDR"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  // Persistance locale
+  setPersistence(auth, browserLocalPersistence);
+
+  // ===== PAYS =====
+  const countries = [
+    { name: "Niger", flag: "🇳🇪", code: "+227" },
+    { name: "Bénin", flag: "🇧🇯", code: "+229" },
+    { name: "Mali", flag: "🇲🇱", code: "+223" },
+    { name: "Burkina Faso", flag: "🇧🇫", code: "+226" },
+    { name: "Sénégal", flag: "🇸🇳", code: "+221" },
+    { name: "Côte d'Ivoire", flag: "🇨🇮", code: "+225" },
+    { name: "Togo", flag: "🇹🇬", code: "+228" },
+    { name: "Guinée", flag: "🇬🇳", code: "+224" },
+    { name: "Ghana", flag: "🇬🇭", code: "+233" },
+    { name: "Cameroun", flag: "🇨🇲", code: "+237" },
+    { name: "Nigéria", flag: "🇳🇬", code: "+234" },
+    { name: "Tchad", flag: "🇹🇩", code: "+235" },
+    { name: "Maroc", flag: "🇲🇦", code: "+212" }
+  ];
+
+  let selectedCountry = "Niger";
+  let selectedFlag = "🇳🇪";
+  let selectedCode = "+227";
+
+  // ===== DOM =====
+  const registerForm = document.getElementById('registerForm');
+  const registerBtn = document.getElementById('registerBtn');
+  const googleBtn = document.getElementById('googleBtn');
+  const messageBanner = document.getElementById('messageBanner');
+  const messageIcon = document.getElementById('messageIcon');
+  const messageText = document.getElementById('messageText');
+  const togglePassword = document.getElementById('togglePassword');
+  const passwordInput = document.getElementById('password');
+
+  // Pays
+  const countrySelector = document.getElementById('countrySelector');
+  const selectedCountryFlag = document.getElementById('selectedCountryFlag');
+  const selectedCountryName = document.getElementById('selectedCountryName');
+  const paysInput = document.getElementById('pays');
+  const countryModal = document.getElementById('countryModal');
+  const closeCountryModalBtn = document.getElementById('closeCountryModalBtn');
+  const countrySearch = document.getElementById('countrySearch');
+  const countryList = document.getElementById('countryList');
+
+  // Référence
+  const referralCodeInput = document.getElementById('referralCode');
+  const referralInfo = document.getElementById('referralInfo');
+  const referralMessage = document.getElementById('referralMessage');
+
+  // ===== TOGGLE PASSWORD =====
+  togglePassword.addEventListener('click', () => {
+    const type = passwordInput.type === 'password' ? 'text' : 'password';
+    passwordInput.type = type;
+    togglePassword.classList.toggle('fa-eye');
+    togglePassword.classList.toggle('fa-eye-slash');
+  });
+
+  // ===== MESSAGE =====
+  function showMessage(text, type = 'error') {
+    messageBanner.className = `message-banner ${type}`;
+    messageIcon.className = type === 'error' ? 'fas fa-exclamation-circle' : 
+                           (type === 'success' ? 'fas fa-check-circle' : 'fas fa-info-circle');
+    messageText.textContent = text;
+    messageBanner.classList.remove('hidden');
+    if (type === 'success') {
+      setTimeout(() => messageBanner.classList.add('hidden'), 5000);
+    }
+  }
+
+  function hideMessage() {
+    messageBanner.classList.add('hidden');
+  }
+  
+   // ===== COUNTRY MODAL =====
+  function openCountryModal() {
+    countryModal.classList.add('show');
+    countrySearch.value = '';
+    renderCountryList();
+    setTimeout(() => countrySearch.focus(), 200);
+  }
+  function closeCountryModal() {
+    countryModal.classList.remove('show');
+  }
+  function selectCountry(name, flag, code) {
+    selectedCountry = name;
+    selectedFlag = flag;
+    selectedCode = code;
+    selectedCountryFlag.textContent = flag;
+    selectedCountryName.textContent = name;
+    paysInput.value = name;
+    const indicatifSelect = document.getElementById('indicatif');
+    for (let i = 0; i < indicatifSelect.options.length; i++) {
+      if (indicatifSelect.options[i].value === code) {
+        indicatifSelect.selectedIndex = i;
+        break;
+      }
+    }
+    closeCountryModal();
+  }
+  function renderCountryList(filter = "") {
+    const filtered = countries.filter(c => 
+      c.name.toLowerCase().includes(filter.toLowerCase()) ||
+      c.code.includes(filter)
+    );
+    countryList.innerHTML = filtered.map(c => `
+      <div class="country-option ${c.name === selectedCountry ? 'selected' : ''}"
+           data-name="${c.name}" data-flag="${c.flag}" data-code="${c.code}">
+        <span class="country-option-flag">${c.flag}</span>
+        <span class="country-option-name">${c.name}</span>
+        <span class="country-option-code">${c.code}</span>
+      </div>
+    `).join('');
+    document.querySelectorAll('.country-option').forEach(opt => {
+      opt.addEventListener('click', () => {
+        const name = opt.dataset.name;
+        const flag = opt.dataset.flag;
+        const code = opt.dataset.code;
+        selectCountry(name, flag, code);
+      });
+    });
+  }
+
+  countrySelector.addEventListener('click', openCountryModal);
+  closeCountryModalBtn.addEventListener('click', closeCountryModal);
+  countryModal.addEventListener('click', (e) => {
+    if (e.target === countryModal) closeCountryModal();
+  });
+  countrySearch.addEventListener('input', (e) => renderCountryList(e.target.value));
+
+  document.getElementById('indicatif').addEventListener('change', (e) => {
+    const code = e.target.value;
+    const country = countries.find(c => c.code === code);
+    if (country) {
+      selectCountry(country.name, country.flag, country.code);
+    }
+  });
+
+  // ================================================================
+  // ===== VÉRIFICATION CODE PARRAINAGE (EN TEMPS RÉEL) =====
+  // ================================================================
+  let referralCheckStatus = { valid: false, parrainId: null, checked: false };
+
+  async function checkReferralCode(code) {
+    if (!code || code.length < 4) {
+      referralInfo.style.display = 'none';
+      referralCheckStatus = { valid: false, parrainId: null, checked: false };
+      return null;
+    }
+    referralInfo.style.display = 'flex';
+    referralMessage.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Vérification...';
+    referralInfo.className = 'referral-info';
+
+    try {
+      const normalizedCode = code.trim().toUpperCase();
+      const usersRef = collection(db, "users");
+      const q = query(usersRef, where("referralCode", "==", normalizedCode));
+      const snapshot = await getDocs(q);
+
+      if (!snapshot.empty) {
+        const parrainId = snapshot.docs[0].id;
+        referralMessage.innerHTML = '<i class="fas fa-check-circle"></i> ✅ Code valide !';
+        referralInfo.className = 'referral-info valid';
+        referralCheckStatus = { valid: true, parrainId, checked: true };
+        return parrainId;
+      } else {
+        referralMessage.innerHTML = '<i class="fas fa-exclamation-triangle"></i> ⚠️ Code invalide.';
+        referralInfo.className = 'referral-info invalid';
+        referralCheckStatus = { valid: false, parrainId: null, checked: true };
+        return null;
+      }
+    } catch (error) {
+      console.error("❌ Erreur vérification:", error);
+      referralMessage.innerHTML = '<i class="fas fa-exclamation-circle"></i> Erreur';
+      referralInfo.className = 'referral-info invalid';
+      referralCheckStatus = { valid: false, parrainId: null, checked: true };
+      return null;
+    }
+  }
+
+  let debounceTimer;
+  referralCodeInput.addEventListener('input', (e) => {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
+      checkReferralCode(e.target.value);
+    }, 500);
+  });
+
+  // ================================================================
+  // ===== LECTURE DU CODE PARRAINAGE DEPUIS L'URL =====
+  // ================================================================
+  const urlParams = new URLSearchParams(window.location.search);
+  const refCode = urlParams.get('ref');
+  if (refCode) {
+    referralCodeInput.value = refCode;
+    setTimeout(() => checkReferralCode(refCode), 300);
+  }
+
+  // ================================================================
+  // ===== GÉNÉRATION CODE PARRAINAGE UNIQUE =====
+  // ================================================================
+  async function generateUniqueReferralCode(uid, prenom, nom) {
+    const base = (prenom.substring(0, 3) + nom.substring(0, 3) + uid.substring(0, 4)).toUpperCase().replace(/[^A-Z0-9]/g, '');
+    let code = base.length >= 4 ? base.substring(0, 8) : base + uid.substring(0, 4);
+    if (code.length < 4) code = code + Math.random().toString(36).substring(2, 6).toUpperCase();
+    let isUnique = false;
+    let attempts = 0;
+    let finalCode = code;
+    while (!isUnique && attempts < 5) {
+      const usersRef = collection(db, "users");
+      const q = query(usersRef, where("referralCode", "==", finalCode));
+      const snapshot = await getDocs(q);
+      if (snapshot.empty) {
+        isUnique = true;
+      } else {
+        finalCode = code + Math.random().toString(36).substring(2, 5).toUpperCase();
+        attempts++;
+      }
+    }
+    return finalCode;
+  }
+
+  // ================================================================
+  // ===== CRÉDIT PARRAIN (500 FCFA) =====
+  // ================================================================
+  async function creditReferralReward(parrainUid) {
+    if (!parrainUid) return false;
+    try {
+      const parrainRef = doc(db, "users", parrainUid);
+      const parrainDoc = await getDoc(parrainRef);
+      if (!parrainDoc.exists()) return false;
+      const data = parrainDoc.data();
+      await updateDoc(parrainRef, {
+        balance: (data.balance || 0) + 500,
+        referralBalance: (data.referralBalance || 0) + 500,
+        referralsCount: (data.referralsCount || 0) + 1,
+        referralEarnings: (data.referralEarnings || 0) + 500,
+        lastReferral: new Date().toISOString()
+      });
+      return true;
+    } catch (error) {
+      console.error("❌ Erreur crédit parrain:", error);
+      return false;
+    }
+  }
+
+  // ================================================================
+  // ===== INSCRIPTION =====
+  // ================================================================
+  registerForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    hideMessage();
+
+    const nom = document.getElementById('nom').value.trim();
+    const prenom = document.getElementById('prenom').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const telephone = document.getElementById('telephone').value.trim();
+    const password = document.getElementById('password').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    const pays = document.getElementById('pays').value;
+    const indicatif = document.getElementById('indicatif').value;
+    const referralCode = document.getElementById('referralCode').value.trim().toUpperCase();
+
+    // Validations
+    if (!nom || !prenom || !email || !telephone || !password) {
+      showMessage('Tous les champs sont obligatoires.', 'error');
+      return;
+    }
+    if (nom.length < 2 || prenom.length < 2) {
+      showMessage('Le nom et prénom doivent contenir au moins 2 caractères.', 'error');
+      return;
+    }
+    if (!email.includes('@') || !email.includes('.')) {
+      showMessage('Email invalide.', 'error');
+      return;
+    }
+    const cleanPhone = telephone.replace(/\D/g, '');
+    if (cleanPhone.length < 7) {
+      showMessage('Numéro de téléphone invalide.', 'error');
+      return;
+    }
+    if (password.length < 6) {
+      showMessage('Le mot de passe doit contenir au moins 6 caractères.', 'error');
+      return;
+    }
+    if (password !== confirmPassword) {
+      showMessage('Les mots de passe ne correspondent pas.', 'error');
+      return;
+    }
+
+    let parrainId = null;
+    if (referralCode && referralCode.length >= 4) {
+      const result = await checkReferralCode(referralCode);
+      if (result) {
+        parrainId = result;
+      } else {
+        showMessage(`⚠️ Le code "${referralCode}" est invalide.`, 'warning');
+        return;
+      }
+    }
+
+    // Désactiver le bouton
+    registerBtn.disabled = true;
+    registerBtn.innerHTML = '<span class="loader"></span> Création...';
+
+    try {
+      // 1. Création Firebase Auth
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      // 2. Envoyer email de vérification
+      try {
+        await sendEmailVerification(user);
+        console.log("✅ Email de vérification envoyé");
+      } catch (verifError) {
+        console.warn("⚠️ Erreur envoi email vérification:", verifError);
+      }
+
+      // 3. Générer code parrainage unique pour ce nouvel utilisateur
+      const generatedReferralCode = await generateUniqueReferralCode(user.uid, prenom, nom);
+      const fullPhone = `${indicatif} ${telephone}`;
+      const now = new Date().toISOString();
+
+      // 4. Données utilisateur
+      const userData = {
+        uid: user.uid,
+        email: email,
+        nom: nom,
+        prenom: prenom,
+        fullName: `${prenom} ${nom}`,
+        pays: pays,
+        phone: fullPhone,
+        balance: 0,
+        totalDepots: 0,
+        totalRetraits: 0,
+        totalAchats: 0,
+        totalVentes: 0,
+        totalRevenus: 0,
+        referralsCount: 0,
+        referralEarnings: 0,
+        referralCode: generatedReferralCode,
+        referredBy: referralCode || null,
+        status: "active",
+        role: "user",
+        registrationDate: now,
+        createdAt: now,
+        lastLogin: now,
+        emailVerified: false
+      };
+
+      // 5. Sauvegarde dans Firestore
+      await setDoc(doc(db, "users", user.uid), userData);
+
+      // 6. Créditer le parrain si code valide
+      if (parrainId) {
+        await creditReferralReward(parrainId);
+        console.log(`✅ ${500} FCFA crédités au parrain ${parrainId}`);
+      }
+
+      // 7. Sauvegarde locale
+      localStorage.setItem('ARVEXA_current_user', user.uid);
+      localStorage.setItem('ARVEXA_user_name', userData.fullName);
+
+      showMessage('✅ Compte créé avec succès ! Redirection...', 'success');
+
+      setTimeout(() => {
+        window.location.href = 'index.html';
+      }, 1500);
+
+    } catch (error) {
+      console.error("❌ Erreur inscription:", error);
+      let errorMsg = 'Erreur lors de l\'inscription.';
+      switch (error.code) {
+        case 'auth/email-already-in-use':
+          errorMsg = 'Cet email est déjà utilisé. Connectez-vous.';
+          break;
+        case 'auth/invalid-email':
+          errorMsg = 'Email invalide.';
+          break;
+        case 'auth/weak-password':
+          errorMsg = 'Mot de passe trop faible (minimum 6 caractères).';
+          break;
+        default:
+          errorMsg = error.message || 'Erreur inconnue. Réessayez.';
+      }
+      showMessage(errorMsg, 'error');
+      registerBtn.disabled = false;
+      registerBtn.innerHTML = '<i class="fas fa-user-plus"></i> Créer mon compte';
+    }
+  });
+
+  // ================================================================
+  // ===== CONNEXION GOOGLE =====
+  // ================================================================
+  googleBtn.addEventListener('click', async () => {
+    googleBtn.disabled = true;
+    googleBtn.innerHTML = '<span class="loader"></span> Connexion...';
+
+    try {
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+
+      const userRef = doc(db, "users", user.uid);
+      const docSnap = await getDoc(userRef);
+
+      if (!docSnap.exists()) {
+        const displayName = user.displayName || "Utilisateur";
+        const [prenom, ...nomParts] = displayName.split(' ');
+        const nom = nomParts.join(' ') || "Google";
+        const now = new Date().toISOString();
+        const generatedReferralCode = await generateUniqueReferralCode(user.uid, prenom || "Utilisateur", nom);
+
+        const userData = {
+          uid: user.uid,
+          email: user.email,
+          nom: nom,
+          prenom: prenom || "Google",
+          fullName: displayName,
+          pays: "Niger",
+          phone: user.phoneNumber || "",
+          balance: 0,
+          totalDepots: 0,
+          totalRetraits: 0,
+          totalAchats: 0,
+          totalVentes: 0,
+          totalRevenus: 0,
+          referralsCount: 0,
+          referralEarnings: 0,
+          referralCode: generatedReferralCode,
+          referredBy: null,
+          status: "active",
+          role: "user",
+          registrationDate: now,
+          createdAt: now,
+          lastLogin: now,
+          emailVerified: user.emailVerified || false
+        };
+        await setDoc(userRef, userData);
+      } else {
+        await updateDoc(userRef, { lastLogin: new Date().toISOString() });
+      }
+
+      localStorage.setItem('ARVEXA_current_user', user.uid);
+      showMessage('✅ Connexion Google réussie !', 'success');
+      setTimeout(() => window.location.href = 'index.html', 1000);
+
+    } catch (error) {
+      console.error("❌ Erreur Google:", error);
+      let errorMsg = 'Erreur lors de la connexion avec Google.';
+      if (error.code === 'auth/popup-closed-by-user') {
+        errorMsg = 'Fenêtre popup fermée. Réessayez.';
+      } else if (error.code === 'auth/network-request-failed') {
+        errorMsg = 'Erreur réseau. Vérifiez votre connexion.';
+      }
+      showMessage(errorMsg, 'error');
+    } finally {
+      googleBtn.disabled = false;
+      googleBtn.innerHTML = '<i class="fab fa-google"></i> S\'inscrire avec Google';
+    }
+  });
+
+  // ================================================================
+  // ===== REDIRECTION SI DÉJÀ CONNECTÉ =====
+  // ================================================================
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      localStorage.setItem('ARVEXA_current_user', user.uid);
+      window.location.href = 'index.html';
+    }
+  });
+
+  console.log("🌿 ARVEXA - Page d'inscription chargée");
+</script>
+</body>
+</html>

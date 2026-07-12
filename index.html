@@ -579,7 +579,7 @@
       transform: translateX(2px);
     }
 
-    /* ===== ACTUALITÉS ARVEXA - CARTE FIXE ===== */
+    /* ===== ACTUALITÉS ===== */
     .actualites-section { margin: 8px 0 24px; }
     
     .actu-card {
@@ -685,8 +685,7 @@
       color: var(--text-dim);
       background: rgba(10, 10, 10, 0.3);
     }
-
-      /* ===== FOOTER ===== */
+     /* ===== FOOTER ===== */
     .footer {
       border-top: 1px solid rgba(184, 134, 11, 0.03);
       padding: 28px 0 16px;
@@ -756,7 +755,7 @@
     }
 
     /* ============================================================
-       MENU - ANIMATION ULTRA FLUIDE AVEC RESSORT
+       MENU - ULTRA RAPIDE AVEC TRANSITION INSTANTANÉE
        ============================================================ */
     .menu-overlay {
       position: fixed;
@@ -767,7 +766,7 @@
       z-index: 2000;
       visibility: hidden;
       opacity: 0;
-      transition: opacity 0.25s ease, visibility 0.25s ease;
+      transition: opacity 0.15s ease, visibility 0.15s ease;
       display: flex;
       touch-action: none;
     }
@@ -783,7 +782,7 @@
       backdrop-filter: blur(4px);
       cursor: default;
       touch-action: none;
-      transition: backdrop-filter 0.3s ease;
+      transition: backdrop-filter 0.15s ease;
     }
 
     .menu-sidebar {
@@ -795,7 +794,7 @@
       border-left: 1px solid rgba(184, 134, 11, 0.03);
       padding: 20px 0;
       transform: translateX(100%);
-      transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+      transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
       display: flex;
       flex-direction: column;
       overflow-y: auto;
@@ -808,21 +807,21 @@
 
     .menu-link {
       opacity: 0;
-      transform: translateX(30px);
-      transition: opacity 0.3s ease, transform 0.3s ease, background 0.2s ease, color 0.2s ease;
+      transform: translateX(20px);
+      transition: opacity 0.15s ease, transform 0.15s ease, background 0.2s ease, color 0.2s ease;
     }
     .menu-overlay.active .menu-link {
       opacity: 1;
       transform: translateX(0);
     }
-    .menu-overlay.active .menu-link:nth-child(1) { transition-delay: 0.05s; }
-    .menu-overlay.active .menu-link:nth-child(2) { transition-delay: 0.09s; }
-    .menu-overlay.active .menu-link:nth-child(3) { transition-delay: 0.13s; }
-    .menu-overlay.active .menu-link:nth-child(4) { transition-delay: 0.17s; }
-    .menu-overlay.active .menu-link:nth-child(5) { transition-delay: 0.21s; }
-    .menu-overlay.active .menu-link:nth-child(6) { transition-delay: 0.25s; }
-    .menu-overlay.active .menu-link:nth-child(7) { transition-delay: 0.29s; }
-    .menu-overlay.active .menu-link:nth-child(8) { transition-delay: 0.33s; }
+    .menu-overlay.active .menu-link:nth-child(1) { transition-delay: 0.02s; }
+    .menu-overlay.active .menu-link:nth-child(2) { transition-delay: 0.04s; }
+    .menu-overlay.active .menu-link:nth-child(3) { transition-delay: 0.06s; }
+    .menu-overlay.active .menu-link:nth-child(4) { transition-delay: 0.08s; }
+    .menu-overlay.active .menu-link:nth-child(5) { transition-delay: 0.10s; }
+    .menu-overlay.active .menu-link:nth-child(6) { transition-delay: 0.12s; }
+    .menu-overlay.active .menu-link:nth-child(7) { transition-delay: 0.14s; }
+    .menu-overlay.active .menu-link:nth-child(8) { transition-delay: 0.16s; }
 
     .menu-sidebar::-webkit-scrollbar { width: 2px; }
     .menu-sidebar::-webkit-scrollbar-track { background: transparent; }
@@ -897,14 +896,14 @@
       text-decoration: none;
       font-size: 13px;
       font-weight: 400;
-      transition: background 0.2s ease, color 0.2s ease;
+      transition: background 0.15s ease, color 0.15s ease;
     }
     .menu-link:active { transform: scale(0.96); }
     .menu-link i {
       width: 18px;
       font-size: 14px;
       color: var(--text-muted);
-      transition: color 0.2s ease;
+      transition: color 0.15s ease;
     }
     .menu-link.active {
       background: rgba(184, 134, 11, 0.03);
@@ -949,6 +948,43 @@
       margin-top: 8px;
       font-weight: 300;
     }
+
+    /* ============================================================
+       GAIN NOTIFICATION
+       ============================================================ */
+    .gain-notification {
+      position: fixed;
+      bottom: 20px;
+      left: 16px;
+      right: 16px;
+      background: rgba(0, 0, 0, 0.95);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--accent);
+      border-radius: 16px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      z-index: 10001;
+      transform: translateY(200px);
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      max-width: 400px;
+      margin: 0 auto;
+    }
+    .gain-notification.show { transform: translateY(0); }
+    .gain-notification .notif-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, var(--success), #1A5A3A);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 18px;
+    }
+    .gain-notification .notif-content h4 { font-size: 14px; margin-bottom: 4px; color: var(--text-light); }
+    .gain-notification .notif-content p { font-size: 11px; color: var(--text-dim); }
 
     /* ============================================================
        TOAST
@@ -1064,6 +1100,15 @@
 <div class="glow glow-1"></div>
 <div class="glow glow-2"></div>
 <div class="glow glow-3"></div>
+
+<!-- ===== GAIN NOTIFICATION ===== -->
+<div class="gain-notification" id="gainNotification">
+  <div class="notif-icon"><i class="fas fa-gift"></i></div>
+  <div class="notif-content">
+    <h4 id="gainNotifTitle">💰 Gains quotidiens</h4>
+    <p id="gainNotifMessage">Message</p>
+  </div>
+</div>
 
 <!-- ===== MENU ===== -->
 <div class="menu-overlay" id="menuOverlay">
@@ -1192,7 +1237,8 @@
   </div>
 
   <div class="formations-list-horizontal">
-    <a href="#" class="formation-card-horizontal formation-link" onclick="showComingSoon(event)">
+    <!-- Formation 1 - Lien vers economiser.html -->
+    <a href="economiser.html" class="formation-card-horizontal">
       <div class="formation-horiz-img-wrap">
         <img src="https://images.pexels.com/photos/4386367/pexels-photo-4386367.jpeg?auto=compress&cs=tinysrgb&w=200&h=240&fit=crop" alt="Économiser" class="formation-horiz-img" loading="lazy">
         <span class="formation-horiz-badge">Débutant</span>
@@ -1202,12 +1248,13 @@
         <p class="formation-horiz-description">Apprenez à garder de l'argent pour vos projets et vos envies.</p>
         <div class="formation-horiz-footer">
           <span class="formation-horiz-price">🎁 GRATUIT</span>
-          <span class="formation-horiz-action">Découvrir <i class="fas fa-chevron-right"></i></span>
+          <span class="formation-horiz-action">Voir la formation <i class="fas fa-chevron-right"></i></span>
         </div>
       </div>
     </a>
 
-    <a href="#" class="formation-card-horizontal formation-link" onclick="showComingSoon(event)">
+    <!-- Formation 2 - Lien vers investir-argent.html -->
+    <a href="investir-argent.html" class="formation-card-horizontal">
       <div class="formation-horiz-img-wrap">
         <img src="https://images.pexels.com/photos/5849577/pexels-photo-5849577.jpeg?auto=compress&cs=tinysrgb&w=200&h=240&fit=crop" alt="Investir" class="formation-horiz-img" loading="lazy">
         <span class="formation-horiz-badge">Débutant</span>
@@ -1217,7 +1264,7 @@
         <p class="formation-horiz-description">Découvrez comment votre argent peut travailler pour vous.</p>
         <div class="formation-horiz-footer">
           <span class="formation-horiz-price">🎁 GRATUIT</span>
-          <span class="formation-horiz-action">Découvrir <i class="fas fa-chevron-right"></i></span>
+          <span class="formation-horiz-action">Voir la formation <i class="fas fa-chevron-right"></i></span>
         </div>
       </div>
     </a>
@@ -1270,7 +1317,7 @@
     </a>
   </div>
 
-  <!-- ===== ACTUALITÉS ARVEXA - CARTE FIXE AVEC NAVIGATION ===== -->
+  <!-- ===== ACTUALITÉS ARVEXA ===== -->
   <div class="actualites-section">
     <div class="section-header">
       <div class="section-header-left">
@@ -1302,7 +1349,7 @@
       </div>
     </div>
   </div>
-
+  
   <!-- ===== FOOTER ===== -->
   <footer class="footer">
     <div class="footer-logo">ARVE<span>XA</span></div>
@@ -1325,6 +1372,7 @@
 <!-- ===== TOAST ===== -->
 <div class="toast" id="toast"></div>
 
+<!-- ============================================================ -->
 <!-- ===== IMPORTS ===== -->
 <script type="importmap">
   {
@@ -1361,14 +1409,14 @@
 
   // ===== FIREBASE CONFIG =====
   const firebaseConfig = {
-  apiKey: "AIzaSyBEbYuuUlNCLMBUHClv4UnyownNHw2q3_g",
-  authDomain: "nexgen-39043.firebaseapp.com",
-  projectId: "nexgen-39043",
-  storageBucket: "nexgen-39043.firebasestorage.app",
-  messagingSenderId: "619390144325",
-  appId: "1:619390144325:web:35d96b125501e4e8b1782c",
-  measurementId: "G-HC2Q5DNKDR"
-};
+    apiKey: "AIzaSyBEbYuuUlNCLMBUHClv4UnyownNHw2q3_g",
+    authDomain: "nexgen-39043.firebaseapp.com",
+    projectId: "nexgen-39043",
+    storageBucket: "nexgen-39043.firebasestorage.app",
+    messagingSenderId: "619390144325",
+    appId: "1:619390144325:web:35d96b125501e4e8b1782c",
+    measurementId: "G-HC2Q5DNKDR"
+  };
 
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
@@ -1384,7 +1432,6 @@
   const statInvestmentsEl = document.getElementById('statInvestments');
   const statReferralsEl = document.getElementById('statReferrals');
 
-  // Menu
   const menuOverlay = document.getElementById('menuOverlay');
   const menuBtn = document.getElementById('menuBtn');
   const menuCloseBtn = document.getElementById('menuCloseBtn');
@@ -1394,13 +1441,16 @@
   const menuUseremail = document.getElementById('menuUseremail');
   const menuLogoutBtn = document.getElementById('menuLogoutBtn');
 
-  // Actualités
   const actuText = document.getElementById('actuText');
   const actuBadge = document.getElementById('actuBadge');
   const actuDate = document.getElementById('actuDate');
   const actuCounter = document.getElementById('actuCounter');
   const actuPrevBtn = document.getElementById('actuPrevBtn');
   const actuNextBtn = document.getElementById('actuNextBtn');
+
+  const gainNotification = document.getElementById('gainNotification');
+  const gainNotifTitle = document.getElementById('gainNotifTitle');
+  const gainNotifMessage = document.getElementById('gainNotifMessage');
 
   const adminLockBtn = document.getElementById('adminLockBtn');
   const toast = document.getElementById('toast');
@@ -1410,7 +1460,7 @@
   let unsubscribeUser = null;
   let unsubscribeActualites = null;
 
-  // ===== DONNÉES DES ACTUALITÉS (PAR DÉFAUT) =====
+  // ===== DONNÉES DES ACTUALITÉS =====
   const defaultActualites = [
     {
       id: 'default_1',
@@ -1468,7 +1518,18 @@
   }
 
   // ================================================================
-  // 2. SHOW COMING SOON
+  // 2. GAIN NOTIFICATION
+  // ================================================================
+  function showGainNotification(title, message) {
+    gainNotifTitle.innerText = title;
+    gainNotifMessage.innerHTML = message;
+    gainNotification.classList.add('show');
+    setTimeout(() => gainNotification.classList.remove('show'), 3500);
+    if (navigator.vibrate) navigator.vibrate(100);
+  }
+
+  // ================================================================
+  // 3. SHOW COMING SOON
   // ================================================================
   window.showComingSoon = function(e) {
     if (e) e.preventDefault();
@@ -1476,7 +1537,7 @@
   };
 
   // ================================================================
-  // 3. FORMATER LA DATE
+  // 4. FORMATER LA DATE
   // ================================================================
   function formatDate(dateStr) {
     if (!dateStr) return 'Date inconnue';
@@ -1497,7 +1558,7 @@
   }
 
   // ================================================================
-  // 4. AFFICHER UNE ACTUALITÉ
+  // 5. AFFICHER UNE ACTUALITÉ
   // ================================================================
   function displayActu(index) {
     if (!actualites.length) {
@@ -1525,7 +1586,7 @@
   }
 
   // ================================================================
-  // 5. NAVIGATION ACTUALITÉS
+  // 6. NAVIGATION ACTUALITÉS
   // ================================================================
   function nextActu() {
     if (currentActuIndex < actualites.length - 1) {
@@ -1545,7 +1606,7 @@
   actuPrevBtn.addEventListener('click', prevActu);
 
   // ================================================================
-  // 6. CHARGER LES ACTUALITÉS DEPUIS FIRESTORE
+  // 7. CHARGER LES ACTUALITÉS DEPUIS FIRESTORE
   // ================================================================
   function loadActualites() {
     if (unsubscribeActualites) {
@@ -1570,13 +1631,7 @@
         });
       });
 
-      // Si pas d'actualités dans Firestore, utiliser les défauts
-      if (data.length === 0) {
-        actualites = defaultActualites;
-      } else {
-        actualites = data;
-      }
-
+      actualites = data.length > 0 ? data : defaultActualites;
       currentActuIndex = 0;
       displayActu(0);
     }, (error) => {
@@ -1588,32 +1643,13 @@
   }
 
   // ================================================================
-  // 7. SWIPE POUR LE MENU
+  // 8. MENU - SWIPE INSTANTANÉ
   // ================================================================
   let touchStartX = 0;
   let touchStartY = 0;
   let isSwiping = false;
-  let swipeThreshold = 50;
+  let swipeThreshold = 40;
   let isMenuOpen = false;
-
-  const formationsList = document.querySelector('.formations-list-horizontal');
-
-  function isTouchOnExcludedElement(x, y) {
-    const element = document.elementFromPoint(x, y);
-    if (!element) return false;
-    
-    let current = element;
-    while (current && current !== document.body) {
-      if (current === formationsList) {
-        return true;
-      }
-      if (current.closest && current.closest('.formations-list-horizontal')) {
-        return true;
-      }
-      current = current.parentElement;
-    }
-    return false;
-  }
 
   function openMenu() {
     if (isMenuOpen) return;
@@ -1643,13 +1679,9 @@
     const deltaX = touch.screenX - touchStartX;
     const deltaY = touch.screenY - touchStartY;
 
-    if (Math.abs(deltaY) > Math.abs(deltaX)) return;
+    if (Math.abs(deltaY) > Math.abs(deltaX) * 1.2) return;
 
-    if (isTouchOnExcludedElement(touch.clientX, touch.clientY)) {
-      return;
-    }
-
-    if (Math.abs(deltaX) > 20) {
+    if (Math.abs(deltaX) > 15) {
       isSwiping = true;
       e.preventDefault();
     }
@@ -1668,7 +1700,7 @@
   }, { passive: true });
 
   // ================================================================
-  // 8. MENU (clics)
+  // 9. MENU - CLICS
   // ================================================================
   menuBtn.addEventListener('click', (e) => {
     e.preventDefault();
@@ -1691,7 +1723,7 @@
   });
 
   // ================================================================
-  // 9. ADMIN BUTTON
+  // 10. ADMIN BUTTON
   // ================================================================
   function checkAdminButton(user) {
     if (!adminLockBtn) return;
@@ -1708,7 +1740,7 @@
   }
 
   // ================================================================
-  // 10. DÉCONNEXION
+  // 11. DÉCONNEXION
   // ================================================================
   menuLogoutBtn.addEventListener('click', async (e) => {
     e.preventDefault();
@@ -1717,6 +1749,7 @@
         await signOut(auth);
         localStorage.removeItem('ARVEXA_current_user');
         localStorage.removeItem('ARVEXA_user_data');
+        sessionStorage.clear();
         showToast('✅ Déconnexion réussie', 'success');
         setTimeout(() => {
           window.location.href = 'login.html';
@@ -1729,7 +1762,7 @@
   });
 
   // ================================================================
-  // 11. UPDATE UI AVEC STATISTIQUES RÉELLES
+  // 12. UPDATE UI
   // ================================================================
   function updateUI(data) {
     if (!data) return;
@@ -1747,11 +1780,11 @@
     const balance = data.balance || 0;
     statBalanceEl.textContent = `${balance.toLocaleString('fr-FR')} FCFA`;
 
-    const totalRevenus = data.totalRevenus || 0;
+    const totalRevenus = data.gainsTotal || data.totalRevenus || 0;
     statRevenueEl.textContent = `${totalRevenus.toLocaleString('fr-FR')} FCFA`;
 
-    const totalInvestis = data.totalInvestis || 0;
-    statInvestmentsEl.textContent = totalInvestis;
+    const investCount = data.investments ? data.investments.filter(i => i.status === 'active').length : 0;
+    statInvestmentsEl.textContent = investCount;
 
     const referralsCount = data.referralsCount || 0;
     statReferralsEl.textContent = referralsCount;
@@ -1761,63 +1794,100 @@
   }
 
   // ================================================================
-  // 12. CHARGER LES STATISTIQUES RÉELLES
+  // 13. FORCE CHECK & CREDIT GAINS
   // ================================================================
-  async function loadRealStats(userId) {
+  async function forceCheckAndCreditGains() {
+    if (!currentUser || !userData) return false;
+    if (!userData.investments || userData.investments.length === 0) return false;
+    
+    const activeInvests = userData.investments.filter(i => i.status === 'active');
+    if (activeInvests.length === 0) return false;
+    
     try {
-      const investQ = query(
-        collection(db, 'investissements'),
-        where('userId', '==', userId),
-        where('statut', '==', 'active')
-      );
-      const investSnap = await getDocs(investQ);
-      const investCount = investSnap.size;
+      const userRef = doc(db, "users", currentUser.uid);
+      const userDoc = await getDoc(userRef);
+      if (!userDoc.exists()) return false;
+      
+      const data = userDoc.data();
+      const active = (data.investments || []).filter(i => i.status === 'active');
+      if (active.length === 0) return false;
+      
+      let totalGain = 0;
+      let gainDetails = [];
+      const now = new Date();
+      let updated = false;
+      const updatedInvests = [...data.investments];
 
-      const txQ = query(
-        collection(db, 'transactions'),
-        where('userId', '==', userId),
-        where('type', 'in', ['gain', 'revenu', 'profit'])
-      );
-      const txSnap = await getDocs(txQ);
-      let totalRevenue = 0;
-      txSnap.forEach(doc => {
-        totalRevenue += doc.data().montant || 0;
-      });
-
-      const refQ = query(
-        collection(db, 'users'),
-        where('referredBy', '==', userId)
-      );
-      const refSnap = await getDocs(refQ);
-      const refCount = refSnap.size;
-
-      const userRef = doc(db, 'users', userId);
-      await updateDoc(userRef, {
-        totalInvestis: investCount,
-        totalRevenus: totalRevenue,
-        referralsCount: refCount
-      });
-
-      return { investCount, totalRevenue, refCount };
+      for (let i = 0; i < updatedInvests.length; i++) {
+        const inv = updatedInvests[i];
+        if (inv.status === 'active') {
+          const last = new Date(inv.lastPayout || inv.createdAt || now);
+          const hours = (now - last) / (1000 * 3600);
+          if (hours >= 24) {
+            const days = Math.floor(hours / 24);
+            const remaining = inv.totalDays - inv.currentDay + 1;
+            const actual = Math.min(days, remaining);
+            if (actual > 0) {
+              const gain = inv.dailyReturn * actual;
+              totalGain += gain;
+              gainDetails.push({ pack: inv.packName || 'Investissement', gain: gain, days: actual });
+              inv.totalEarned = (inv.totalEarned || 0) + gain;
+              inv.currentDay += actual;
+              inv.lastPayout = now.toISOString();
+              updatedInvests[i] = inv;
+              updated = true;
+            }
+          }
+        }
+      }
+      
+      if (updated && totalGain > 0) {
+        const newBalance = (data.balance || 0) + totalGain;
+        await updateDoc(userRef, {
+          balance: newBalance,
+          gainsTotal: (data.gainsTotal || 0) + totalGain,
+          investments: updatedInvests,
+          lastGainDate: now.toISOString()
+        });
+        const detailText = gainDetails.map(d => `${d.pack}: +${d.gain.toLocaleString('fr-FR')} FCFA`).join(', ');
+        showGainNotification('💰 Gains quotidiens', `${detailText || `+${totalGain.toLocaleString('fr-FR')} FCFA`} ajoutés à votre solde !`);
+        return true;
+      }
+      return false;
     } catch (error) {
-      console.error('Erreur chargement stats:', error);
-      return null;
+      console.error("❌ Erreur vérification gains:", error);
+      return false;
     }
   }
 
   // ================================================================
-  // 13. AUTH
+  // 14. AUTH
   // ================================================================
+  const sessionValidated = sessionStorage.getItem('status_validated');
+  const sessionUid = sessionStorage.getItem('session_uid');
+
   onAuthStateChanged(auth, async (user) => {
     if (user) {
       currentUser = user;
       localStorage.setItem('ARVEXA_current_user', user.uid);
+      
+      if (sessionValidated === 'true' && sessionUid === user.uid) {
+        console.log("✅ Session déjà validée, chargement rapide");
+        const cached = localStorage.getItem('ARVEXA_user_data');
+        if (cached) {
+          userData = JSON.parse(cached);
+          updateUI(userData);
+        }
+        listenToUser(user.uid);
+        loadActualites();
+        setTimeout(() => forceCheckAndCreditGains(), 2000);
+        return;
+      }
 
-      const userRef = doc(db, 'users', user.uid);
-
-            try {
+      try {
+        const userRef = doc(db, 'users', user.uid);
         const docSnap = await getDoc(userRef);
-
+        
         if (!docSnap.exists()) {
           const newUser = {
             uid: user.uid,
@@ -1826,14 +1896,12 @@
             nom: user.displayName?.split(' ').slice(1).join(' ') || '',
             fullName: user.displayName || 'Investisseur',
             balance: 0,
+            gainsTotal: 0,
             totalDepots: 0,
             totalRetraits: 0,
-            totalInvestis: 0,
-            totalRevenus: 0,
+            investments: [],
             referralsCount: 0,
             referralEarnings: 0,
-            referralCode: `ARV-${Date.now().toString(36).toUpperCase()}-${user.uid.substring(0, 4).toUpperCase()}`,
-            photoURL: user.photoURL || '',
             status: 'active',
             role: 'user',
             createdAt: new Date().toISOString(),
@@ -1841,72 +1909,76 @@
           };
           await setDoc(userRef, newUser);
           userData = newUser;
-          console.log('✅ Compte utilisateur créé');
         } else {
           userData = docSnap.data();
-          await updateDoc(userRef, {
-            lastLogin: new Date().toISOString()
-          });
-          console.log('✅ Utilisateur chargé');
-          await loadRealStats(user.uid);
+          await updateDoc(userRef, { lastLogin: new Date().toISOString() });
         }
 
-        localStorage.setItem('ARVEXA_user_data', JSON.stringify(userData));
+        sessionStorage.setItem('status_validated', 'true');
+        sessionStorage.setItem('session_uid', user.uid);
+
         updateUI(userData);
-
-        if (unsubscribeUser) unsubscribeUser();
-        unsubscribeUser = onSnapshot(userRef, (docSnap) => {
-          if (docSnap.exists()) {
-            userData = docSnap.data();
-            updateUI(userData);
-            localStorage.setItem('ARVEXA_user_data', JSON.stringify(userData));
-          }
-        });
-
-        checkAdminButton(user);
-
-        // Charger les actualités
+        listenToUser(user.uid);
         loadActualites();
 
+        setTimeout(() => forceCheckAndCreditGains(), 2000);
+
       } catch (error) {
-        console.error('❌ Erreur Firestore:', error);
+        console.error('Erreur Firestore:', error);
         const cached = localStorage.getItem('ARVEXA_user_data');
         if (cached) {
           userData = JSON.parse(cached);
           updateUI(userData);
-          showToast('⚠️ Données en cache - Connexion limitée', 'warning');
-        } else {
-          showToast('❌ Erreur de chargement des données', 'error');
         }
-        // Quand même charger les actualités
         loadActualites();
       }
-
     } else {
       currentUser = null;
-      userData = null;
-      if (unsubscribeUser) {
-        unsubscribeUser();
-        unsubscribeUser = null;
-      }
-      if (unsubscribeActualites) {
-        unsubscribeActualites();
-        unsubscribeActualites = null;
-      }
-      localStorage.removeItem('ARVEXA_current_user');
-      localStorage.removeItem('ARVEXA_user_data');
-
-      const currentPath = window.location.pathname;
-      if (!currentPath.includes('login.html') && 
-          !currentPath.includes('register.html') &&
-          !currentPath.includes('confiance.html')) {
+      const savedUid = localStorage.getItem('ARVEXA_current_user');
+      if (savedUid) {
+        setTimeout(() => {
+          if (!auth.currentUser) {
+            window.location.href = 'login.html';
+          }
+        }, 2000);
+      } else {
         window.location.href = 'login.html';
       }
     }
   });
 
   // ================================================================
-  // 14. GESTION EN LIGNE/HORS LIGNE
+  // 15. LISTENER EN TEMPS RÉEL
+  // ================================================================
+  function listenToUser(uid) {
+    if (unsubscribeUser) unsubscribeUser();
+    const userRef = doc(db, 'users', uid);
+    unsubscribeUser = onSnapshot(userRef, (snap) => {
+      if (snap.exists()) {
+        userData = snap.data();
+        updateUI(userData);
+        localStorage.setItem('ARVEXA_user_data', JSON.stringify(userData));
+      }
+    }, (error) => {
+      console.error('Erreur onSnapshot:', error);
+    });
+  }
+
+  // ================================================================
+  // 16. NAVIGATION
+  // ================================================================
+  document.getElementById('userProfileBtn').addEventListener('click', (e) => {
+    e.preventDefault();
+    window.location.href = 'profil.html';
+  });
+
+  document.getElementById('logoLink').addEventListener('click', (e) => {
+    e.preventDefault();
+    window.location.href = 'index.html';
+  });
+
+  // ================================================================
+  // 17. GESTION RÉSEAU
   // ================================================================
   window.addEventListener('online', () => {
     showToast('📶 Connexion Internet rétablie', 'success');
@@ -1927,20 +1999,7 @@
   });
 
   // ================================================================
-  // 15. NAVIGATION
-  // ================================================================
-  document.getElementById('userProfileBtn').addEventListener('click', (e) => {
-    e.preventDefault();
-    window.location.href = 'profil.html';
-  });
-
-  document.getElementById('logoLink').addEventListener('click', (e) => {
-    e.preventDefault();
-    window.location.href = 'index.html';
-  });
-
-  // ================================================================
-  // 16. SERVICE WORKER
+  // 18. SERVICE WORKER
   // ================================================================
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
@@ -1958,7 +2017,7 @@
     });
   }
 
-  console.log("🚀 ARVEXA - Page d'accueil avec Actualités ARVEXA (carte fixe)");
+  console.log("🚀 ARVEXA - Page d'accueil avec cache session et swipe instantané");
 </script>
 </body>
 </html>

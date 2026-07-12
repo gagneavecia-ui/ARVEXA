@@ -397,20 +397,10 @@
       background: rgba(10, 10, 10, 0.8);
     }
     .social-btn.google {
-      background: #FFFFFF;
-      border: 1px solid #DADCE0;
-      color: #3C4043;
-      font-family: 'Roboto', 'Inter', 'Segoe UI', Arial, sans-serif;
+      color: #EA4335;
     }
-    .social-btn.google:hover {
-      background: #F8F9FA;
-      border-color: #DADCE0;
-      box-shadow: 0 1px 2px rgba(60, 64, 67, 0.3);
-    }
-    .social-btn.google svg {
-      width: 18px;
-      height: 18px;
-      flex-shrink: 0;
+    .social-btn.google i {
+      font-size: 18px;
     }
 
     /* ===== REGISTER LINK ===== */
@@ -507,6 +497,12 @@
 </head>
 <body>
 
+<!-- ===== NETTOYAGE CACHE AU CHARGEMENT ===== -->
+<script>
+  console.log("🧹 Nettoyage du cache au chargement de login.html");
+  sessionStorage.clear();
+</script>
+
 <!-- ===== BACKGROUND ===== -->
 <div class="gradient-bg"></div>
 <div class="glow glow-1"></div>
@@ -575,13 +571,7 @@
 
       <!-- Google button -->
       <button type="button" class="social-btn google" id="googleBtn">
-        <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-          <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12s5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24s8.955,20,20,20s20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/>
-          <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/>
-          <path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/>
-          <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/>
-        </svg>
-        Se connecter avec Google
+        <i class="fab fa-google"></i> Se connecter avec Google
       </button>
     </form>
 
@@ -595,37 +585,26 @@
 <!-- ===== TOAST ===== -->
 <div class="toast" id="toast"></div>
 
-<!-- ============================================================ -->
-<!-- ===== IMPORTS ===== -->
 <script type="importmap">
   {
     "imports": {
       "firebase/app": "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js",
-      "firebase/auth": "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js",
-      "firebase/firestore": "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js"
+      "firebase/auth": "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js"
     }
   }
 </script>
 
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+  import { initializeApp } from "firebase/app";
   import { 
     getAuth, 
     signInWithEmailAndPassword,
     signInWithPopup,
     GoogleAuthProvider,
-    sendPasswordResetEmail,
     setPersistence,
     browserLocalPersistence,
     onAuthStateChanged
-  } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
-  import { 
-    getFirestore, 
-    doc, 
-    getDoc, 
-    setDoc,
-    enableIndexedDbPersistence
-  } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+  } from "firebase/auth";
 
   // ===== FIREBASE CONFIG - NEXGEN =====
   const firebaseConfig = {
@@ -640,16 +619,10 @@
 
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
-  const db = getFirestore(app);
   
-  // Activer la persistance
-  enableIndexedDbPersistence(db).catch(() => {});
-
   setPersistence(auth, browserLocalPersistence);
 
-  // ================================================================
-  // ===== DOM =====
-  // ================================================================
+  // ===== ÉLÉMENTS DOM =====
   const loginForm = document.getElementById('loginForm');
   const loginBtn = document.getElementById('loginBtn');
   const googleBtn = document.getElementById('googleBtn');
@@ -660,11 +633,9 @@
   const passwordInput = document.getElementById('password');
   const toast = document.getElementById('toast');
 
-  let authInitialized = false;
+  let authChecked = false;
 
-  // ================================================================
   // ===== TOAST =====
-  // ================================================================
   function showToast(message, type = 'info') {
     toast.textContent = message;
     toast.className = `toast ${type}`;
@@ -672,9 +643,7 @@
     setTimeout(() => toast.classList.remove('show'), 4000);
   }
 
-  // ================================================================
   // ===== MESSAGE BANNER =====
-  // ================================================================
   function showMessage(text, type = 'error') {
     messageBanner.className = `message-banner ${type}`;
     messageIcon.className = type === 'error' ? 'fas fa-exclamation-circle' : 
@@ -690,9 +659,7 @@
     messageBanner.classList.add('hidden');
   }
 
-  // ================================================================
-  // ===== TOGGLE PASSWORD =====
-  // ================================================================
+  // ===== AFFICHER/MASQUER MOT DE PASSE =====
   togglePassword.addEventListener('click', () => {
     const type = passwordInput.type === 'password' ? 'text' : 'password';
     passwordInput.type = type;
@@ -700,100 +667,23 @@
     togglePassword.classList.toggle('fa-eye-slash');
   });
 
-  // ================================================================
-  // ===== GÉNÉRER UN ID UNIQUE =====
-  // ================================================================
-  function generateCustomerId() {
-    const prefix = 'ARV';
-    const timestamp = Date.now().toString(36).toUpperCase();
-    const random = Math.random().toString(36).substring(2, 7).toUpperCase();
-    return `${prefix}-${timestamp}-${random}`;
-  }
+  // ===== VÉRIFICATION AUTOMATIQUE DE CONNEXION =====
+  onAuthStateChanged(auth, (user) => {
+    if (authChecked) return;
+    authChecked = true;
 
-  // ================================================================
-  // ===== CRÉER UN COMPTE UTILISATEUR DANS FIRESTORE =====
-  // ================================================================
-  async function createUserInFirestore(user) {
-    if (!user) return null;
-
-    try {
-      const userRef = doc(db, 'users', user.uid);
-      const userSnap = await getDoc(userRef);
-
-      if (!userSnap.exists()) {
-        const newId = generateCustomerId();
-        const newUser = {
-          uid: user.uid,
-          email: user.email || '',
-          prenom: user.displayName?.split(' ')[0] || 'Investisseur',
-          nom: user.displayName?.split(' ').slice(1).join(' ') || '',
-          fullName: user.displayName || 'Investisseur',
-          id: newId,
-          customerId: newId,
-          balance: 0,
-          totalDepots: 0,
-          totalRetraits: 0,
-          totalInvestis: 0,
-          totalRevenus: 0,
-          referralsCount: 0,
-          referralEarnings: 0,
-          referralCode: `ARV-${Date.now().toString(36).toUpperCase()}-${user.uid.substring(0, 4).toUpperCase()}`,
-          photoURL: user.photoURL || '',
-          status: 'active',
-          role: 'user',
-          emailVerified: user.emailVerified || false,
-          createdAt: new Date().toISOString(),
-          lastLogin: new Date().toISOString()
-        };
-        await setDoc(userRef, newUser);
-        console.log('✅ Compte utilisateur créé dans Firestore');
-        return newUser;
-      }
-
-      // Mettre à jour la dernière connexion
-      await updateDoc(userRef, {
-        lastLogin: new Date().toISOString()
-      });
-
-      return userSnap.data();
-    } catch (error) {
-      console.error('❌ Erreur création compte:', error);
-      return null;
+    if (user) {
+      console.log("✅ Utilisateur déjà connecté:", user.email);
+      localStorage.setItem('ARVEXA_current_user', user.uid);
+      window.location.href = 'index.html';
+    } else {
+      console.log("👤 Aucun utilisateur connecté, affichage du formulaire");
+      loginBtn.disabled = false;
+      loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Se connecter';
     }
-  }
+  });
 
-  // ================================================================
-  // ===== REDIRECTION APRÈS CONNEXION =====
-  // ================================================================
-  async function redirectAfterLogin(user) {
-    if (!user) return;
-
-    try {
-      // Vérifier/créer le compte Firestore
-      const userData = await createUserInFirestore(user);
-      
-      if (userData) {
-        // Sauvegarder en localStorage
-        localStorage.setItem('ARVEXA_current_user', user.uid);
-        localStorage.setItem('ARVEXA_user_data', JSON.stringify(userData));
-        
-        // Rediriger vers l'accueil
-        showToast('✅ Connexion réussie !', 'success');
-        setTimeout(() => {
-          window.location.href = 'index.html';
-        }, 500);
-      } else {
-        showMessage('❌ Erreur lors de la création du compte', 'error');
-      }
-    } catch (error) {
-      console.error('❌ Erreur redirection:', error);
-      showMessage('❌ Erreur lors de la connexion', 'error');
-    }
-  }
-
-  // ================================================================
-  // ===== CONNEXION EMAIL / PASSWORD =====
-  // ================================================================
+  // ===== CONNEXION EMAIL / MOT DE PASSE =====
   loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     hideMessage();
@@ -811,51 +701,47 @@
 
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      // La redirection est gérée par onAuthStateChanged
+      const user = userCredential.user;
+      
+      console.log("✅ Connexion réussie pour:", user.email);
+      showMessage('✅ Connexion réussie ! Redirection...', 'success');
+      
+      localStorage.setItem('ARVEXA_current_user', user.uid);
+      
+      setTimeout(() => {
+        window.location.href = 'index.html';
+      }, 1500);
+      
     } catch (error) {
-      console.error('❌ Erreur connexion:', error);
+      console.error("❌ Erreur connexion:", error);
+      
       let errorMsg = 'Erreur lors de la connexion.';
       switch (error.code) {
+        case 'auth/invalid-credential':
+        case 'auth/user-not-found':
+        case 'auth/wrong-password':
+          errorMsg = 'Email ou mot de passe incorrect.';
+          break;
         case 'auth/invalid-email':
           errorMsg = 'Email invalide.';
           break;
         case 'auth/user-disabled':
           errorMsg = 'Ce compte a été désactivé.';
           break;
-        case 'auth/user-not-found':
-          errorMsg = 'Aucun compte trouvé avec cet email.';
-          break;
-        case 'auth/wrong-password':
-          errorMsg = 'Mot de passe incorrect.';
-          break;
-        case 'auth/invalid-credential':
-          errorMsg = 'Email ou mot de passe incorrect.';
-          break;
         case 'auth/too-many-requests':
           errorMsg = 'Trop de tentatives. Réessayez plus tard.';
           break;
-        case 'auth/unauthorized-domain':
-          errorMsg = 'Ce domaine n\'est pas autorisé dans Firebase (Authentication > Settings > Authorized domains).';
-          break;
-        case 'auth/api-key-not-valid.-please-pass-a-valid-api-key.':
-        case 'auth/invalid-api-key':
-          errorMsg = 'Clé API Firebase invalide. Vérifiez firebaseConfig.';
-          break;
-        case 'auth/operation-not-allowed':
-          errorMsg = 'La connexion Email/Mot de passe n\'est pas activée dans Firebase Console.';
-          break;
         default:
-          errorMsg = `Erreur (${error.code || 'inconnue'}) : ${error.message || ''}`;
+          errorMsg = error.message || 'Erreur inconnue.';
       }
       showMessage(errorMsg, 'error');
+      
       loginBtn.disabled = false;
       loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Se connecter';
     }
   });
 
-  // ================================================================
   // ===== CONNEXION GOOGLE =====
-  // ================================================================
   googleBtn.addEventListener('click', async () => {
     googleBtn.disabled = true;
     googleBtn.innerHTML = '<span class="loader"></span> Connexion...';
@@ -863,95 +749,51 @@
     try {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
-      // La redirection est gérée par onAuthStateChanged
+      const user = result.user;
+      
+      console.log("✅ Connexion Google réussie pour:", user.email);
+      showMessage('✅ Connexion réussie ! Redirection...', 'success');
+      
+      localStorage.setItem('ARVEXA_current_user', user.uid);
+      
+      setTimeout(() => {
+        window.location.href = 'index.html';
+      }, 1500);
+      
     } catch (error) {
-      console.error('❌ Erreur Google:', error);
+      console.error("❌ Erreur Google:", error);
+      
       let errorMsg = 'Erreur lors de la connexion avec Google.';
-      switch (error.code) {
-        case 'auth/popup-closed-by-user':
-          errorMsg = 'Fenêtre popup fermée. Réessayez.';
-          break;
-        case 'auth/network-request-failed':
-          errorMsg = 'Erreur réseau. Vérifiez votre connexion.';
-          break;
-        case 'auth/popup-blocked':
-          errorMsg = 'La popup a été bloquée par le navigateur. Autorisez les popups pour ce site.';
-          break;
-        case 'auth/unauthorized-domain':
-          errorMsg = 'Ce domaine n\'est pas autorisé dans Firebase (Authentication > Settings > Authorized domains). Ajoutez le domaine de votre site.';
-          break;
-        case 'auth/operation-not-allowed':
-          errorMsg = 'La connexion Google n\'est pas activée dans Firebase Console (Authentication > Sign-in method > Google).';
-          break;
-        case 'auth/account-exists-with-different-credential':
-          errorMsg = 'Un compte existe déjà avec cet email via une autre méthode de connexion.';
-          break;
-        default:
-          errorMsg = `Erreur (${error.code || 'inconnue'}) : ${error.message || ''}`;
+      if (error.code === 'auth/popup-closed-by-user') {
+        errorMsg = 'Fenêtre popup fermée. Réessayez.';
+      } else if (error.code === 'auth/network-request-failed') {
+        errorMsg = 'Erreur réseau. Vérifiez votre connexion.';
+      } else if (error.code === 'auth/cancelled-popup-request') {
+        errorMsg = 'Connexion annulée. Réessayez.';
       }
       showMessage(errorMsg, 'error');
-      googleBtn.disabled = false;
-      googleBtn.innerHTML = '<svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg"><path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12s5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24s8.955,20,20,20s20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/></svg> Se connecter avec Google';
-    }
-  });
-
-  // ================================================================
-  // ===== ON AUTH STATE CHANGED - CORRIGÉ =====
-  // ================================================================
-  onAuthStateChanged(auth, async (user) => {
-    // Éviter les doubles exécutions
-    if (authInitialized) return;
-    authInitialized = true;
-
-    if (user) {
-      // Utilisateur connecté - vérifier Firestore et rediriger
-      try {
-        const userData = await createUserInFirestore(user);
-        if (userData) {
-          localStorage.setItem('ARVEXA_current_user', user.uid);
-          localStorage.setItem('ARVEXA_user_data', JSON.stringify(userData));
-          
-          // Rediriger uniquement si on est sur login ou register
-          const currentPath = window.location.pathname;
-          if (currentPath.includes('login.html') || currentPath.includes('register.html')) {
-            window.location.href = 'index.html';
-          }
-        }
-      } catch (error) {
-        console.error('❌ Erreur vérification Firestore:', error);
-        // Si erreur réseau, rediriger quand même avec les données en cache
-        const cached = localStorage.getItem('ARVEXA_user_data');
-        if (cached) {
-          window.location.href = 'index.html';
-        } else {
-          showMessage('⚠️ Erreur de connexion au serveur', 'warning');
-        }
-      }
-    } else {
-      // Utilisateur NON connecté - nettoyer et rester sur login
-      localStorage.removeItem('ARVEXA_current_user');
-      localStorage.removeItem('ARVEXA_user_data');
       
-      // Ne pas rediriger si déjà sur login
-      const currentPath = window.location.pathname;
-      if (!currentPath.includes('login.html') && !currentPath.includes('register.html')) {
-        window.location.href = 'login.html';
-      }
+      googleBtn.disabled = false;
+      googleBtn.innerHTML = '<i class="fab fa-google"></i> Se connecter avec Google';
     }
   });
 
-  // ================================================================
-  // ===== GESTION EN LIGNE/HORS LIGNE =====
-  // ================================================================
-  window.addEventListener('online', () => {
-    showToast('📶 Connexion Internet rétablie', 'success');
-  });
+  // ===== ENREGISTREMENT DU SERVICE WORKER =====
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js')
+        .then(registration => {
+          console.log('✅ Service Worker enregistré avec succès:', registration.scope);
+        })
+        .catch(error => {
+          console.log('❌ Échec de l\'enregistrement du Service Worker:', error);
+        });
+    });
+  }
 
-  window.addEventListener('offline', () => {
-    showToast('📶 Connexion Internet perdue', 'error');
-  });
-
-  console.log("🔐 ARVEXA - Page Login corrigée avec vérification Firestore");
+  // ===== GESTION RÉSEAU =====
+  window.addEventListener('online', () => showToast('📶 Connexion Internet rétablie', 'success'));
+  window.addEventListener('offline', () => showToast('📶 Connexion Internet perdue', 'error'));
 </script>
 </body>
 </html>
