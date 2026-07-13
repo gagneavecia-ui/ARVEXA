@@ -14,9 +14,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   
   <style>
-    /* ============================================================
-       ROOT - UNIFORME AVEC ARVEXA
-       ============================================================ */
+    /* ===== ROOT ===== */
     :root {
       --primary: #1A3A2A;
       --primary-dark: #0A1A12;
@@ -68,9 +66,7 @@
       100% { opacity: 1; }
     }
 
-    /* ============================================================
-       BACKGROUND
-       ============================================================ */
+    /* ===== BACKGROUND ===== */
     .gradient-bg {
       position: fixed;
       top: 0;
@@ -100,9 +96,7 @@
       100% { transform: translate(30px, -20px) scale(1.1); }
     }
 
-    /* ============================================================
-       HEADER - UNIFORME
-       ============================================================ */
+    /* ===== HEADER ===== */
     .header {
       display: flex;
       justify-content: space-between;
@@ -151,6 +145,30 @@
     }
     .admin-badge i {
       font-size: 11px;
+    }
+
+    /* ===== NOTIFICATION STATUS BADGE ===== */
+    .notif-status {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 30px;
+      font-size: 10px;
+      font-weight: 500;
+    }
+    .notif-status.active {
+      background: rgba(45, 125, 90, 0.12);
+      color: var(--success);
+      border: 1px solid rgba(45, 125, 90, 0.15);
+    }
+    .notif-status.inactive {
+      background: rgba(138, 58, 58, 0.12);
+      color: var(--danger);
+      border: 1px solid rgba(138, 58, 58, 0.15);
+    }
+    .notif-status i {
+      font-size: 12px;
     }
 
     .logout-btn {
@@ -229,7 +247,7 @@
     }
 
     /* ============================================================
-       STATS GRID - 4 CARTES
+       STATS GRID
        ============================================================ */
     .stats-grid {
       display: grid;
@@ -304,7 +322,7 @@
     }
 
     /* ============================================================
-       REVENUE CARD (CAISSE PRINCIPALE)
+       REVENUE CARD
        ============================================================ */
     .revenue-card {
       background: linear-gradient(135deg, rgba(20, 20, 20, 0.95), rgba(10, 10, 10, 0.98));
@@ -582,7 +600,7 @@
     }
     
     /* ============================================================
-       MODAL DÉTAILS DÉPÔT
+       MODAL
        ============================================================ */
     .modal-overlay {
       position: fixed;
@@ -737,7 +755,7 @@
     }
 
     /* ============================================================
-       RECENT ACTIVITIES
+       ACTIVITIES
        ============================================================ */
     .activity-card {
       background: var(--bg-card);
@@ -884,7 +902,7 @@
     }
 
     /* ============================================================
-       MENU - COMME L'INDEX UTILISATEUR
+       MENU
        ============================================================ */
     .menu-overlay {
       position: fixed;
@@ -1044,7 +1062,6 @@
     }
     .menu-link:hover:not(.active) i { color: var(--text-light); }
 
-    /* Lien spécial Accueil */
     .menu-link.home-link {
       background: rgba(184, 134, 11, 0.06);
       border: 1px solid rgba(184, 134, 11, 0.08);
@@ -1135,6 +1152,9 @@
       .modal-actions .btn-close-modal {
         flex: 1;
       }
+      .notif-status {
+        display: none;
+      }
     }
 
     @media (min-width: 601px) and (max-width: 768px) {
@@ -1196,11 +1216,9 @@
     </div>
 
     <nav class="menu-nav">
-      <!-- Lien vers la page principale (index utilisateur) -->
       <a href="../index.html" class="menu-link home-link">
         <i class="fas fa-home"></i> Accueil ARVEXA
       </a>
-
       <a href="index.html" class="menu-link active">
         <i class="fas fa-chart-pie"></i> Tableau de bord
       </a>
@@ -1227,7 +1245,7 @@
   </div>
 </div>
 
-<!-- ===== MODAL DÉTAILS DÉPÔT ===== -->
+<!-- ===== MODAL ===== -->
 <div class="modal-overlay" id="depositModal">
   <div class="modal-dialog">
     <div class="modal-header">
@@ -1245,6 +1263,9 @@
   <a href="index.html" class="logo">ARVE<span>XA</span></a>
   <div class="header-actions">
     <div class="admin-badge"><i class="fas fa-shield-alt"></i> Admin</div>
+    <span class="notif-status" id="notifStatus">
+      <i class="fas fa-circle"></i> <span id="notifStatusText">Chargement...</span>
+    </span>
     <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i></button>
     <a href="#" class="menu-btn" id="menuBtn"><i class="fas fa-bars"></i></a>
   </div>
@@ -1273,7 +1294,7 @@
     </div>
   </div>
 
-  <!-- ===== STATS 4 CARTES ===== -->
+  <!-- ===== STATS ===== -->
   <div class="stats-grid">
     <div class="stat-card">
       <div class="stat-header">
@@ -1321,7 +1342,7 @@
   </div>
 
   <!-- ===== DÉPÔTS EN ATTENTE ===== -->
-  <div class="pending-card">
+  <div class="pending-card" id="pendingCard">
     <div class="pending-header">
       <h3>⏳ Dépôts en <span>attente</span></h3>
       <span class="pending-count" id="pendingCount">0</span>
@@ -1334,7 +1355,7 @@
     </div>
   </div>
 
-  <!-- ===== DERNIÈRES ACTIVITÉS ===== -->
+  <!-- ===== ACTIVITÉS ===== -->
   <div class="activity-card">
     <div class="activity-header">
       <h3>🔄 Dernières <span>activités</span></h3>
@@ -1364,20 +1385,21 @@
     "imports": {
       "firebase/app": "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js",
       "firebase/auth": "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js",
-      "firebase/firestore": "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js"
+      "firebase/firestore": "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js",
+      "firebase/messaging": "https://www.gstatic.com/firebasejs/12.12.1/firebase-messaging.js"
     }
   }
 </script>
 
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+  import { initializeApp } from "firebase/app";
   import { 
     getAuth, 
     onAuthStateChanged, 
     signOut,
     setPersistence,
     browserLocalPersistence
-  } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+  } from "firebase/auth";
   import { 
     getFirestore, 
     collection, 
@@ -1388,9 +1410,13 @@
     doc, 
     updateDoc, 
     getDoc,
-    runTransaction,
-    limit
-  } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+    runTransaction
+  } from "firebase/firestore";
+  import { 
+    getMessaging, 
+    getToken, 
+    onMessage 
+  } from "firebase/messaging";
 
   // ================================================================
   // FIREBASE CONFIG
@@ -1408,14 +1434,17 @@
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const db = getFirestore(app);
+  const messaging = getMessaging(app);
+
+  // VAPID Key
+  const VAPID_KEY = "BJKkMr-LMevY9HePx3vzYqWMILwAV8mxwOdfkbR-PvEu_m7eu309ygioDNLLqW1wRc2b93Irb1svNnLQIpegquk";
 
   setPersistence(auth, browserLocalPersistence);
 
   // ================================================================
-  // DOM ELEMENTS
+  // DOM
   // ================================================================
   const totalRevenue = document.getElementById('totalRevenue');
-  const revenueBadge = document.getElementById('revenueBadge');
   const revenueCount = document.getElementById('revenueCount');
   const revenueStats = document.getElementById('revenueStats');
 
@@ -1430,45 +1459,17 @@
   const pendingCount = document.getElementById('pendingCount');
   const activityList = document.getElementById('activityList');
 
+  const notifStatus = document.getElementById('notifStatus');
+  const notifStatusText = document.getElementById('notifStatusText');
+
   const toast = document.getElementById('toast');
-
-  // Modal
-  const depositModal = document.getElementById('depositModal');
-  const modalContent = document.getElementById('modalContent');
-  const modalCloseBtn = document.getElementById('modalCloseBtn');
-
-  // ================================================================
-  // MENU
-  // ================================================================
-  const menuOverlay = document.getElementById('menuOverlay');
-  const menuBtn = document.getElementById('menuBtn');
-  const menuCloseBtn = document.getElementById('menuCloseBtn');
-  const menuBackdrop = document.getElementById('menuBackdrop');
-
-  function openMenu() {
-    menuOverlay.classList.add('active');
-    document.body.style.overflow = 'hidden';
-  }
-
-  function closeMenu() {
-    menuOverlay.classList.remove('active');
-    document.body.style.overflow = '';
-  }
-
-  menuBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    openMenu();
-  });
-
-  menuCloseBtn.addEventListener('click', closeMenu);
-  menuBackdrop.addEventListener('click', closeMenu);
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') closeMenu();
-  });
 
   // ================================================================
   // MODAL
   // ================================================================
+  const depositModal = document.getElementById('depositModal');
+  const modalContent = document.getElementById('modalContent');
+  const modalCloseBtn = document.getElementById('modalCloseBtn');
   let currentDepositId = null;
 
   function openDepositModal(deposit) {
@@ -1520,7 +1521,6 @@
       </div>
     `;
 
-    // Écouteurs des boutons du modal
     document.getElementById('modalApproveBtn').addEventListener('click', () => {
       if (currentDepositId) {
         handleApproveDeposit(currentDepositId);
@@ -1595,7 +1595,7 @@
   }
 
   // ================================================================
-  // VALIDER UN DÉPÔT (AVEC CRÉDIT DU SOLDE UTILISATEUR)
+  // GESTION DES DÉPÔTS
   // ================================================================
   async function handleApproveDeposit(id) {
     if (!confirm('✅ Valider ce dépôt et créditer l\'utilisateur ?')) return;
@@ -1641,7 +1641,9 @@
           balance: newBalance,
           realBalance: (userData.realBalance || 0) + montant,
           totalDeposits: (userData.totalDeposits || 0) + montant,
-          lastDeposit: new Date().toISOString()
+          lastDeposit: new Date().toISOString(),
+          hasDeposited: true,
+          isUnlocked: true
         });
       });
       
@@ -1656,10 +1658,156 @@
       showToast('❌ Erreur: ' + (error.message || 'Impossible de valider le dépôt'), 'error');
     }
   }
+
+  async function handleRejectDeposit(id) {
+    if (!confirm('❌ Rejeter ce dépôt ?')) return;
+    
+    try {
+      const depRef = doc(db, 'depots', id);
+      await updateDoc(depRef, {
+        statut: 'rejeté',
+        rejectedAt: new Date().toISOString()
+      });
+      showToast('❌ Dépôt rejeté', 'error');
+    } catch (error) {
+      console.error('❌ Erreur rejet:', error);
+      showToast('❌ Erreur lors du rejet', 'error');
+    }
+  }
   
-   // ================================================================
-  // RENDER DÉPÔTS EN ATTENTE
   // ================================================================
+  // FCM - NOTIFICATIONS PUSH (COMME WHATSAPP)
+  // ================================================================
+  async function setupFCMNotifications() {
+    try {
+      // 1. Demander la permission
+      const permission = await Notification.requestPermission();
+      
+      if (permission === 'granted') {
+        console.log('✅ Permission notification accordée');
+        
+        // 2. Obtenir le token FCM
+        const token = await getToken(messaging, { vapidKey: VAPID_KEY });
+        console.log('📱 Token FCM Admin:', token);
+        
+        // 3. Sauvegarder le token dans Firestore
+        if (auth.currentUser) {
+          const userRef = doc(db, 'users', auth.currentUser.uid);
+          await updateDoc(userRef, {
+            fcmToken: token,
+            isAdmin: true,
+            notificationsEnabled: true
+          });
+          console.log('✅ Token FCM sauvegardé pour admin');
+          updateNotificationStatus(true);
+        }
+        
+        return token;
+      } else {
+        console.warn('⚠️ Permission notification refusée');
+        updateNotificationStatus(false);
+        return null;
+      }
+    } catch (error) {
+      console.error('❌ Erreur setup FCM:', error);
+      updateNotificationStatus(false);
+      return null;
+    }
+  }
+
+  // Mettre à jour le statut des notifications dans l'UI
+  function updateNotificationStatus(enabled) {
+    if (enabled) {
+      notifStatus.className = 'notif-status active';
+      notifStatusText.textContent = '🔔 Notifications actives';
+    } else {
+      notifStatus.className = 'notif-status inactive';
+      notifStatusText.textContent = '🔕 Notifications désactivées';
+    }
+  }
+
+  // Écouter les messages en premier plan (quand l'admin est sur le site)
+  onMessage(messaging, (payload) => {
+    console.log('📩 Message reçu en premier plan:', payload);
+    
+    if (payload.data?.type === 'new_deposit') {
+      // Notification de nouveau dépôt → style WhatsApp
+      const userName = payload.data.userName || 'Utilisateur';
+      const amount = payload.data.amount || '0';
+      
+      showToast(
+        `💰 NOUVEAU DÉPÔT\n${userName} - ${parseInt(amount).toLocaleString('fr-FR')} FCFA`,
+        'success'
+      );
+      
+      // Faire vibrer le téléphone
+      if (navigator.vibrate) {
+        navigator.vibrate([200, 100, 200]);
+      }
+      
+      // Recharger la liste des dépôts en attente
+      setTimeout(() => {
+        location.reload();
+      }, 2000);
+    }
+  });
+
+  // ================================================================
+  // MENU
+  // ================================================================
+  const menuOverlay = document.getElementById('menuOverlay');
+  const menuBtn = document.getElementById('menuBtn');
+  const menuCloseBtn = document.getElementById('menuCloseBtn');
+  const menuBackdrop = document.getElementById('menuBackdrop');
+
+  function openMenu() {
+    menuOverlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeMenu() {
+    menuOverlay.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  menuBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    openMenu();
+  });
+
+  menuCloseBtn.addEventListener('click', closeMenu);
+  menuBackdrop.addEventListener('click', closeMenu);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeMenu();
+  });
+
+  // ================================================================
+  // LOGOUT
+  // ================================================================
+  async function handleLogout() {
+    if (confirm('Voulez-vous vous déconnecter ?')) {
+      try {
+        await signOut(auth);
+        localStorage.removeItem('ARVEXA_current_user');
+        window.location.href = '../login.html';
+      } catch (error) {
+        console.error('Erreur déconnexion:', error);
+        showToast('❌ Erreur lors de la déconnexion', 'error');
+      }
+    }
+  }
+
+  document.getElementById('logoutBtn').addEventListener('click', handleLogout);
+  document.getElementById('menuLogoutBtn').addEventListener('click', handleLogout);
+
+  // ================================================================
+  // RENDER
+  // ================================================================
+  let allDeposits = [];
+  let allRetraits = [];
+  let allUsers = [];
+  let chartInstance = null;
+
   function renderPendingDeposits() {
     const pending = allDeposits.filter(d => d.statut === 'en_attente' || d.statut === 'pending');
 
@@ -1696,10 +1844,8 @@
       </div>
     `).join('');
 
-    // Clic sur l'item → ouvrir le modal
     document.querySelectorAll('.pending-item').forEach(item => {
       item.addEventListener('click', (e) => {
-        // Éviter de déclencher si on clique sur les boutons
         if (e.target.closest('.pending-actions')) return;
         const depositData = item.dataset.deposit;
         if (depositData) {
@@ -1713,7 +1859,6 @@
       });
     });
 
-    // Écouteurs pour valider/rejeter (boutons dans la liste)
     document.querySelectorAll('.pending-item .approve').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -1731,9 +1876,6 @@
     });
   }
 
-  // ================================================================
-  // RENDER ACTIVITÉS
-  // ================================================================
   function renderActivities() {
     const activities = [];
 
@@ -1796,15 +1938,9 @@
     `).join('');
   }
 
-  // ================================================================
-  // GRAPHIQUE
-  // ================================================================
-  let chartInstance = null;
-
   function renderChart() {
     const ctx = document.getElementById('revenueChart').getContext('2d');
 
-    const last30Days = [];
     const labels = [];
     const data = [];
     for (let i = 29; i >= 0; i--) {
@@ -1865,13 +2001,6 @@
       }
     });
   }
-
-  // ================================================================
-  // UPDATE UI
-  // ================================================================
-  let allDeposits = [];
-  let allRetraits = [];
-  let allUsers = [];
 
   function updateUI() {
     const validDepots = allDeposits.filter(d => d.statut === 'validé');
@@ -1971,25 +2100,6 @@
   }
 
   // ================================================================
-  // LOGOUT
-  // ================================================================
-  async function handleLogout() {
-    if (confirm('Voulez-vous vous déconnecter ?')) {
-      try {
-        await signOut(auth);
-        localStorage.removeItem('ARVEXA_current_user');
-        window.location.href = '../login.html';
-      } catch (error) {
-        console.error('Erreur déconnexion:', error);
-        showToast('❌ Erreur lors de la déconnexion', 'error');
-      }
-    }
-  }
-
-  document.getElementById('logoutBtn').addEventListener('click', handleLogout);
-  document.getElementById('menuLogoutBtn').addEventListener('click', handleLogout);
-
-  // ================================================================
   // AUTH
   // ================================================================
   const ADMIN_EMAIL = 'gagneavecia@gmail.com';
@@ -2011,10 +2121,28 @@
     document.getElementById('menuUseremail').textContent = user.email;
     document.getElementById('menuAvatar').textContent = user.email.charAt(0).toUpperCase();
 
+    // Démarrer l'écoute des données
     listenData();
+
+    // SETUP FCM - NOTIFICATIONS PUSH (COMME WHATSAPP)
+    await setupFCMNotifications();
+
+    // Vérifier le statut des notifications toutes les 5 minutes
+    setInterval(async () => {
+      try {
+        const userRef = doc(db, 'users', auth.currentUser.uid);
+        const userSnap = await getDoc(userRef);
+        if (userSnap.exists()) {
+          const data = userSnap.data();
+          updateNotificationStatus(data.notificationsEnabled === true);
+        }
+      } catch (error) {
+        console.error('Erreur vérification statut:', error);
+      }
+    }, 300000);
   });
 
-  console.log('✅ ARVEXA - Admin Dashboard chargé');
+  console.log('✅ ARVEXA - Admin Dashboard avec notifications push (comme WhatsApp)');
 </script>
 </body>
 </html>
