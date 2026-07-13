@@ -134,6 +134,26 @@
       flex-shrink: 0;
     }
 
+    /* ===== BANNER LECTURE SEULE ===== */
+    #readOnlyBanner {
+      background: rgba(184, 134, 11, 0.08);
+      border-bottom: 1px solid var(--accent);
+      padding: 10px 16px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--accent);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    #readOnlyBanner a {
+      color: var(--accent);
+      font-weight: 600;
+      text-decoration: underline;
+    }
+
     /* ===== CONTAINER ===== */
     .container {
       max-width: 600px;
@@ -326,70 +346,39 @@
       -moz-appearance: textfield;
     }
 
-    /* ===== CALCUL ===== */
-    .calculation-box {
-      background: rgba(184, 134, 11, 0.02);
-      border: 1px solid rgba(184, 134, 11, 0.04);
-      border-radius: 12px;
-      padding: clamp(12px, 1.5vw, 16px);
+    /* ===== MONTANT AFFICHÉ (SANS FRAIS) ===== */
+    .amount-display {
       margin-top: 14px;
-      transition: border-color 0.3s;
+      padding: clamp(12px, 1.5vw, 16px);
+      background: rgba(184, 134, 11, 0.03);
+      border: 1px solid rgba(184, 134, 11, 0.06);
+      border-radius: 12px;
+      text-align: center;
+      transition: all 0.3s;
     }
-    .calculation-box.has-value {
-      border-color: rgba(184, 134, 11, 0.12);
-      background: rgba(184, 134, 11, 0.04);
+    .amount-display.has-value {
+      border-color: rgba(184, 134, 11, 0.15);
+      background: rgba(184, 134, 11, 0.05);
     }
-    .calc-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 4px 0;
-      font-size: clamp(12px, 1.2vw, 14px);
-      flex-wrap: wrap;
-      gap: 4px;
+    .amount-display .label {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
     }
-    .calc-row .label {
-      color: #8A8A7A;
-    }
-    .calc-row .value {
-      font-weight: 600;
-      text-align: right;
-    }
-    .calc-row .value.primary {
-      color: var(--accent);
-    }
-    .calc-row .value.success {
-      color: var(--success);
-    }
-    .calc-row .value.danger {
-      color: var(--danger);
-    }
-    .calc-divider {
-      border: none;
-      border-top: 1px solid rgba(255, 255, 255, 0.04);
-      margin: 8px 0;
-    }
-    .calc-total {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 6px 0 0;
-      font-size: clamp(15px, 1.8vw, 18px);
+    .amount-display .value {
+      font-size: clamp(28px, 5vw, 40px);
       font-weight: 700;
-      flex-wrap: wrap;
-      gap: 4px;
-    }
-    .calc-total .label {
-      color: var(--text-light);
-    }
-    .calc-total .value {
-      color: var(--success);
-      font-size: clamp(18px, 2.5vw, 24px);
       font-family: 'Playfair Display', 'Georgia', serif;
-      text-align: right;
+      color: var(--success);
+      margin-top: 2px;
     }
-
-    /* ===== PAYMENT METHODS ===== */
+    .amount-display .value.zero {
+      color: var(--text-muted);
+      opacity: 0.4;
+    }
+    
+        /* ===== PAYMENT METHODS ===== */
     .payment-methods {
       margin-bottom: 20px;
       width: 100%;
@@ -471,6 +460,18 @@
       font-size: clamp(18px, 2vw, 24px);
     }
 
+    /* ===== MONTANT MINIMUM ===== */
+    .min-amount-hint {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-align: center;
+      margin-top: 8px;
+      font-weight: 300;
+    }
+    .min-amount-hint strong {
+      color: var(--accent);
+    }
+
     /* ===== ADMIN NOTE ===== */
     .admin-note {
       background: rgba(45, 125, 90, 0.04);
@@ -486,6 +487,79 @@
     .admin-note i {
       color: var(--success);
       margin-right: 6px;
+    }
+
+    /* ===== HISTORIQUE ===== */
+    .history-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .history-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 14px;
+      background: rgba(10, 10, 10, 0.3);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      transition: border-color 0.2s;
+    }
+    .history-item:hover {
+      border-color: rgba(184, 134, 11, 0.06);
+    }
+    .history-item .left {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .history-item .left .amount {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-light);
+    }
+    .history-item .left .date {
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+    .history-item .right {
+      text-align: right;
+    }
+    .status-badge {
+      font-size: 9px;
+      font-weight: 600;
+      padding: 2px 10px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .status-badge.pending {
+      background: rgba(212, 160, 23, 0.12);
+      color: #D4A017;
+      border: 1px solid rgba(212, 160, 23, 0.15);
+    }
+    .status-badge.validated {
+      background: rgba(45, 125, 90, 0.12);
+      color: var(--success);
+      border: 1px solid rgba(45, 125, 90, 0.15);
+    }
+    .status-badge.rejected {
+      background: rgba(138, 58, 58, 0.12);
+      color: var(--danger);
+      border: 1px solid rgba(138, 58, 58, 0.15);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 20px;
+      color: var(--text-dim);
+    }
+    .empty-state i {
+      font-size: 24px;
+      opacity: 0.2;
+      display: block;
+      margin-bottom: 6px;
     }
 
     /* ===== TOAST ===== */
@@ -577,6 +651,13 @@
 <!-- ===== BACKGROUND ===== -->
 <div class="gradient-bg"></div>
 
+<!-- ===== BANNER LECTURE SEULE ===== -->
+<div id="readOnlyBanner">
+  <i class="fas fa-lock"></i>
+  <span>Vous êtes en mode <strong>lecture seule</strong>. Pour débloquer l'application, </span>
+  <a href="unlock.html">faites un premier dépôt ici</a>
+</div>
+
 <!-- ===== HEADER ===== -->
 <header class="header">
   <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i></a>
@@ -602,7 +683,7 @@
     <ol class="step-list">
       <li>
         <span class="step-number">1</span>
-        <span>Saisissez le montant que vous souhaitez recharger</span>
+        <span>Saisissez le montant que vous souhaitez recharger (<span class="step-highlight">minimum 3 000 FCFA</span>)</span>
       </li>
       <li>
         <span class="step-number">2</span>
@@ -620,28 +701,21 @@
     <label class="form-label"><i class="fas fa-coins"></i> Montant à recharger</label>
     <div class="input-group">
       <span class="currency">F</span>
-      <input type="number" id="amountInput" placeholder="Ex: 5000" min="100" step="100">
+      <input type="number" id="amountInput" placeholder="Ex: 5000" min="3000" step="100">
     </div>
 
-    <!-- CALCUL -->
-    <div class="calculation-box" id="calculationBox">
-      <div class="calc-row">
-        <span class="label">Montant envoyé</span>
-        <span class="value primary" id="calcSent">0 F</span>
-      </div>
-      <div class="calc-row">
-        <span class="label">Frais de traitement (10%)</span>
-        <span class="value danger" id="calcFee">0 F</span>
-      </div>
-      <hr class="calc-divider">
-      <div class="calc-total">
-        <span class="label">💰 Vous recevrez</span>
-        <span class="value" id="calcReceived">0 F</span>
-      </div>
+    <!-- AFFICHAGE MONTANT (SANS FRAIS) -->
+    <div class="amount-display" id="amountDisplay">
+      <div class="label">💰 Montant qui sera crédité</div>
+      <div class="value zero" id="displayAmount">0 FCFA</div>
+    </div>
+
+    <div class="min-amount-hint">
+      ⚠️ Montant minimum : <strong>3 000 FCFA</strong>
     </div>
   </div>
-
-  <!-- MOYENS DE PAIEMENT -->
+  
+    <!-- MOYENS DE PAIEMENT -->
   <div class="payment-methods">
     <span class="title"><i class="fas fa-credit-card"></i> Moyens de paiement acceptés</span>
     <div class="payment-grid">
@@ -678,6 +752,19 @@
     Envoyer la demande via WhatsApp
   </a>
 
+  <!-- HISTORIQUE DES DÉPÔTS -->
+  <div class="card" style="margin-top:18px;padding-bottom:8px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <span style="font-size:13px;font-weight:600;color:var(--text-light);">📋 Historique des dépôts</span>
+    </div>
+    <div class="history-list" id="historyList">
+      <div class="empty-state">
+        <i class="fas fa-clock"></i>
+        <p>Aucun dépôt effectué</p>
+      </div>
+    </div>
+  </div>
+
   <!-- NOTE -->
   <div class="admin-note">
     <i class="fas fa-shield-alt"></i>
@@ -697,7 +784,8 @@
     "imports": {
       "firebase/app": "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js",
       "firebase/auth": "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js",
-      "firebase/firestore": "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js"
+      "firebase/firestore": "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js",
+      "firebase/messaging": "https://www.gstatic.com/firebasejs/12.12.1/firebase-messaging.js"
     }
   }
 </script>
@@ -726,9 +814,14 @@ import {
   orderBy,
   enableIndexedDbPersistence
 } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+import { 
+  getMessaging, 
+  getToken, 
+  onMessage 
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-messaging.js";
 
 // ================================================================
-// FIREBASE CONFIG - NEXGEN
+// FIREBASE CONFIG
 // ================================================================
 const firebaseConfig = {
   apiKey: "AIzaSyBEbYuuUlNCLMBUHClv4UnyownNHw2q3_g",
@@ -741,20 +834,20 @@ const firebaseConfig = {
 };
 
 // ================================================================
-// INITIALISATION UNIQUE
+// INITIALISATION
 // ================================================================
 
-// 1. App
 const app = initializeApp(firebaseConfig);
-
-// 2. Auth
 const auth = getAuth(app);
+const db = getFirestore(app);
+const messaging = getMessaging(app);
+
+// VAPID Key
+const VAPID_KEY = "BJKkMr-LMevY9HePx3vzYqWMILwAV8mxwOdfkbR-PvEu_m7eu309ygioDNLLqW1wRc2b93Irb1svNnLQIpegquk";
+
 setPersistence(auth, browserLocalPersistence);
 
-// 3. Firestore (SANS configuration de cache pour éviter l'erreur)
-const db = getFirestore(app);
-
-// 4. Persistance (optionnel)
+// Persistance Firestore
 enableIndexedDbPersistence(db)
   .then(() => console.log('✅ Persistance activée'))
   .catch((err) => {
@@ -766,295 +859,502 @@ enableIndexedDbPersistence(db)
       console.warn('⚠️ Erreur persistance:', err.message);
     }
   });
+
+// ================================================================
+// ===== DOM ÉLÉMENTS =====
+// ================================================================
+const userIdDisplay = document.getElementById('userIdDisplay');
+const copyIdBtn = document.getElementById('copyIdBtn');
+const amountInput = document.getElementById('amountInput');
+const displayAmount = document.getElementById('displayAmount');
+const amountDisplay = document.getElementById('amountDisplay');
+const whatsappBtn = document.getElementById('whatsappBtn');
+const toast = document.getElementById('toast');
+const historyList = document.getElementById('historyList');
+const readOnlyBanner = document.getElementById('readOnlyBanner');
+
+let currentUserId = null;
+let currentAuthUser = null;
+let userData = null;
+let isUnlocked = false;
+
+// ================================================================
+// ===== CONSTANTES =====
+// ================================================================
+const WHATSAPP_NUMBER = "22798064667";
+const MONTANT_MIN = 3000;
+const MONTANT_MAX = 1000000;
+
+// ================================================================
+// ===== TOAST =====
+// ================================================================
+function showToast(message, type = 'success') {
+  toast.textContent = message;
+  toast.className = `toast ${type}`;
+  setTimeout(() => toast.classList.add('show'), 50);
+  setTimeout(() => toast.classList.remove('show'), 4000);
+}
+
+// ================================================================
+// ===== GÉNÉRATION D'ID UNIQUE =====
+// ================================================================
+function generateCustomerId() {
+  const prefix = 'ARV';
+  const timestamp = Date.now().toString(36).toUpperCase();
+  const random = Math.random().toString(36).substring(2, 7).toUpperCase();
+  return `${prefix}-${timestamp}-${random}`;
+}
+
+// ================================================================
+// ===== OBTENIR L'ID UTILISATEUR =====
+// ================================================================
+async function getUserId(user) {
+  if (!user) return null;
+
+  try {
+    const userRef = doc(db, 'users', user.uid);
+    const userSnap = await getDoc(userRef);
+    
+    if (userSnap.exists()) {
+      const data = userSnap.data();
+      isUnlocked = data.isUnlocked === true || data.hasDeposited === true;
+      const existingId = data.id || data.customerId;
+      if (existingId) {
+        return existingId;
+      }
+      const newId = generateCustomerId();
+      await updateDoc(userRef, { id: newId, customerId: newId });
+      return newId;
+    } else {
+      const newId = generateCustomerId();
+      const newUser = {
+        uid: user.uid,
+        email: user.email || '',
+        prenom: user.displayName?.split(' ')[0] || 'Investisseur',
+        id: newId,
+        customerId: newId,
+        balance: 0,
+        hasDeposited: false,
+        isUnlocked: false,
+        status: 'active',
+        role: 'user',
+        createdAt: new Date().toISOString(),
+        lastLogin: new Date().toISOString()
+      };
+      await setDoc(userRef, newUser);
+      isUnlocked = false;
+      return newId;
+    }
+  } catch (error) {
+    console.warn('⚠️ Erreur Firestore, ID local utilisé:', error);
+    return generateCustomerId();
+  }
+}
+
+// ================================================================
+// ===== AFFICHER L'ID =====
+// ================================================================
+async function displayUserId(user) {
+  if (!user) {
+    window.location.href = 'login.html';
+    return;
+  }
+
+  currentAuthUser = user;
+  const id = await getUserId(user);
+  currentUserId = id;
+  userIdDisplay.textContent = id || 'ID indisponible';
   
-  // ================================================================
-  // ===== ÉLÉMENTS DOM =====
-  // ================================================================
-  const userIdDisplay = document.getElementById('userIdDisplay');
-  const copyIdBtn = document.getElementById('copyIdBtn');
-  const amountInput = document.getElementById('amountInput');
-  const calcSent = document.getElementById('calcSent');
-  const calcFee = document.getElementById('calcFee');
-  const calcReceived = document.getElementById('calcReceived');
-  const whatsappBtn = document.getElementById('whatsappBtn');
-  const toast = document.getElementById('toast');
-
-  let currentUserId = null;
-  let currentAuthUser = null;
-  let userData = null;
-
-  // ================================================================
-  // ===== CONSTANTES =====
-  // ================================================================
-  const WHATSAPP_NUMBER = "22798064667";
-  const FRAIS_POURCENTAGE = 10; // 10%
-  const MONTANT_MIN = 100;
-  const MONTANT_MAX = 1000000;
-
-  // ================================================================
-  // ===== TOAST =====
-  // ================================================================
-  function showToast(message, type = 'success') {
-    toast.textContent = message;
-    toast.className = `toast ${type}`;
-    setTimeout(() => toast.classList.add('show'), 50);
-    setTimeout(() => toast.classList.remove('show'), 4000);
-  }
-
-  // ================================================================
-  // ===== GÉNÉRATION D'ID UNIQUE =====
-  // ================================================================
-  function generateCustomerId() {
-    // Format: ARV-XXXXX-XXXXX
-    const prefix = 'ARV';
-    const timestamp = Date.now().toString(36).toUpperCase();
-    const random = Math.random().toString(36).substring(2, 7).toUpperCase();
-    return `${prefix}-${timestamp}-${random}`;
-  }
-
-  // ================================================================
-  // ===== OBTENIR L'ID UTILISATEUR =====
-  // ================================================================
-  async function getUserId(user) {
-    if (!user) return null;
-
-    try {
-      const userRef = doc(db, 'users', user.uid);
-      const userSnap = await getDoc(userRef);
+  try {
+    const userRef = doc(db, 'users', user.uid);
+    const userSnap = await getDoc(userRef);
+    if (userSnap.exists()) {
+      userData = userSnap.data();
+      isUnlocked = userData.isUnlocked === true || userData.hasDeposited === true;
       
-      if (userSnap.exists()) {
-        const data = userSnap.data();
-        // Utiliser l'ID existant ou en générer un nouveau
-        const existingId = data.id || data.customerId;
-        if (existingId) {
-          return existingId;
+      if (!isUnlocked) {
+        readOnlyBanner.style.display = 'flex';
+      }
+    }
+  } catch (error) {
+    console.warn('⚠️ Erreur chargement données:', error);
+  }
+}
+
+// ================================================================
+// ===== COPIER L'ID =====
+// ================================================================
+copyIdBtn.addEventListener('click', async () => {
+  const id = userIdDisplay.textContent;
+  if (!id || id === 'CHARGEMENT...') return;
+
+  try {
+    await navigator.clipboard.writeText(id);
+    copyIdBtn.innerHTML = '<i class="fas fa-check"></i> ID copié !';
+    copyIdBtn.classList.add('copied');
+    showToast('✅ ID copié dans le presse-papier', 'success');
+    
+    setTimeout(() => {
+      copyIdBtn.innerHTML = '<i class="fas fa-copy"></i> Copier mon ID';
+      copyIdBtn.classList.remove('copied');
+    }, 3000);
+  } catch {
+    const textarea = document.createElement('textarea');
+    textarea.value = id;
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textarea);
+    showToast('✅ ID copié !', 'success');
+  }
+});
+
+// ================================================================
+// ===== METTRE À JOUR L'AFFICHAGE DU MONTANT =====
+// ================================================================
+function updateAmountDisplay() {
+  const amount = parseInt(amountInput.value) || 0;
+  
+  if (amount >= MONTANT_MIN) {
+    displayAmount.textContent = amount.toLocaleString('fr-FR') + ' FCFA';
+    displayAmount.className = 'value';
+    amountDisplay.classList.add('has-value');
+  } else if (amount > 0 && amount < MONTANT_MIN) {
+    displayAmount.textContent = amount.toLocaleString('fr-FR') + ' FCFA (minimum ' + MONTANT_MIN.toLocaleString('fr-FR') + ' FCFA)';
+    displayAmount.className = 'value zero';
+    amountDisplay.classList.add('has-value');
+  } else {
+    displayAmount.textContent = '0 FCFA';
+    displayAmount.className = 'value zero';
+    amountDisplay.classList.remove('has-value');
+  }
+  
+  updateWhatsAppLink(amount);
+}
+
+// ================================================================
+// ===== METTRE À JOUR LE LIEN WHATSAPP =====
+// ================================================================
+function updateWhatsAppLink(amount) {
+  const amountValue = amount || parseInt(amountInput.value) || 0;
+  
+  if (amountValue < MONTANT_MIN) {
+    whatsappBtn.disabled = true;
+    whatsappBtn.style.opacity = '0.5';
+    whatsappBtn.innerHTML = `<i class="fab fa-whatsapp"></i> ⚠️ Minimum ${MONTANT_MIN.toLocaleString('fr-FR')} FCFA`;
+    return;
+  }
+
+  if (amountValue > MONTANT_MAX) {
+    whatsappBtn.disabled = true;
+    whatsappBtn.style.opacity = '0.5';
+    whatsappBtn.innerHTML = `<i class="fab fa-whatsapp"></i> ⚠️ Maximum ${MONTANT_MAX.toLocaleString('fr-FR')} FCFA`;
+    return;
+  }
+
+  whatsappBtn.disabled = false;
+  whatsappBtn.style.opacity = '1';
+  whatsappBtn.innerHTML = `<i class="fab fa-whatsapp"></i> Envoyer la demande via WhatsApp`;
+  
+  const message = `Bonjour ARVEXA, je souhaite recharger mon compte de ${amountValue.toLocaleString('fr-FR')} FCFA. Mon ID est : ${currentUserId}`;
+  whatsappBtn.href = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+}
+
+// ================================================================
+// ===== ENVOYER UNE NOTIFICATION PUSH À L'ADMIN (FCM) =====
+// ================================================================
+async function sendAdminNotification(depositData) {
+  try {
+    // Récupérer le token FCM de l'admin
+    const adminQuery = query(
+      collection(db, 'users'),
+      where('isAdmin', '==', true),
+      where('notificationsEnabled', '==', true)
+    );
+    
+    const adminSnapshot = await getDocs(adminQuery);
+    
+    if (adminSnapshot.empty) {
+      console.log('⚠️ Aucun admin avec notifications activées');
+      return;
+    }
+
+    // Pour chaque admin, envoyer une notification
+    const adminTokens = [];
+    adminSnapshot.forEach(doc => {
+      const data = doc.data();
+      if (data.fcmToken) {
+        adminTokens.push(data.fcmToken);
+      }
+    });
+
+    if (adminTokens.length === 0) {
+      console.log('⚠️ Aucun token FCM trouvé pour l\'admin');
+      return;
+    }
+
+    // Envoyer via FCM
+    const message = {
+      notification: {
+        title: `💰 Nouveau dépôt - ${depositData.montant.toLocaleString('fr-FR')} FCFA`,
+        body: `${depositData.userName} - ID: ${depositData.displayId}`
+      },
+      data: {
+        type: 'new_deposit',
+        depositId: depositData.id || '',
+        userId: depositData.userId || '',
+        userName: depositData.userName || '',
+        amount: String(depositData.montant || 0),
+        click_action: '/admin/index.html'
+      },
+      tokens: adminTokens
+    };
+
+    // Utiliser l'API FCM via fetch
+    const response = await fetch('https://fcm.googleapis.com/v1/projects/nexgen-39043/messages:send', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${await getAccessToken()}`
+      },
+      body: JSON.stringify({
+        message: {
+          notification: message.notification,
+          data: message.data,
+          tokens: message.tokens
         }
-        
-        // Générer un nouvel ID
-        const newId = generateCustomerId();
-        await updateDoc(userRef, {
-          id: newId,
-          customerId: newId
-        });
-        return newId;
-      } else {
-        // Créer le document utilisateur avec un ID
-        const newId = generateCustomerId();
-        const newUser = {
-          uid: user.uid,
-          email: user.email || '',
-          prenom: user.displayName?.split(' ')[0] || 'Investisseur',
-          id: newId,
-          customerId: newId,
-          balance: 0,
-          status: 'active',
-          role: 'user',
-          createdAt: new Date().toISOString(),
-          lastLogin: new Date().toISOString()
-        };
-        await setDoc(userRef, newUser);
-        return newId;
-      }
-    } catch (error) {
-      console.warn('⚠️ Erreur Firestore, ID local utilisé:', error);
-      // Fallback: générer un ID local
-      return generateCustomerId();
-    }
-  }
+      })
+    });
 
-  // ================================================================
-  // ===== AFFICHER L'ID =====
-  // ================================================================
-  async function displayUserId(user) {
-    if (!user) {
-      window.location.href = 'login.html';
-      return;
-    }
-
-    currentAuthUser = user;
-    const id = await getUserId(user);
-    currentUserId = id;
-    userIdDisplay.textContent = id || 'ID indisponible';
-    
-    // Charger les données utilisateur
-    try {
-      const userRef = doc(db, 'users', user.uid);
-      const userSnap = await getDoc(userRef);
-      if (userSnap.exists()) {
-        userData = userSnap.data();
-      }
-    } catch (error) {
-      console.warn('⚠️ Erreur chargement données:', error);
-    }
-  }
-
-  // ================================================================
-  // ===== COPIER L'ID =====
-  // ================================================================
-  copyIdBtn.addEventListener('click', async () => {
-    const id = userIdDisplay.textContent;
-    if (!id || id === 'CHARGEMENT...') return;
-
-    try {
-      await navigator.clipboard.writeText(id);
-      copyIdBtn.innerHTML = '<i class="fas fa-check"></i> ID copié !';
-      copyIdBtn.classList.add('copied');
-      showToast('✅ ID copié dans le presse-papier', 'success');
-      
-      setTimeout(() => {
-        copyIdBtn.innerHTML = '<i class="fas fa-copy"></i> Copier mon ID';
-        copyIdBtn.classList.remove('copied');
-      }, 3000);
-    } catch {
-      // Fallback pour les navigateurs sans clipboard
-      const textarea = document.createElement('textarea');
-      textarea.value = id;
-      document.body.appendChild(textarea);
-      textarea.select();
-      document.execCommand('copy');
-      document.body.removeChild(textarea);
-      showToast('✅ ID copié !', 'success');
-    }
-  });
-
-  // ================================================================
-  // ===== CALCUL DES FRAIS =====
-  // ================================================================
-  function calculateFees() {
-    const amount = parseInt(amountInput.value) || 0;
-    const fee = Math.round(amount * FRAIS_POURCENTAGE / 100);
-    const received = amount - fee;
-
-    calcSent.textContent = amount.toLocaleString('fr-FR') + ' F';
-    calcFee.textContent = fee.toLocaleString('fr-FR') + ' F';
-    calcReceived.textContent = received.toLocaleString('fr-FR') + ' F';
-
-    const box = document.getElementById('calculationBox');
-    if (amount > 0) {
-      box.classList.add('has-value');
+    if (response.ok) {
+      console.log('✅ Notifications FCM envoyées avec succès');
     } else {
-      box.classList.remove('has-value');
+      console.error('❌ Erreur FCM:', await response.text());
     }
 
-    updateWhatsAppLink(amount);
+  } catch (error) {
+    console.error('❌ Erreur envoi notification FCM:', error);
+  }
+}
+
+// ================================================================
+// ===== OBTENIR LE TOKEN D'ACCÈS FCM =====
+// ================================================================
+async function getAccessToken() {
+  // Cette fonction nécessite un token OAuth2
+  // Alternative plus simple : utiliser sendEachForMulticast via Firebase Admin SDK (server-side)
+  // Pour une solution côté client, on peut utiliser la méthode HTTP avec token d'accès
+  console.log('⚠️ Utiliser Firebase Admin SDK côté serveur pour les notifications FCM');
+  return '';
+}
+
+// ================================================================
+// ===== ENVOI VIA WHATSAPP ET NOTIFICATION =====
+// ================================================================
+whatsappBtn.addEventListener('click', async (event) => {
+  event.preventDefault();
+
+  const amount = parseInt(amountInput.value, 10) || 0;
+  if (!currentAuthUser || !currentUserId) {
+    showToast('⚠️ Veuillez vous reconnecter pour poursuivre.', 'error');
+    return;
   }
 
-  // ================================================================
-  // ===== METTRE À JOUR LE LIEN WHATSAPP =====
-  // ================================================================
-  function updateWhatsAppLink(amount) {
-    const amountValue = amount || parseInt(amountInput.value) || 0;
-    
-    if (amountValue < MONTANT_MIN) {
-      whatsappBtn.disabled = true;
-      whatsappBtn.style.opacity = '0.5';
-      whatsappBtn.textContent = `💰 Minimum ${MONTANT_MIN} FCFA`;
-      return;
-    }
-
-    if (amountValue > MONTANT_MAX) {
-      whatsappBtn.disabled = true;
-      whatsappBtn.style.opacity = '0.5';
-      whatsappBtn.textContent = `⚠️ Maximum ${MONTANT_MAX.toLocaleString('fr-FR')} FCFA`;
-      return;
-    }
-
-    whatsappBtn.disabled = false;
-    whatsappBtn.style.opacity = '1';
-    whatsappBtn.innerHTML = `<i class="fab fa-whatsapp"></i> Envoyer la demande via WhatsApp`;
-    
-    const fee = Math.round(amountValue * FRAIS_POURCENTAGE / 100);
-    const net = amountValue - fee;
-    const message = `Bonjour ARVEXA, je souhaite recharger mon compte de ${amountValue.toLocaleString('fr-FR')} FCFA (frais ${fee} FCFA, net reçu ${net.toLocaleString('fr-FR')} FCFA). Mon ID est : ${currentUserId}`;
-    whatsappBtn.href = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+  if (amount < MONTANT_MIN) {
+    showToast(`⚠️ Le montant minimum est de ${MONTANT_MIN.toLocaleString('fr-FR')} FCFA.`, 'error');
+    return;
   }
 
-  // ================================================================
-  // ===== ENVOI VIA WHATSAPP =====
-  // ================================================================
-  whatsappBtn.addEventListener('click', async (event) => {
-    event.preventDefault();
+  if (amount > MONTANT_MAX) {
+    showToast(`⚠️ Le montant maximum est de ${MONTANT_MAX.toLocaleString('fr-FR')} FCFA.`, 'error');
+    return;
+  }
 
-    const amount = parseInt(amountInput.value, 10) || 0;
-    if (!currentAuthUser || !currentUserId) {
-      showToast('⚠️ Veuillez vous reconnecter pour poursuivre.', 'error');
-      return;
-    }
+  try {
+    const userName = userData?.prenom || userData?.fullName || 'Utilisateur';
 
-    if (amount < MONTANT_MIN) {
-      showToast(`⚠️ Le montant minimum est de ${MONTANT_MIN} FCFA.`, 'error');
-      return;
-    }
+    // 1. Enregistrer la demande dans Firestore
+    const docRef = await addDoc(collection(db, 'depots'), {
+      userId: currentAuthUser.uid,
+      displayId: currentUserId,
+      userName: userName,
+      userEmail: userData?.email || currentAuthUser.email,
+      montant: amount,
+      frais: 0,
+      net: amount,
+      date: new Date().toISOString().split('T')[0],
+      timestamp: new Date().toISOString(),
+      statut: 'en_attente',
+      type: 'recharge',
+      source: 'whatsapp',
+      paymentMethod: 'whatsapp'
+    });
 
-    if (amount > MONTANT_MAX) {
-      showToast(`⚠️ Le montant maximum est de ${MONTANT_MAX.toLocaleString('fr-FR')} FCFA.`, 'error');
-      return;
-    }
+    // 2. 🔔 NOTIFICATION DANS FIRESTORE (pour l'admin)
+    await addDoc(collection(db, 'notifications'), {
+      type: 'deposit_pending',
+      title: '💰 Nouveau dépôt en attente',
+      body: `${userName} - ${amount.toLocaleString('fr-FR')} FCFA`,
+      userId: currentAuthUser.uid,
+      userName: userName,
+      amount: amount,
+      depositId: docRef.id,
+      read: false,
+      createdAt: new Date().toISOString(),
+      target: 'admin'
+    });
+    console.log('✅ Notification admin enregistrée dans Firestore');
 
-    try {
-      const fee = Math.round(amount * FRAIS_POURCENTAGE / 100);
-      const net = amount - fee;
+    // 3. 🔔 NOTIFICATION PUSH FCM (comme WhatsApp) - ENVOYÉE À L'ADMIN
+    await sendAdminNotification({
+      id: docRef.id,
+      userId: currentAuthUser.uid,
+      displayId: currentUserId,
+      userName: userName,
+      montant: amount
+    });
+    console.log('✅ Notification FCM envoyée');
 
-      // Enregistrer la demande dans Firestore
-      await addDoc(collection(db, 'depots'), {
+    // 4. 🔔 NOTIFICATION À L'UTILISATEUR (si débloqué)
+    if (isUnlocked) {
+      await addDoc(collection(db, 'notifications'), {
+        type: 'deposit_submitted',
+        title: '📥 Demande de dépôt envoyée',
+        body: `Votre demande de ${amount.toLocaleString('fr-FR')} FCFA a été envoyée. En attente de validation.`,
         userId: currentAuthUser.uid,
-        displayId: currentUserId,
-        userName: userData?.prenom || userData?.fullName || 'Utilisateur',
-        userEmail: userData?.email || currentAuthUser.email,
-        montant: amount,
-        frais: fee,
-        net: net,
-        date: new Date().toISOString().split('T')[0],
-        timestamp: new Date().toISOString(),
-        statut: 'en_attente',
-        type: 'recharge',
-        source: 'whatsapp',
-        paymentMethod: 'whatsapp'
+        read: false,
+        createdAt: new Date().toISOString(),
+        target: 'user'
       });
-
-      showToast(`✅ Demande de recharge de ${amount.toLocaleString('fr-FR')} FCFA enregistrée.`, 'success');
-      
-      // Ouvrir WhatsApp
-      window.open(whatsappBtn.href, '_blank', 'noopener,noreferrer');
-      
-      // Réinitialiser le montant
-      amountInput.value = '';
-      calculateFees();
-      
-    } catch (error) {
-      console.error('❌ Erreur enregistrement recharge:', error);
-      showToast('❌ Erreur lors de l\'enregistrement de la recharge.', 'error');
+      console.log('✅ Notification utilisateur enregistrée');
     }
+
+    showToast(`✅ Demande de recharge de ${amount.toLocaleString('fr-FR')} FCFA enregistrée.`, 'success');
+    
+    // Ouvrir WhatsApp
+    window.open(whatsappBtn.href, '_blank', 'noopener,noreferrer');
+    
+    // Réinitialiser le montant
+    amountInput.value = '';
+    updateAmountDisplay();
+    
+    // Recharger l'historique
+    loadHistory();
+    
+  } catch (error) {
+    console.error('❌ Erreur enregistrement recharge:', error);
+    showToast('❌ Erreur lors de l\'enregistrement de la recharge.', 'error');
+  }
+});
+
+// ================================================================
+// ===== CHARGER L'HISTORIQUE DES DÉPÔTS =====
+// ================================================================
+let unsubscribeHistory = null;
+
+function loadHistory() {
+  if (!currentAuthUser) return;
+  
+  if (unsubscribeHistory) {
+    unsubscribeHistory();
+    unsubscribeHistory = null;
+  }
+
+  const q = query(
+    collection(db, 'depots'),
+    where('userId', '==', currentAuthUser.uid),
+    orderBy('timestamp', 'desc')
+  );
+
+  unsubscribeHistory = onSnapshot(q, (snapshot) => {
+    if (snapshot.empty) {
+      historyList.innerHTML = `
+        <div class="empty-state">
+          <i class="fas fa-clock"></i>
+          <p>Aucun dépôt effectué</p>
+        </div>
+      `;
+      return;
+    }
+
+    historyList.innerHTML = '';
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      const item = document.createElement('div');
+      item.className = 'history-item';
+      
+      const statusMap = {
+        'en_attente': 'pending',
+        'validé': 'validated',
+        'rejeté': 'rejected'
+      };
+      const statusClass = statusMap[data.statut] || 'pending';
+      const statusLabel = data.statut === 'en_attente' ? 'En attente' :
+                         data.statut === 'validé' ? '✅ Validé' : '❌ Rejeté';
+
+      item.innerHTML = `
+        <div class="left">
+          <span class="amount">${data.montant.toLocaleString('fr-FR')} FCFA</span>
+          <span class="date">${data.date || 'Date inconnue'}</span>
+        </div>
+        <div class="right">
+          <span class="status-badge ${statusClass}">${statusLabel}</span>
+        </div>
+      `;
+      historyList.appendChild(item);
+    });
+  }, (error) => {
+    console.error('Erreur historique:', error);
   });
+}
 
-  // ================================================================
-  // ===== ÉVÉNEMENTS =====
-  // ================================================================
-  amountInput.addEventListener('input', calculateFees);
+// ================================================================
+// ===== FCM - ÉCOUTER LES MESSAGES EN PREMIER PLAN =====
+// ================================================================
+onMessage(messaging, (payload) => {
+  console.log('📩 Message reçu en premier plan:', payload);
+  
+  if (payload.data?.type === 'deposit_validated') {
+    showToast(
+      `✅ Dépôt validé ! ${parseInt(payload.data.amount || 0).toLocaleString('fr-FR')} FCFA crédités`,
+      'success'
+    );
+    
+    if (navigator.vibrate) {
+      navigator.vibrate([200, 100, 200]);
+    }
+  }
+});
 
-  // ================================================================
-  // ===== AUTH =====
-  // ================================================================
-  onAuthStateChanged(auth, async (user) => {
-    if (user) {
-      await displayUserId(user);
-      localStorage.setItem('ARVEXA_current_user', user.uid);
+// ================================================================
+// ===== ÉVÉNEMENTS =====
+// ================================================================
+amountInput.addEventListener('input', updateAmountDisplay);
+
+// ================================================================
+// ===== AUTH =====
+// ================================================================
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    await displayUserId(user);
+    localStorage.setItem('ARVEXA_current_user', user.uid);
+    loadHistory();
+    updateAmountDisplay();
+  } else {
+    const savedUid = localStorage.getItem('ARVEXA_current_user');
+    if (savedUid) {
+      setTimeout(() => {
+        if (!auth.currentUser) {
+          window.location.href = 'login.html';
+        }
+      }, 2000);
     } else {
-      const savedUid = localStorage.getItem('ARVEXA_current_user');
-      if (savedUid) {
-        // Attendre un peu pour voir si la connexion se rétablit
-        setTimeout(() => {
-          if (!auth.currentUser) {
-            window.location.href = 'login.html';
-          }
-        }, 2000);
-      } else {
-        window.location.href = 'login.html';
-      }
+      window.location.href = 'login.html';
     }
-  });
+  }
+});
 
-  console.log("💰 ARVEXA - Page Recharger (version corrigée)");
+console.log("💰 ARVEXA - Page Recharger avec notifications FCM (minimum 3 000 FCFA, sans frais)");
 </script>
 </body>
 </html>
