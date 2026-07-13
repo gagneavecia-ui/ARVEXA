@@ -10,10 +10,17 @@
   <meta name="apple-mobile-web-app-title" content="ARVEXA">
   <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3135/3135715.png">
   <link rel="manifest" href="manifest.json">
+  
+  <!-- ===== PRELOAD FONTS ===== -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <!-- ===== FONT AWESOME ===== -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <style>
-    /* ===== ROOT ===== */
+    /* ===== TOUT LE CSS EST ICI - PAS DE CHARGEMENT EXTERNE ===== */
     :root {
       --primary: #1A3A2A;
       --primary-dark: #0A1A12;
@@ -30,19 +37,15 @@
       --card-border: rgba(184, 134, 11, 0.06);
       --glass-bg: rgba(26, 58, 42, 0.15);
       --glass-border: rgba(184, 134, 11, 0.04);
-      --transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+      --transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
       --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      --radius: 16px;
     }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
     body {
-      font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+      font-family: 'Inter', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
       background: var(--bg-dark);
       color: var(--text-light);
       font-size: 14px;
@@ -51,984 +54,345 @@
       min-height: 100vh;
       touch-action: pan-y;
       user-select: none;
+      opacity: 0;
+      animation: pageFadeIn 0.4s ease forwards;
     }
+    @keyframes pageFadeIn { 0% { opacity: 0; } 100% { opacity: 1; } }
+
+    /* ===== ÉCRAN DE CHARGEMENT ===== */
+    #loadingScreen {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: var(--bg-dark); z-index: 9999;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      transition: opacity 0.4s ease, visibility 0.4s ease;
+    }
+    #loadingScreen.hide { opacity: 0; visibility: hidden; pointer-events: none; }
+    .loader-logo { font-size: 32px; font-weight: 700; font-family: 'Playfair Display', serif; letter-spacing: 3px; color: var(--text-light); margin-bottom: 20px; }
+    .loader-logo span { color: var(--accent); }
+    .loader-spinner { width: 36px; height: 36px; border: 3px solid rgba(184,134,11,0.1); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loader-text { margin-top: 14px; color: var(--text-muted); font-size: 12px; font-weight: 300; opacity: 0.6; }
 
     /* ===== BACKGROUND ===== */
     .gradient-bg {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: -2;
-      background: radial-gradient(ellipse 40% 30% at 30% 20%, rgba(26, 58, 42, 0.12) 0%, transparent 70%),
-                  radial-gradient(ellipse 30% 20% at 70% 80%, rgba(184, 134, 11, 0.02) 0%, transparent 60%),
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2;
+      background: radial-gradient(ellipse 40% 30% at 30% 20%, rgba(26,58,42,0.12) 0%, transparent 70%),
+                  radial-gradient(ellipse 30% 20% at 70% 80%, rgba(184,134,11,0.02) 0%, transparent 60%),
                   linear-gradient(180deg, #0A0A0A 0%, #060606 100%);
     }
-
-    /* ===== GLOW ===== */
     .glow {
-      position: fixed;
-      border-radius: 50%;
-      filter: blur(80px);
-      pointer-events: none;
-      z-index: -1;
-      opacity: 0.15;
-      animation: glowMove 10s ease-in-out infinite alternate;
+      position: fixed; border-radius: 50%; filter: blur(80px); pointer-events: none; z-index: -1;
+      opacity: 0.15; animation: glowMove 10s ease-in-out infinite alternate;
     }
-    .glow-1 { width: 350px; height: 350px; background: rgba(26, 58, 42, 0.15); top: -80px; right: -80px; }
-    .glow-2 { width: 200px; height: 200px; background: rgba(184, 134, 11, 0.03); bottom: 0; left: 0; animation-delay: -4s; }
-    .glow-3 { width: 250px; height: 250px; background: rgba(26, 58, 42, 0.08); top: 40%; left: 50%; transform: translate(-50%, -50%); animation-delay: -8s; }
-    @keyframes glowMove {
-      0% { transform: translate(0, 0) scale(1); }
-      100% { transform: translate(30px, -20px) scale(1.1); }
-    }
+    .glow-1 { width: 350px; height: 350px; background: rgba(26,58,42,0.15); top: -80px; right: -80px; }
+    .glow-2 { width: 200px; height: 200px; background: rgba(184,134,11,0.03); bottom: 0; left: 0; animation-delay: -4s; }
+    .glow-3 { width: 250px; height: 250px; background: rgba(26,58,42,0.08); top: 40%; left: 50%; transform: translate(-50%,-50%); animation-delay: -8s; }
+    @keyframes glowMove { 0% { transform: translate(0,0) scale(1); } 100% { transform: translate(30px,-20px) scale(1.1); } }
 
     /* ===== HEADER ===== */
     .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px 5%;
-      background: rgba(10, 10, 10, 0.95);
-      backdrop-filter: blur(12px);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      border-bottom: 1px solid rgba(184, 134, 11, 0.04);
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 10px 5%; background: rgba(10,10,10,0.95); backdrop-filter: blur(12px);
+      position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(184,134,11,0.04);
     }
-    .logo {
-      display: flex;
-      align-items: center;
-      text-decoration: none;
-    }
-    .logo-text {
-      font-size: 18px;
-      font-weight: 600;
-      font-family: 'Georgia', 'Times New Roman', serif;
-      letter-spacing: 2px;
-      color: var(--text-light);
-    }
-    .logo-text span { color: var(--accent); font-weight: 700; }
+    .logo { display: flex; align-items: center; text-decoration: none; }
+    .logo-text { font-size: 18px; font-weight: 700; font-family: 'Playfair Display', serif; letter-spacing: 2px; color: var(--text-light); }
+    .logo-text span { color: var(--accent); font-style: italic; }
 
     .header-actions { display: flex; align-items: center; gap: 8px; }
     .user-profile {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 4px 10px 4px 4px;
-      background: var(--glass-bg);
-      border: 1px solid var(--glass-border);
-      border-radius: 40px;
-      cursor: pointer;
-      transition: var(--transition);
-      text-decoration: none;
-      color: inherit;
-      position: relative;
-      z-index: 101;
+      display: flex; align-items: center; gap: 8px; padding: 4px 10px 4px 4px;
+      background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 40px;
+      cursor: pointer; transition: var(--transition); text-decoration: none; color: inherit;
     }
     .user-profile:active { transform: scale(0.96); }
-    .user-profile:hover { border-color: rgba(184, 134, 11, 0.1); }
     .user-avatar {
-      width: 26px; height: 26px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 600;
-      font-size: 10px;
-      background: var(--accent);
-      color: var(--bg-dark);
-      flex-shrink: 0;
+      width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      font-weight: 600; font-size: 10px; background: var(--accent); color: var(--bg-dark); flex-shrink: 0;
     }
-    .user-name {
-      font-size: 11px;
-      font-weight: 400;
-      color: var(--text-dim);
-      max-width: 80px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
+    .user-name { font-size: 11px; font-weight: 400; color: var(--text-dim); max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .menu-btn {
-      width: 32px; height: 32px;
-      background: var(--glass-bg);
-      border: 1px solid var(--glass-border);
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--text-dim);
-      cursor: pointer;
-      transition: var(--transition);
-      text-decoration: none;
-      position: relative;
-      z-index: 101;
+      width: 32px; height: 32px; background: var(--glass-bg); border: 1px solid var(--glass-border);
+      border-radius: 8px; display: flex; align-items: center; justify-content: center;
+      color: var(--text-dim); cursor: pointer; transition: var(--transition);
     }
     .menu-btn:active { transform: scale(0.94); }
-    .menu-btn:hover { border-color: rgba(184, 134, 11, 0.12); color: var(--text-light); }
+    .menu-btn:hover { border-color: rgba(184,134,11,0.12); color: var(--text-light); }
 
     /* ===== CONTAINER ===== */
-    .container {
-      max-width: 500px;
-      margin: 0 auto;
-      padding: 16px 16px 80px;
-      touch-action: pan-y;
-    }
+    .container { max-width: 500px; margin: 0 auto; padding: 16px 16px 80px; touch-action: pan-y; }
 
     /* ===== HERO ===== */
-    .hero-section {
-      margin-bottom: 24px;
-      animation: fadeInUp 0.7s ease-out;
-    }
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(30px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+    .hero-section { margin-bottom: 24px; animation: fadeInUp 0.5s ease-out; }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     .hero-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: rgba(184, 134, 11, 0.03);
-      border: 1px solid rgba(184, 134, 11, 0.04);
-      border-radius: 30px;
-      padding: 3px 12px;
-      margin-bottom: 14px;
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(184,134,11,0.03); border: 1px solid rgba(184,134,11,0.04);
+      border-radius: 30px; padding: 3px 12px; margin-bottom: 14px;
     }
-    .hero-badge span {
-      color: var(--text-dim);
-      font-size: 9px;
-      font-weight: 400;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-    }
+    .hero-badge span { color: var(--text-dim); font-size: 9px; font-weight: 400; letter-spacing: 1px; text-transform: uppercase; }
     .hero-badge i { color: var(--accent); font-size: 8px; }
-    .hero-title {
-      font-size: 28px;
-      font-weight: 600;
-      font-family: 'Georgia', 'Times New Roman', serif;
-      line-height: 1.2;
-      margin-bottom: 10px;
-      color: var(--text-light);
-    }
+    .hero-title { font-size: 28px; font-weight: 700; font-family: 'Playfair Display', serif; line-height: 1.2; margin-bottom: 10px; color: var(--text-light); }
     .hero-title span { color: var(--accent); font-style: italic; }
-    .hero-description {
-      font-size: 13px;
-      color: var(--text-dim);
-      font-weight: 300;
-    }
+    .hero-description { font-size: 13px; color: var(--text-dim); font-weight: 300; }
 
     /* ===== DASHBOARD ===== */
-    .dashboard-stats-container { margin-bottom: 28px; animation: fadeInUp 0.8s ease-out; }
+    .dashboard-stats-container { margin-bottom: 28px; animation: fadeInUp 0.5s ease-out; }
     .main-stat-card {
-      background: linear-gradient(135deg, rgba(20, 20, 20, 0.95), rgba(10, 10, 10, 0.98));
-      border: 1px solid rgba(184, 134, 11, 0.04);
-      border-radius: 16px;
-      padding: 18px 20px;
-      transition: var(--transition);
-      position: relative;
-      overflow: hidden;
-      box-shadow: var(--shadow);
+      background: linear-gradient(135deg, rgba(20,20,20,0.95), rgba(10,10,10,0.98));
+      border: 1px solid rgba(184,134,11,0.04); border-radius: 16px; padding: 18px 20px;
+      transition: var(--transition); position: relative; overflow: hidden; box-shadow: var(--shadow);
     }
     .main-stat-card::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: linear-gradient(135deg, rgba(184, 134, 11, 0.02), transparent);
-      border-radius: 16px;
-      pointer-events: none;
+      content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(135deg, rgba(184,134,11,0.02), transparent); border-radius: 16px; pointer-events: none;
     }
     .main-stat-card::after {
-      content: '';
-      position: absolute;
-      top: -50%; right: -30%;
-      width: 80%; height: 80%;
-      background: radial-gradient(circle, rgba(184, 134, 11, 0.02), transparent 70%);
-      pointer-events: none;
+      content: ''; position: absolute; top: -50%; right: -30%; width: 80%; height: 80%;
+      background: radial-gradient(circle, rgba(184,134,11,0.02), transparent 70%); pointer-events: none;
       animation: cardGlow 8s ease-in-out infinite alternate;
     }
-    @keyframes cardGlow {
-      0% { transform: translate(0,0) scale(1); opacity: 0.3; }
-      100% { transform: translate(-20px,-20px) scale(1.2); opacity: 0.6; }
-    }
-    .main-stat-card:hover { border-color: rgba(184, 134, 11, 0.08); transform: translateY(-2px); }
-    .main-stat-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 6px;
-      position: relative;
-      z-index: 1;
-    }
-    .main-stat-label {
-      font-size: 10px;
-      font-weight: 400;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
-    }
+    @keyframes cardGlow { 0% { transform: translate(0,0) scale(1); opacity: 0.3; } 100% { transform: translate(-20px,-20px) scale(1.2); opacity: 0.6; } }
+    .main-stat-card:hover { border-color: rgba(184,134,11,0.08); transform: translateY(-2px); }
+    .main-stat-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; position: relative; z-index: 1; }
+    .main-stat-label { font-size: 10px; font-weight: 400; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; }
     .btn-recharge {
-      background: var(--accent);
-      color: var(--bg-dark);
-      border: none;
-      border-radius: 30px;
-      padding: 5px 14px;
-      font-size: 10px;
-      font-weight: 600;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      transition: var(--transition);
-      text-decoration: none;
-      position: relative;
-      z-index: 1;
+      background: var(--accent); color: var(--bg-dark); border: none; border-radius: 30px;
+      padding: 5px 14px; font-size: 10px; font-weight: 600; cursor: pointer;
+      display: flex; align-items: center; gap: 5px; transition: var(--transition); text-decoration: none; position: relative; z-index: 1;
     }
     .btn-recharge:active { transform: scale(0.95); }
     .btn-recharge:hover { background: #9A7209; box-shadow: 0 0 30px rgba(184,134,11,0.1); }
-    .main-stat-value {
-      font-family: 'Georgia', 'Times New Roman', serif;
-      font-size: 30px;
-      font-weight: 600;
-      margin-bottom: 6px;
-      position: relative;
-      z-index: 1;
-      color: var(--text-light);
-      letter-spacing: 1px;
-    }
-    .main-stat-footer {
-      font-size: 10px;
-      color: var(--text-muted);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      position: relative;
-      z-index: 1;
-    }
+    .main-stat-value { font-family: 'Playfair Display', serif; font-size: 30px; font-weight: 700; margin-bottom: 6px; position: relative; z-index: 1; color: var(--text-light); letter-spacing: 1px; }
+    .main-stat-footer { font-size: 10px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; position: relative; z-index: 1; }
     .main-stat-footer i { color: var(--success); }
 
     /* ===== QUICK STATS ===== */
     .quick-stats {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-bottom: 28px;
-      animation: fadeInUp 0.9s ease-out;
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 28px;
+      animation: fadeInUp 0.6s ease-out;
     }
     .quick-stat-item {
-      background: rgba(20, 20, 20, 0.4);
-      border: 1px solid rgba(255,255,255,0.02);
-      border-radius: 12px;
-      padding: 12px 10px;
-      text-align: center;
-      transition: var(--transition);
+      background: rgba(20,20,20,0.4); border: 1px solid rgba(255,255,255,0.02);
+      border-radius: 12px; padding: 12px 10px; text-align: center; transition: var(--transition);
     }
-    .quick-stat-item:hover {
-      border-color: rgba(184, 134, 11, 0.04);
-      transform: translateY(-2px);
-      background: rgba(20, 20, 20, 0.6);
-    }
+    .quick-stat-item:hover { border-color: rgba(184,134,11,0.04); transform: translateY(-2px); background: rgba(20,20,20,0.6); }
     .quick-stat-icon { font-size: 16px; margin-bottom: 4px; opacity: 0.5; }
     .quick-stat-icon.gold { color: var(--accent); }
     .quick-stat-icon.green { color: var(--success); }
     .quick-stat-icon.blue { color: #4A7A6A; }
-    .quick-stat-value {
-      font-size: 16px;
-      font-weight: 600;
-      font-family: 'Georgia', 'Times New Roman', serif;
-      color: var(--text-light);
-    }
-    .quick-stat-label {
-      font-size: 9px;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      font-weight: 300;
-    }
+    .quick-stat-value { font-size: 16px; font-weight: 700; font-family: 'Playfair Display', serif; color: var(--text-light); }
+    .quick-stat-label { font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 300; }
 
     /* ===== SECTION HEADER ===== */
-    .section-header {
-      margin-bottom: 14px;
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      flex-wrap: wrap;
-    }
-    .section-header-left {
-      border-left: 2px solid var(--accent);
-      padding-left: 10px;
-    }
-    .section-subtitle {
-      color: var(--accent);
-      font-size: 9px;
-      font-weight: 400;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      opacity: 0.5;
-    }
-    .section-title {
-      font-size: 18px;
-      font-weight: 600;
-      font-family: 'Georgia', 'Times New Roman', serif;
-      color: var(--text-light);
-    }
+    .section-header { margin-bottom: 14px; display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; }
+    .section-header-left { border-left: 2px solid var(--accent); padding-left: 10px; }
+    .section-subtitle { color: var(--accent); font-size: 9px; font-weight: 400; text-transform: uppercase; letter-spacing: 2px; opacity: 0.5; }
+    .section-title { font-size: 18px; font-weight: 700; font-family: 'Playfair Display', serif; color: var(--text-light); }
     .section-title span { color: var(--accent); font-style: italic; }
-    .section-link {
-      color: var(--text-muted);
-      font-size: 11px;
-      text-decoration: none;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      transition: var(--transition);
-      font-weight: 400;
-    }
+    .section-link { color: var(--text-muted); font-size: 11px; text-decoration: none; display: flex; align-items: center; gap: 4px; transition: var(--transition); font-weight: 400; }
     .section-link:hover { color: var(--accent); gap: 8px; }
     .section-link i { font-size: 9px; transition: var(--transition); }
     .section-link:hover i { transform: translateX(2px); }
 
     /* ===== FORMATIONS ===== */
-    .formations-list-horizontal {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      margin-bottom: 32px;
-    }
+    .formations-list-horizontal { display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px; }
     .formation-card-horizontal {
-      display: flex;
-      background: var(--bg-card);
-      backdrop-filter: blur(10px);
-      border: 1px solid var(--card-border);
-      border-radius: 14px;
-      overflow: hidden;
-      text-decoration: none;
-      color: inherit;
-      transition: var(--transition);
-      height: 130px;
-      cursor: pointer;
-      animation: fadeInUp 0.8s ease-out;
+      display: flex; background: var(--bg-card); backdrop-filter: blur(10px);
+      border: 1px solid var(--card-border); border-radius: 14px; overflow: hidden;
+      text-decoration: none; color: inherit; transition: var(--transition); height: 130px;
+      cursor: pointer; animation: fadeInUp 0.6s ease-out;
     }
     .formation-card-horizontal:active { transform: scale(0.98); }
-    .formation-card-horizontal:hover {
-      border-color: rgba(184, 134, 11, 0.08);
-      transform: translateY(-2px);
-      background: rgba(20, 20, 20, 0.8);
-    }
-    .formation-horiz-img-wrap {
-      position: relative;
-      width: 100px;
-      min-width: 100px;
-      height: 100%;
-      overflow: hidden;
-    }
-    .formation-horiz-img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      filter: brightness(0.6) saturate(0.8);
-      transition: var(--transition);
-    }
-    .formation-card-horizontal:hover .formation-horiz-img {
-      filter: brightness(0.75) saturate(0.9);
-      transform: scale(1.05);
-    }
+    .formation-card-horizontal:hover { border-color: rgba(184,134,11,0.08); transform: translateY(-2px); background: rgba(20,20,20,0.8); }
+    .formation-horiz-img-wrap { position: relative; width: 100px; min-width: 100px; height: 100%; overflow: hidden; }
+    .formation-horiz-img { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.6) saturate(0.8); transition: var(--transition); }
+    .formation-card-horizontal:hover .formation-horiz-img { filter: brightness(0.75) saturate(0.9); transform: scale(1.05); }
     .formation-horiz-badge {
-      position: absolute;
-      top: 6px;
-      left: 6px;
-      background: rgba(10, 10, 10, 0.85);
-      border: 1px solid rgba(184, 134, 11, 0.06);
-      color: var(--accent);
-      font-size: 8px;
-      font-weight: 400;
-      padding: 2px 8px;
-      border-radius: 4px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+      position: absolute; top: 6px; left: 6px; background: rgba(10,10,10,0.85);
+      border: 1px solid rgba(184,134,11,0.06); color: var(--accent); font-size: 8px;
+      font-weight: 400; padding: 2px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px;
     }
-    .formation-horiz-content {
-      flex: 1;
-      padding: 10px 14px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      overflow: hidden;
-    }
-    .formation-horiz-title {
-      font-size: 13px;
-      font-weight: 600;
-      font-family: 'Georgia', 'Times New Roman', serif;
-      color: var(--text-light);
-      line-height: 1.3;
-      margin-bottom: 2px;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
-    .formation-horiz-description {
-      color: var(--text-dim);
-      font-size: 10px;
-      line-height: 1.3;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-      margin-bottom: 6px;
-      font-weight: 300;
-    }
-    .formation-horiz-footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding-top: 4px;
-      border-top: 1px solid rgba(255,255,255,0.02);
-    }
-    .formation-horiz-price {
-      font-size: 10px;
-      font-weight: 600;
-      color: var(--success);
-    }
-    .formation-horiz-action {
-      font-size: 10px;
-      font-weight: 400;
-      color: var(--accent);
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      transition: var(--transition);
-    }
-    .formation-card-horizontal:hover .formation-horiz-action i {
-      transform: translateX(2px);
-    }
+    .formation-horiz-content { flex: 1; padding: 10px 14px; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; }
+    .formation-horiz-title { font-size: 13px; font-weight: 700; font-family: 'Playfair Display', serif; color: var(--text-light); line-height: 1.3; margin-bottom: 2px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .formation-horiz-description { color: var(--text-dim); font-size: 10px; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 6px; font-weight: 300; }
+    .formation-horiz-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 4px; border-top: 1px solid rgba(255,255,255,0.02); }
+    .formation-horiz-price { font-size: 10px; font-weight: 600; color: var(--success); }
+    .formation-horiz-action { font-size: 10px; font-weight: 400; color: var(--accent); display: flex; align-items: center; gap: 4px; transition: var(--transition); }
+    .formation-card-horizontal:hover .formation-horiz-action i { transform: translateX(2px); }
 
     /* ===== DIVIDER ===== */
-    .section-divider {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin: 32px 0 24px;
-    }
-    .section-divider-line {
-      flex: 1;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(184, 134, 11, 0.06), transparent);
-    }
-    .section-divider-icon {
-      color: var(--text-muted);
-      font-size: 10px;
-      opacity: 0.2;
-    }
+    .section-divider { display: flex; align-items: center; gap: 12px; margin: 32px 0 24px; }
+    .section-divider-line { flex: 1; height: 1px; background: linear-gradient(90deg, transparent, rgba(184,134,11,0.06), transparent); }
+    .section-divider-icon { color: var(--text-muted); font-size: 10px; opacity: 0.2; }
 
     /* ===== SERVICES ===== */
-    .services-list {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin-bottom: 28px;
-    }
+    .services-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 28px; }
     .service-item {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 12px 16px;
-      background: var(--bg-card);
-      border: 1px solid var(--card-border);
-      border-radius: 12px;
-      text-decoration: none;
-      color: inherit;
-      transition: var(--transition);
-      cursor: pointer;
+      display: flex; align-items: center; gap: 14px; padding: 12px 16px;
+      background: var(--bg-card); border: 1px solid var(--card-border); border-radius: 12px;
+      text-decoration: none; color: inherit; transition: var(--transition); cursor: pointer;
     }
     .service-item:active { transform: scale(0.98); }
-    .service-item:hover {
-      border-color: rgba(184, 134, 11, 0.06);
-      background: rgba(20, 20, 20, 0.8);
-      transform: translateX(4px);
-    }
-    .service-icon {
-      width: 38px; height: 38px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 16px;
-      flex-shrink: 0;
-    }
-    .service-icon.gold { background: rgba(184, 134, 11, 0.06); color: var(--accent); }
-    .service-icon.green { background: rgba(45, 125, 90, 0.06); color: var(--success); }
-    .service-icon.blue { background: rgba(26, 58, 42, 0.15); color: #4A7A6A; }
+    .service-item:hover { border-color: rgba(184,134,11,0.06); background: rgba(20,20,20,0.8); transform: translateX(4px); }
+    .service-icon { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+    .service-icon.gold { background: rgba(184,134,11,0.06); color: var(--accent); }
+    .service-icon.green { background: rgba(45,125,90,0.06); color: var(--success); }
+    .service-icon.blue { background: rgba(26,58,42,0.15); color: #4A7A6A; }
     .service-content { flex: 1; }
-    .service-title {
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--text-light);
-    }
-    .service-desc {
-      font-size: 10px;
-      color: var(--text-dim);
-      font-weight: 300;
-    }
-    .service-arrow {
-      color: var(--text-muted);
-      font-size: 11px;
-      transition: var(--transition);
-    }
-    .service-item:hover .service-arrow {
-      color: var(--accent);
-      transform: translateX(2px);
-    }
+    .service-title { font-size: 13px; font-weight: 500; color: var(--text-light); }
+    .service-desc { font-size: 10px; color: var(--text-dim); font-weight: 300; }
+    .service-arrow { color: var(--text-muted); font-size: 11px; transition: var(--transition); }
+    .service-item:hover .service-arrow { color: var(--accent); transform: translateX(2px); }
 
     /* ===== ACTUALITÉS ===== */
     .actualites-section { margin: 8px 0 24px; }
-    
     .actu-card {
-      background: rgba(20, 20, 20, 0.4);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(184, 134, 11, 0.03);
-      border-radius: 16px;
-      padding: 18px 20px;
-      transition: var(--transition);
-      min-height: 120px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
+      background: rgba(20,20,20,0.4); backdrop-filter: blur(10px);
+      border: 1px solid rgba(184,134,11,0.03); border-radius: 16px;
+      padding: 18px 20px; transition: var(--transition); min-height: 120px;
+      display: flex; flex-direction: column; justify-content: space-between;
     }
-    .actu-card:hover {
-      border-color: rgba(184, 134, 11, 0.06);
-      background: rgba(20, 20, 20, 0.6);
-    }
-    
-    .actu-card-header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
+    .actu-card:hover { border-color: rgba(184,134,11,0.06); background: rgba(20,20,20,0.6); }
+    .actu-card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
     .actu-badge {
-      display: inline-block;
-      font-size: 9px;
-      font-weight: 600;
-      padding: 2px 12px;
-      border-radius: 20px;
-      background: rgba(184, 134, 11, 0.08);
-      color: var(--accent);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      flex-shrink: 0;
+      display: inline-block; font-size: 9px; font-weight: 600; padding: 2px 12px;
+      border-radius: 20px; background: rgba(184,134,11,0.08); color: var(--accent);
+      text-transform: uppercase; letter-spacing: 0.5px; flex-shrink: 0;
     }
-    .actu-badge.promotion { background: rgba(45, 125, 90, 0.08); color: var(--success); }
-    .actu-badge.astuce { background: rgba(184, 134, 11, 0.05); color: #D4A017; }
-    .actu-badge.update { background: rgba(26, 58, 42, 0.15); color: #4A7A6A; }
-    
-    .actu-date {
-      font-size: 9px;
-      color: var(--text-muted);
-      opacity: 0.5;
-      margin-left: auto;
-      flex-shrink: 0;
-    }
-    
-    .actu-text {
-      font-size: 13px;
-      color: var(--text-light);
-      line-height: 1.6;
-      font-weight: 400;
-      flex: 1;
-    }
-    
-    .actu-card-footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 12px;
-      padding-top: 10px;
-      border-top: 1px solid rgba(255,255,255,0.03);
-    }
-    .actu-counter {
-      font-size: 10px;
-      color: var(--text-muted);
-      opacity: 0.4;
-    }
-    
-    .actu-nav-buttons {
-      display: flex;
-      gap: 6px;
-    }
+    .actu-badge.promotion { background: rgba(45,125,90,0.08); color: var(--success); }
+    .actu-badge.astuce { background: rgba(184,134,11,0.05); color: #D4A017; }
+    .actu-badge.update { background: rgba(26,58,42,0.15); color: #4A7A6A; }
+    .actu-date { font-size: 9px; color: var(--text-muted); opacity: 0.5; margin-left: auto; flex-shrink: 0; }
+    .actu-text { font-size: 13px; color: var(--text-light); line-height: 1.6; font-weight: 400; flex: 1; }
+    .actu-card-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.03); }
+    .actu-counter { font-size: 10px; color: var(--text-muted); opacity: 0.4; }
+    .actu-nav-buttons { display: flex; gap: 6px; }
     .actu-nav-btn {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      border: 1px solid rgba(184, 134, 11, 0.06);
-      background: rgba(10, 10, 10, 0.3);
-      color: var(--text-dim);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: var(--transition);
-      font-size: 11px;
+      width: 28px; height: 28px; border-radius: 50%; border: 1px solid rgba(184,134,11,0.06);
+      background: rgba(10,10,10,0.3); color: var(--text-dim); cursor: pointer;
+      display: flex; align-items: center; justify-content: center; transition: var(--transition); font-size: 11px;
     }
     .actu-nav-btn:active { transform: scale(0.92); }
-    .actu-nav-btn:hover {
-      border-color: rgba(184, 134, 11, 0.12);
-      color: var(--text-light);
-      background: rgba(10, 10, 10, 0.5);
-    }
-    .actu-nav-btn:disabled {
-      opacity: 0.2;
-      cursor: not-allowed;
-      transform: none;
-    }
-    .actu-nav-btn:disabled:hover {
-      border-color: rgba(184, 134, 11, 0.06);
-      color: var(--text-dim);
-      background: rgba(10, 10, 10, 0.3);
-    }
-     /* ===== FOOTER ===== */
-    .footer {
-      border-top: 1px solid rgba(184, 134, 11, 0.03);
-      padding: 28px 0 16px;
-      text-align: center;
-      margin-top: 20px;
-    }
-    .footer-logo {
-      font-size: 16px;
-      font-weight: 600;
-      font-family: 'Georgia', 'Times New Roman', serif;
-      letter-spacing: 2px;
-      margin-bottom: 8px;
-      color: var(--text-light);
-    }
-    .footer-logo span { color: var(--accent); }
-    .footer-text {
-      color: var(--text-muted);
-      font-size: 10px;
-      font-weight: 300;
-      margin-bottom: 14px;
-    }
-    .footer-divider {
-      width: 40px;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, var(--accent), transparent);
-      margin: 0 auto 14px;
-      border-radius: 2px;
-      opacity: 0.2;
-    }
-    .social-links {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin-bottom: 16px;
-      flex-wrap: wrap;
-    }
+    .actu-nav-btn:hover { border-color: rgba(184,134,11,0.12); color: var(--text-light); background: rgba(10,10,10,0.5); }
+    .actu-nav-btn:disabled { opacity: 0.2; cursor: not-allowed; transform: none; }
+
+    /* ===== FOOTER ===== */
+    .footer { border-top: 1px solid rgba(184,134,11,0.03); padding: 28px 0 16px; text-align: center; margin-top: 20px; }
+    .footer-logo { font-size: 16px; font-weight: 700; font-family: 'Playfair Display', serif; letter-spacing: 2px; margin-bottom: 8px; color: var(--text-light); }
+    .footer-logo span { color: var(--accent); font-style: italic; }
+    .footer-text { color: var(--text-muted); font-size: 10px; font-weight: 300; margin-bottom: 14px; }
+    .footer-divider { width: 40px; height: 1px; background: linear-gradient(90deg, transparent, var(--accent), transparent); margin: 0 auto 14px; border-radius: 2px; opacity: 0.2; }
+    .social-links { display: flex; justify-content: center; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
     .social-link {
-      width: 30px; height: 30px;
-      background: var(--glass-bg);
-      border: 1px solid var(--glass-border);
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--text-muted);
-      text-decoration: none;
-      transition: var(--transition);
-      cursor: default;
-      pointer-events: none;
+      width: 30px; height: 30px; background: var(--glass-bg); border: 1px solid var(--glass-border);
+      border-radius: 8px; display: flex; align-items: center; justify-content: center;
+      color: var(--text-muted); text-decoration: none; transition: var(--transition);
+      cursor: default; pointer-events: none;
     }
     .social-link:hover { color: var(--accent); border-color: rgba(184,134,11,0.06); }
     .social-link.admin-link {
-      border-color: rgba(184, 134, 11, 0.08);
-      color: var(--accent);
-      cursor: pointer;
-      pointer-events: auto;
-      opacity: 0.4;
-      transition: var(--transition);
+      border-color: rgba(184,134,11,0.08); color: var(--accent); cursor: pointer; pointer-events: auto;
+      opacity: 0.4; transition: var(--transition);
     }
     .social-link.admin-link:hover { opacity: 1; border-color: var(--accent); transform: scale(1.05); }
     .social-link.admin-link i { font-size: 12px; }
-    .footer-bottom {
-      font-size: 9px;
-      color: var(--text-muted);
-      opacity: 0.4;
-      font-weight: 300;
-    }
+    .footer-bottom { font-size: 9px; color: var(--text-muted); opacity: 0.4; font-weight: 300; }
 
-    /* ============================================================
-       MENU - ULTRA RAPIDE AVEC TRANSITION INSTANTANÉE
+        /* ============================================================
+       MENU
        ============================================================ */
     .menu-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      z-index: 2000;
-      visibility: hidden;
-      opacity: 0;
-      transition: opacity 0.15s ease, visibility 0.15s ease;
-      display: flex;
-      touch-action: none;
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 2000;
+      visibility: hidden; opacity: 0; transition: opacity 0.2s ease, visibility 0.2s ease;
+      display: flex; touch-action: none;
     }
-    .menu-overlay.active {
-      visibility: visible;
-      opacity: 1;
-    }
-
+    .menu-overlay.active { visibility: visible; opacity: 1; }
     .menu-backdrop {
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(3, 3, 3, 0.5);
-      backdrop-filter: blur(4px);
-      cursor: default;
-      touch-action: none;
-      transition: backdrop-filter 0.15s ease;
+      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(3,3,3,0.5); backdrop-filter: blur(4px); cursor: default; touch-action: none;
     }
-
     .menu-sidebar {
-      margin-left: auto;
-      width: 75%;
-      max-width: 320px;
-      height: 100%;
+      margin-left: auto; width: 75%; max-width: 320px; height: 100%;
       background: linear-gradient(180deg, #0A0A0A 0%, #141414 50%, #0A0A0A 100%);
-      border-left: 1px solid rgba(184, 134, 11, 0.03);
-      padding: 20px 0;
-      transform: translateX(100%);
-      transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
-      display: flex;
-      flex-direction: column;
-      overflow-y: auto;
-      touch-action: pan-y;
-      will-change: transform;
+      border-left: 1px solid rgba(184,134,11,0.03); padding: 20px 0;
+      transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+      display: flex; flex-direction: column; overflow-y: auto; touch-action: pan-y; will-change: transform;
     }
-    .menu-overlay.active .menu-sidebar {
-      transform: translateX(0);
-    }
-
-    .menu-link {
-      opacity: 0;
-      transform: translateX(20px);
-      transition: opacity 0.15s ease, transform 0.15s ease, background 0.2s ease, color 0.2s ease;
-    }
-    .menu-overlay.active .menu-link {
-      opacity: 1;
-      transform: translateX(0);
-    }
-    .menu-overlay.active .menu-link:nth-child(1) { transition-delay: 0.02s; }
-    .menu-overlay.active .menu-link:nth-child(2) { transition-delay: 0.04s; }
-    .menu-overlay.active .menu-link:nth-child(3) { transition-delay: 0.06s; }
-    .menu-overlay.active .menu-link:nth-child(4) { transition-delay: 0.08s; }
-    .menu-overlay.active .menu-link:nth-child(5) { transition-delay: 0.10s; }
-    .menu-overlay.active .menu-link:nth-child(6) { transition-delay: 0.12s; }
-    .menu-overlay.active .menu-link:nth-child(7) { transition-delay: 0.14s; }
-    .menu-overlay.active .menu-link:nth-child(8) { transition-delay: 0.16s; }
-
+    .menu-overlay.active .menu-sidebar { transform: translateX(0); }
     .menu-sidebar::-webkit-scrollbar { width: 2px; }
     .menu-sidebar::-webkit-scrollbar-track { background: transparent; }
     .menu-sidebar::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 4px; opacity: 0.2; }
 
-    .menu-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      padding: 0 20px 20px;
-      border-bottom: 1px solid rgba(184, 134, 11, 0.03);
-    }
-    .menu-user {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .menu-avatar {
-      width: 40px; height: 40px;
-      border-radius: 50%;
-      background: var(--accent);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 16px;
-      font-weight: 600;
-      color: var(--bg-dark);
-      flex-shrink: 0;
-    }
-    .menu-username {
-      font-size: 14px;
-      font-weight: 600;
-      font-family: 'Georgia', 'Times New Roman', serif;
-      color: var(--text-light);
-    }
-    .menu-useremail {
-      font-size: 10px;
-      color: var(--text-muted);
-      margin-top: 1px;
-      font-weight: 300;
-    }
+    .menu-header { display: flex; justify-content: space-between; align-items: flex-start; padding: 0 20px 20px; border-bottom: 1px solid rgba(184,134,11,0.03); }
+    .menu-user { display: flex; align-items: center; gap: 12px; }
+    .menu-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 600; color: var(--bg-dark); flex-shrink: 0; }
+    .menu-username { font-size: 14px; font-weight: 700; font-family: 'Playfair Display', serif; color: var(--text-light); }
+    .menu-useremail { font-size: 10px; color: var(--text-muted); margin-top: 1px; font-weight: 300; }
     .menu-close-btn {
-      width: 32px; height: 32px;
-      background: rgba(184, 134, 11, 0.03);
-      border: 1px solid rgba(184, 134, 11, 0.04);
-      border-radius: 8px;
-      color: var(--text-muted);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: var(--transition);
-      flex-shrink: 0;
+      width: 32px; height: 32px; background: rgba(184,134,11,0.03); border: 1px solid rgba(184,134,11,0.04);
+      border-radius: 8px; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: var(--transition); flex-shrink: 0;
     }
     .menu-close-btn:hover { background: rgba(184,134,11,0.04); color: var(--text-light); }
     .menu-close-btn:active { transform: scale(0.92); }
 
-    .menu-nav {
-      flex: 1;
-      padding: 14px 12px 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
+    .menu-nav { flex: 1; padding: 14px 12px 20px; display: flex; flex-direction: column; gap: 2px; }
     .menu-link {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 10px 14px;
-      border-radius: 10px;
-      color: var(--text-dim);
-      text-decoration: none;
-      font-size: 13px;
-      font-weight: 400;
-      transition: background 0.15s ease, color 0.15s ease;
+      display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 10px;
+      color: var(--text-dim); text-decoration: none; font-size: 13px; font-weight: 400;
+      transition: background 0.2s ease, color 0.2s ease;
     }
     .menu-link:active { transform: scale(0.96); }
-    .menu-link i {
-      width: 18px;
-      font-size: 14px;
-      color: var(--text-muted);
-      transition: color 0.15s ease;
-    }
-    .menu-link.active {
-      background: rgba(184, 134, 11, 0.03);
-      color: var(--accent);
-    }
+    .menu-link i { width: 18px; font-size: 14px; color: var(--text-muted); transition: color 0.2s ease; }
+    .menu-link.active { background: rgba(184,134,11,0.03); color: var(--accent); }
     .menu-link.active i { color: var(--accent); }
-    .menu-link:hover:not(.active) {
-      background: rgba(255,255,255,0.01);
-      color: var(--text-light);
-    }
+    .menu-link:hover:not(.active) { background: rgba(255,255,255,0.01); color: var(--text-light); }
     .menu-link:hover:not(.active) i { color: var(--text-light); }
 
-    .menu-footer {
-      padding: 14px 20px 10px;
-      border-top: 1px solid rgba(184, 134, 11, 0.03);
-    }
+    .menu-footer { padding: 14px 20px 10px; border-top: 1px solid rgba(184,134,11,0.03); }
     .menu-logout {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 14px;
-      border-radius: 10px;
-      color: #7A4A4A;
-      text-decoration: none;
-      font-size: 13px;
-      font-weight: 400;
-      transition: var(--transition);
-      opacity: 0.5;
-      cursor: pointer;
+      display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 10px;
+      color: #7A4A4A; text-decoration: none; font-size: 13px; font-weight: 400;
+      transition: var(--transition); cursor: pointer;
     }
     .menu-logout:active { transform: scale(0.96); }
     .menu-logout i { font-size: 14px; }
-    .menu-logout:hover {
-      background: rgba(122, 74, 74, 0.04);
-      opacity: 1;
-    }
-    .menu-version {
-      text-align: center;
-      font-size: 9px;
-      color: var(--text-muted);
-      opacity: 0.2;
-      margin-top: 8px;
-      font-weight: 300;
-    }
-
-    /* ============================================================
-       GAIN NOTIFICATION
-       ============================================================ */
-    .gain-notification {
-      position: fixed;
-      bottom: 20px;
-      left: 16px;
-      right: 16px;
-      background: rgba(0, 0, 0, 0.95);
-      backdrop-filter: blur(12px);
-      border: 1px solid var(--accent);
-      border-radius: 16px;
-      padding: 12px 16px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      z-index: 10001;
-      transform: translateY(200px);
-      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-      max-width: 400px;
-      margin: 0 auto;
-    }
-    .gain-notification.show { transform: translateY(0); }
-    .gain-notification .notif-icon {
-      width: 40px;
-      height: 40px;
-      background: linear-gradient(135deg, var(--success), #1A5A3A);
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-size: 18px;
-    }
-    .gain-notification .notif-content h4 { font-size: 14px; margin-bottom: 4px; color: var(--text-light); }
-    .gain-notification .notif-content p { font-size: 11px; color: var(--text-dim); }
+    .menu-logout:hover { background: rgba(122,74,74,0.04); color: #8A4A4A; }
+    .menu-version { text-align: center; font-size: 9px; color: var(--text-muted); opacity: 0.2; margin-top: 8px; font-weight: 300; }
 
     /* ============================================================
        TOAST
        ============================================================ */
     .toast {
-      position: fixed;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%) translateY(120px);
-      max-width: 90%;
-      width: 400px;
-      padding: 14px 20px;
-      border-radius: 14px;
-      font-size: 13px;
-      font-weight: 500;
-      transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-      z-index: 9999;
-      text-align: center;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-      pointer-events: none;
+      position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(120px);
+      max-width: 90%; width: 400px; padding: 14px 20px; border-radius: 14px;
+      font-size: 13px; font-weight: 500; transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+      z-index: 9999; text-align: center; box-shadow: 0 8px 32px rgba(0,0,0,0.4); pointer-events: none;
     }
-    .toast.show {
-      transform: translateX(-50%) translateY(0);
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .toast.success { background: #0D2A1F; border: 1px solid #2D7D5A; color: #2D7D5A; }
+    .toast.error { background: #2A0D0D; border: 1px solid #8A3A3A; color: #8A3A3A; }
+    .toast.warning { background: #2A1A0D; border: 1px solid #B8860B; color: #B8860B; }
+    .toast.info { background: #0D1A2A; border: 1px solid #4A7A8A; color: #4A7A8A; }
+
+    /* ============================================================
+       GAIN NOTIFICATION
+       ============================================================ */
+    .gain-notification {
+      position: fixed; bottom: 20px; left: 16px; right: 16px;
+      background: rgba(0,0,0,0.95); backdrop-filter: blur(12px); border: 1px solid var(--accent);
+      border-radius: 16px; padding: 12px 16px; display: flex; align-items: center; gap: 12px;
+      z-index: 10001; transform: translateY(200px); transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+      max-width: 400px; margin: 0 auto;
     }
-    .toast.success {
-      background: #0D2A1F;
-      border: 1px solid #2D7D5A;
-      color: #2D7D5A;
+    .gain-notification.show { transform: translateY(0); }
+    .gain-notification .notif-icon {
+      width: 40px; height: 40px; background: linear-gradient(135deg, var(--success), #1A5A3A);
+      border-radius: 12px; display: flex; align-items: center; justify-content: center;
+      color: white; font-size: 18px; flex-shrink: 0;
     }
-    .toast.error {
-      background: #2A0D0D;
-      border: 1px solid #8A3A3A;
-      color: #8A3A3A;
-    }
-    .toast.warning {
-      background: #2A1A0D;
-      border: 1px solid #B8860B;
-      color: #B8860B;
-    }
-    .toast.info {
-      background: #0D1A2A;
-      border: 1px solid #4A7A8A;
-      color: #4A7A8A;
-    }
+    .gain-notification .notif-content h4 { font-size: 14px; margin-bottom: 4px; color: var(--text-light); }
+    .gain-notification .notif-content p { font-size: 11px; color: var(--text-dim); }
 
     /* ============================================================
        RESPONSIVE
@@ -1062,19 +426,10 @@
       .main-stat-value { font-size: 40px; }
       .quick-stats { grid-template-columns: repeat(4, 1fr); }
       .formations-list-horizontal {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 14px;
+        display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px;
       }
-      .formation-card-horizontal {
-        height: 160px;
-        flex-direction: column;
-      }
-      .formation-horiz-img-wrap {
-        width: 100%;
-        min-width: 100%;
-        height: 110px;
-      }
+      .formation-card-horizontal { height: 160px; flex-direction: column; }
+      .formation-horiz-img-wrap { width: 100%; min-width: 100%; height: 110px; }
       .formation-horiz-img { height: 110px; }
       .formation-horiz-content { padding: 10px 14px; height: auto; }
     }
@@ -1082,10 +437,7 @@
       .container { max-width: 1200px; padding: 44px 40px 100px; }
       .hero-title { font-size: 46px; }
       .main-stat-value { font-size: 46px; }
-      .formations-list-horizontal {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 18px;
-      }
+      .formations-list-horizontal { grid-template-columns: repeat(3, 1fr); gap: 18px; }
       .formation-card-horizontal { height: 180px; }
       .formation-horiz-img-wrap { height: 120px; }
       .formation-horiz-img { height: 120px; }
@@ -1100,6 +452,13 @@
 <div class="glow glow-1"></div>
 <div class="glow glow-2"></div>
 <div class="glow glow-3"></div>
+
+<!-- ===== ÉCRAN DE CHARGEMENT ===== -->
+<div id="loadingScreen">
+  <div class="loader-logo">ARVE<span>XA</span></div>
+  <div class="loader-spinner"></div>
+  <div class="loader-text">Chargement de votre espace...</div>
+</div>
 
 <!-- ===== GAIN NOTIFICATION ===== -->
 <div class="gain-notification" id="gainNotification">
@@ -1122,42 +481,25 @@
           <div class="menu-useremail" id="menuUseremail">email@email.com</div>
         </div>
       </div>
-      <button class="menu-close-btn" id="menuCloseBtn">
-        <i class="fas fa-times"></i>
-      </button>
+      <button class="menu-close-btn" id="menuCloseBtn"><i class="fas fa-times"></i></button>
     </div>
-
     <nav class="menu-nav">
-      <a href="index.html" class="menu-link active">
-        <i class="fas fa-home"></i> Accueil
-      </a>
-      <a href="investir.html" class="menu-link">
-        <i class="fas fa-chart-line"></i> Investir
-      </a>
-      <a href="parrainage.html" class="menu-link">
-        <i class="fas fa-users"></i> Parrainage
-      </a>
-      <a href="recharger.html" class="menu-link">
-        <i class="fas fa-plus-circle"></i> Recharger
-      </a>
-      <a href="retrait.html" class="menu-link">
-        <i class="fas fa-arrow-down"></i> Retrait
-      </a>
-      <a href="activite.html" class="menu-link">
-        <i class="fas fa-chart-pie"></i> Mon Activité
-      </a>
-      <a href="avis.html" class="menu-link">
-        <i class="fas fa-star"></i> Avis & Témoignages
-      </a>
-      <a href="profil.html" class="menu-link">
-        <i class="fas fa-user"></i> Mon Profil
-      </a>
+      <a href="index.html" class="menu-link active"><i class="fas fa-home"></i> Accueil</a>
+      <a href="ebooks.html" class="menu-link"><i class="fas fa-book"></i> E-books</a>
+      <a href="formations.html" class="menu-link"><i class="fas fa-graduation-cap"></i> Formations</a>
+      <a href="boutique.html" class="menu-link"><i class="fas fa-shopping-cart"></i> Achat</a>
+      <a href="investir.html" class="menu-link"><i class="fas fa-chart-line"></i> Investir</a>
+      <a href="vendre.html" class="menu-link"><i class="fas fa-store"></i> Vendre</a>
+      <a href="forum.html" class="menu-link"><i class="fas fa-comments"></i> Forum</a>
+      <a href="parrainage.html" class="menu-link"><i class="fas fa-users"></i> Parrainage</a>
+      <a href="recharger.html" class="menu-link"><i class="fas fa-plus-circle"></i> Recharger</a>
+      <a href="retrait.html" class="menu-link"><i class="fas fa-arrow-down"></i> Retrait</a>
+      <a href="activite.html" class="menu-link"><i class="fas fa-chart-pie"></i> Mon Activité</a>
+      <a href="avis.html" class="menu-link"><i class="fas fa-star"></i> Avis</a>
+      <a href="profil.html" class="menu-link"><i class="fas fa-user"></i> Mon Profil</a>
     </nav>
-
     <div class="menu-footer">
-      <a href="#" class="menu-logout" id="menuLogoutBtn">
-        <i class="fas fa-sign-out-alt"></i> Se déconnecter
-      </a>
+      <a href="#" class="menu-logout" id="menuLogoutBtn"><i class="fas fa-sign-out-alt"></i> Se déconnecter</a>
       <div class="menu-version">ARVEXA v1.0</div>
     </div>
   </div>
@@ -1165,9 +507,7 @@
 
 <!-- ===== HEADER ===== -->
 <header class="header">
-  <a href="#" class="logo" id="logoLink">
-    <div class="logo-text">ARVE<span>XA</span></div>
-  </a>
+  <a href="#" class="logo" id="logoLink"><div class="logo-text">ARVE<span>XA</span></div></a>
   <div class="header-actions">
     <a href="#" class="user-profile" id="userProfileBtn">
       <div class="user-avatar" id="userAvatar">A</div>
@@ -1178,14 +518,11 @@
 </header>
 
 <!-- ===== MAIN ===== -->
-<main class="container" id="mainContainer">
+<main class="container" id="mainContent">
 
   <!-- ===== HERO ===== -->
   <div class="hero-section">
-    <div class="hero-badge">
-      <i class="fas fa-leaf"></i>
-      <span>ARVEXA - Investissement & Finance</span>
-    </div>
+    <div class="hero-badge"><i class="fas fa-leaf"></i><span>ARVEXA - Investissement & Finance</span></div>
     <h1 class="hero-title">Construisez votre <span>avenir</span> financier</h1>
     <p class="hero-description">Plateforme d'investissement conçue pour la croissance durable.</p>
   </div>
@@ -1195,15 +532,13 @@
     <div class="main-stat-card">
       <div class="main-stat-header">
         <span class="main-stat-label">💰 Portefeuille ARVEXA</span>
-        <a href="recharger.html" class="btn-recharge">
-          <i class="fas fa-plus"></i> Recharger
-        </a>
+        <a href="recharger.html" class="btn-recharge"><i class="fas fa-plus"></i> Recharger</a>
       </div>
       <div class="main-stat-value" id="statBalance">0 FCFA</div>
       <div class="main-stat-footer">
         <i class="fas fa-wallet"></i> Solde disponible
-        <span style="margin-left: auto; color: var(--success); font-size: 9px; font-weight: 400;">
-          <i class="fas fa-arrow-up"></i> +12% ce mois
+        <span style="margin-left:auto;color:var(--success);font-size:9px;font-weight:400;" id="dailyReturnDisplay">
+          <i class="fas fa-arrow-up"></i> 0% par jour
         </span>
       </div>
     </div>
@@ -1235,10 +570,8 @@
       <h2 class="section-title">Comprendre <span>l'argent</span></h2>
     </div>
   </div>
-
   <div class="formations-list-horizontal">
-    <!-- Formation 1 - Lien vers economiser.html -->
-    <a href="economiser.html" class="formation-card-horizontal">
+    <a href="formations.html" class="formation-card-horizontal">
       <div class="formation-horiz-img-wrap">
         <img src="https://images.pexels.com/photos/4386367/pexels-photo-4386367.jpeg?auto=compress&cs=tinysrgb&w=200&h=240&fit=crop" alt="Économiser" class="formation-horiz-img" loading="lazy">
         <span class="formation-horiz-badge">Débutant</span>
@@ -1248,13 +581,11 @@
         <p class="formation-horiz-description">Apprenez à garder de l'argent pour vos projets et vos envies.</p>
         <div class="formation-horiz-footer">
           <span class="formation-horiz-price">🎁 GRATUIT</span>
-          <span class="formation-horiz-action">Voir la formation <i class="fas fa-chevron-right"></i></span>
+          <span class="formation-horiz-action">Découvrir <i class="fas fa-chevron-right"></i></span>
         </div>
       </div>
     </a>
-
-    <!-- Formation 2 - Lien vers investir-argent.html -->
-    <a href="investir-argent.html" class="formation-card-horizontal">
+    <a href="formations.html" class="formation-card-horizontal">
       <div class="formation-horiz-img-wrap">
         <img src="https://images.pexels.com/photos/5849577/pexels-photo-5849577.jpeg?auto=compress&cs=tinysrgb&w=200&h=240&fit=crop" alt="Investir" class="formation-horiz-img" loading="lazy">
         <span class="formation-horiz-badge">Débutant</span>
@@ -1264,7 +595,7 @@
         <p class="formation-horiz-description">Découvrez comment votre argent peut travailler pour vous.</p>
         <div class="formation-horiz-footer">
           <span class="formation-horiz-price">🎁 GRATUIT</span>
-          <span class="formation-horiz-action">Voir la formation <i class="fas fa-chevron-right"></i></span>
+          <span class="formation-horiz-action">Découvrir <i class="fas fa-chevron-right"></i></span>
         </div>
       </div>
     </a>
@@ -1283,30 +614,17 @@
       <div class="section-subtitle">Services</div>
       <h2 class="section-title">Solutions <span>financières</span></h2>
     </div>
-    <a href="#" class="section-link" onclick="showComingSoon(event)">
-      Voir tout <i class="fas fa-arrow-right"></i>
-    </a>
+    <a href="services.html" class="section-link">Voir tout <i class="fas fa-arrow-right"></i></a>
   </div>
-  
-   <div class="services-list">
-    <a href="investir.html" class="service-item">
-      <div class="service-icon gold"><i class="fas fa-chart-line"></i></div>
+  <div class="services-list">
+    <a href="boutique.html" class="service-item">
+      <div class="service-icon gold"><i class="fas fa-shopping-cart"></i></div>
       <div class="service-content">
-        <div class="service-title">Investir</div>
-        <div class="service-desc">Placez vos fonds et générez des rendements</div>
+        <div class="service-title">Achat</div>
+        <div class="service-desc">E-books, formations et services</div>
       </div>
       <div class="service-arrow"><i class="fas fa-chevron-right"></i></div>
     </a>
-
-    <a href="#" class="service-item" onclick="showComingSoon(event)">
-      <div class="service-icon green"><i class="fas fa-hand-holding-usd"></i></div>
-      <div class="service-content">
-        <div class="service-title">Vendre</div>
-        <div class="service-desc">Monétisez vos actifs et compétences</div>
-      </div>
-      <div class="service-arrow"><i class="fas fa-chevron-right"></i></div>
-    </a>
-
     <a href="activite.html" class="service-item">
       <div class="service-icon blue"><i class="fas fa-chart-pie"></i></div>
       <div class="service-content">
@@ -1317,7 +635,7 @@
     </a>
   </div>
 
-  <!-- ===== ACTUALITÉS ARVEXA ===== -->
+  <!-- ===== ACTUALITÉS ===== -->
   <div class="actualites-section">
     <div class="section-header">
       <div class="section-header-left">
@@ -1325,31 +643,24 @@
         <h2 class="section-title">Dernières <span>annonces</span></h2>
       </div>
     </div>
-
     <div class="actu-card" id="actuCard">
       <div>
         <div class="actu-card-header">
           <span class="actu-badge" id="actuBadge">📢 Nouveau</span>
           <span class="actu-date" id="actuDate">Il y a 2 jours</span>
         </div>
-        <p class="actu-text" id="actuText">
-          Bienvenue sur ARVEXA ! Commencez votre parcours d'investissement dès aujourd'hui.
-        </p>
+        <p class="actu-text" id="actuText">Bienvenue sur ARVEXA ! Commencez votre parcours d'investissement dès aujourd'hui.</p>
       </div>
       <div class="actu-card-footer">
         <span class="actu-counter" id="actuCounter">1 / 5</span>
         <div class="actu-nav-buttons">
-          <button class="actu-nav-btn" id="actuPrevBtn" disabled>
-            <i class="fas fa-chevron-left"></i>
-          </button>
-          <button class="actu-nav-btn" id="actuNextBtn">
-            <i class="fas fa-chevron-right"></i>
-          </button>
+          <button class="actu-nav-btn" id="actuPrevBtn" disabled><i class="fas fa-chevron-left"></i></button>
+          <button class="actu-nav-btn" id="actuNextBtn"><i class="fas fa-chevron-right"></i></button>
         </div>
       </div>
     </div>
   </div>
-  
+
   <!-- ===== FOOTER ===== -->
   <footer class="footer">
     <div class="footer-logo">ARVE<span>XA</span></div>
@@ -1360,9 +671,7 @@
       <a href="#" class="social-link"><i class="fab fa-whatsapp"></i></a>
       <a href="#" class="social-link"><i class="fab fa-telegram"></i></a>
       <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
-      <a href="#" class="social-link admin-link" id="adminLockBtn" style="display: none;">
-        <i class="fas fa-lock"></i>
-      </a>
+      <a href="#" class="social-link admin-link" id="adminLockBtn" style="display:none;"><i class="fas fa-lock"></i></a>
     </div>
     <div class="footer-bottom">© 2026 ARVEXA - Niger Investment & Finance</div>
   </footer>
@@ -1373,7 +682,7 @@
 <div class="toast" id="toast"></div>
 
 <!-- ============================================================ -->
-<!-- ===== IMPORTS ===== -->
+<!-- ===== SCRIPTS ===== -->
 <script type="importmap">
   {
     "imports": {
@@ -1385,29 +694,43 @@
 </script>
 
 <script type="module">
+    // ================================================================
+  // CHARGEMENT RAPIDE - VÉRIFICATION DU CACHE SESSION
+  // ================================================================
+  const loadingScreen = document.getElementById('loadingScreen');
+  const mainContent = document.getElementById('mainContent');
+  
+  // Vérifier si le site a déjà été chargé dans cette session
+  const isFirstLoad = !sessionStorage.getItem('arvexa_loaded');
+  
+  // Si déjà chargé → affichage instantané
+  if (!isFirstLoad) {
+    loadingScreen.classList.add('hide');
+    mainContent.style.display = 'block';
+    mainContent.style.opacity = '1';
+    document.body.style.overflow = '';
+  } else {
+    // Premier chargement → barre de chargement
+    loadingScreen.classList.remove('hide');
+    mainContent.style.display = 'none';
+  }
+
+  // ================================================================
+  // IMPORTS
+  // ================================================================
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
   import { 
-    getAuth, 
-    onAuthStateChanged, 
-    signOut,
-    setPersistence,
-    browserLocalPersistence
+    getAuth, onAuthStateChanged, signOut,
+    setPersistence, browserLocalPersistence
   } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
   import { 
-    getFirestore, 
-    doc, 
-    getDoc, 
-    onSnapshot, 
-    updateDoc, 
-    setDoc,
-    collection,
-    query,
-    where,
-    getDocs,
-    orderBy
+    getFirestore, doc, getDoc, onSnapshot, updateDoc, setDoc,
+    collection, query, orderBy
   } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
-  // ===== FIREBASE CONFIG =====
+  // ================================================================
+  // FIREBASE
+  // ================================================================
   const firebaseConfig = {
     apiKey: "AIzaSyBEbYuuUlNCLMBUHClv4UnyownNHw2q3_g",
     authDomain: "nexgen-39043.firebaseapp.com",
@@ -1421,10 +744,11 @@
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const db = getFirestore(app);
-
   setPersistence(auth, browserLocalPersistence);
 
-  // ===== DOM ELEMENTS =====
+  // ================================================================
+  // DOM
+  // ================================================================
   const userNameEl = document.getElementById('userName');
   const userAvatarEl = document.getElementById('userAvatar');
   const statBalanceEl = document.getElementById('statBalance');
@@ -1451,7 +775,6 @@
   const gainNotification = document.getElementById('gainNotification');
   const gainNotifTitle = document.getElementById('gainNotifTitle');
   const gainNotifMessage = document.getElementById('gainNotifMessage');
-
   const adminLockBtn = document.getElementById('adminLockBtn');
   const toast = document.getElementById('toast');
 
@@ -1460,65 +783,18 @@
   let unsubscribeUser = null;
   let unsubscribeActualites = null;
 
-  // ===== DONNÉES DES ACTUALITÉS =====
-  const defaultActualites = [
-    {
-      id: 'default_1',
-      badge: '📢 Bienvenue',
-      badgeClass: '',
-      text: 'Bienvenue sur ARVEXA ! Commencez votre parcours d\'investissement dès aujourd\'hui.',
-      date: new Date().toISOString(),
-      timestamp: Date.now()
-    },
-    {
-      id: 'default_2',
-      badge: '💡 Astuce',
-      badgeClass: 'astuce',
-      text: 'Réinvestissez vos gains mensuels pour profiter des intérêts composés et booster vos revenus.',
-      date: new Date(Date.now() - 86400000).toISOString(),
-      timestamp: Date.now() - 86400000
-    },
-    {
-      id: 'default_3',
-      badge: '🎉 Promotion',
-      badgeClass: 'promotion',
-      text: 'Bonus de 500 FCFA offert pour tout nouveau parrainage valide jusqu\'au 31 mars 2026.',
-      date: new Date(Date.now() - 172800000).toISOString(),
-      timestamp: Date.now() - 172800000
-    },
-    {
-      id: 'default_4',
-      badge: '📢 Nouveau',
-      badgeClass: '',
-      text: 'Nouveau plan d\'investissement "Performance" disponible à partir de 150 000 FCFA avec un rendement de 18%.',
-      date: new Date(Date.now() - 259200000).toISOString(),
-      timestamp: Date.now() - 259200000
-    },
-    {
-      id: 'default_5',
-      badge: '✅ Mise à jour',
-      badgeClass: 'update',
-      text: 'L\'application ARVEXA est désormais plus rapide avec des temps de chargement réduits de 40%.',
-      date: new Date(Date.now() - 432000000).toISOString(),
-      timestamp: Date.now() - 432000000
-    }
-  ];
-
-  let actualites = [];
-  let currentActuIndex = 0;
-
   // ================================================================
-  // 1. TOAST
+  // TOAST
   // ================================================================
   function showToast(message, type = 'info') {
     toast.textContent = message;
     toast.className = `toast ${type}`;
     setTimeout(() => toast.classList.add('show'), 50);
-    setTimeout(() => toast.classList.remove('show'), 4000);
+    setTimeout(() => toast.classList.remove('show'), 3500);
   }
 
   // ================================================================
-  // 2. GAIN NOTIFICATION
+  // GAIN NOTIFICATION
   // ================================================================
   function showGainNotification(title, message) {
     gainNotifTitle.innerText = title;
@@ -1529,15 +805,7 @@
   }
 
   // ================================================================
-  // 3. SHOW COMING SOON
-  // ================================================================
-  window.showComingSoon = function(e) {
-    if (e) e.preventDefault();
-    showToast('📢 Cette fonctionnalité sera bientôt disponible !', 'info');
-  };
-
-  // ================================================================
-  // 4. FORMATER LA DATE
+  // FORMAT DATE
   // ================================================================
   function formatDate(dateStr) {
     if (!dateStr) return 'Date inconnue';
@@ -1545,21 +813,29 @@
       const date = new Date(dateStr);
       const now = new Date();
       const diff = now - date;
-      
       if (diff < 60000) return 'À l\'instant';
       if (diff < 3600000) return `Il y a ${Math.floor(diff / 60000)} min`;
       if (diff < 86400000) return `Il y a ${Math.floor(diff / 3600000)}h`;
       if (diff < 172800000) return 'Hier';
       if (diff < 604800000) return `Il y a ${Math.floor(diff / 86400000)} jours`;
       return date.toLocaleDateString('fr-FR');
-    } catch {
-      return 'Date inconnue';
-    }
+    } catch { return 'Date inconnue'; }
   }
 
   // ================================================================
-  // 5. AFFICHER UNE ACTUALITÉ
+  // ACTUALITÉS
   // ================================================================
+  const defaultActualites = [
+    { id: 'default_1', badge: '📢 Bienvenue', badgeClass: '', text: 'Bienvenue sur ARVEXA ! Commencez votre parcours d\'investissement dès aujourd\'hui.', date: new Date().toISOString(), timestamp: Date.now() },
+    { id: 'default_2', badge: '💡 Astuce', badgeClass: 'astuce', text: 'Réinvestissez vos gains mensuels pour profiter des intérêts composés et booster vos revenus.', date: new Date(Date.now() - 86400000).toISOString(), timestamp: Date.now() - 86400000 },
+    { id: 'default_3', badge: '🎉 Promotion', badgeClass: 'promotion', text: 'Bonus de 500 FCFA offert pour tout nouveau parrainage valide jusqu\'au 31 mars 2026.', date: new Date(Date.now() - 172800000).toISOString(), timestamp: Date.now() - 172800000 },
+    { id: 'default_4', badge: '📢 Nouveau', badgeClass: '', text: 'Nouveau plan d\'investissement "Performance" disponible à partir de 150 000 FCFA avec un rendement de 18%.', date: new Date(Date.now() - 259200000).toISOString(), timestamp: Date.now() - 259200000 },
+    { id: 'default_5', badge: '✅ Mise à jour', badgeClass: 'update', text: 'L\'application ARVEXA est désormais plus rapide avec des temps de chargement réduits de 40%.', date: new Date(Date.now() - 432000000).toISOString(), timestamp: Date.now() - 432000000 }
+  ];
+
+  let actualites = [];
+  let currentActuIndex = 0;
+
   function displayActu(index) {
     if (!actualites.length) {
       actuText.textContent = 'Aucune actualité pour le moment. Revenez plus tard !';
@@ -1571,179 +847,95 @@
       actuNextBtn.disabled = true;
       return;
     }
-
     const actu = actualites[index];
     if (!actu) return;
-
     actuText.textContent = actu.text || 'Pas de contenu';
     actuBadge.textContent = actu.badge || '📢 Info';
     actuBadge.className = 'actu-badge' + (actu.badgeClass ? ` ${actu.badgeClass}` : '');
     actuDate.textContent = formatDate(actu.date || actu.createdAt);
     actuCounter.textContent = `${index + 1} / ${actualites.length}`;
-    
     actuPrevBtn.disabled = index === 0;
     actuNextBtn.disabled = index === actualites.length - 1;
   }
 
-  // ================================================================
-  // 6. NAVIGATION ACTUALITÉS
-  // ================================================================
-  function nextActu() {
-    if (currentActuIndex < actualites.length - 1) {
-      currentActuIndex++;
-      displayActu(currentActuIndex);
-    }
-  }
+  actuNextBtn.addEventListener('click', () => { if (currentActuIndex < actualites.length - 1) { currentActuIndex++; displayActu(currentActuIndex); } });
+  actuPrevBtn.addEventListener('click', () => { if (currentActuIndex > 0) { currentActuIndex--; displayActu(currentActuIndex); } });
 
-  function prevActu() {
-    if (currentActuIndex > 0) {
-      currentActuIndex--;
-      displayActu(currentActuIndex);
-    }
-  }
-
-  actuNextBtn.addEventListener('click', nextActu);
-  actuPrevBtn.addEventListener('click', prevActu);
-
-  // ================================================================
-  // 7. CHARGER LES ACTUALITÉS DEPUIS FIRESTORE
-  // ================================================================
   function loadActualites() {
-    if (unsubscribeActualites) {
-      unsubscribeActualites();
-      unsubscribeActualites = null;
-    }
-
-    const q = query(
-      collection(db, 'actualites'),
-      orderBy('timestamp', 'desc')
-    );
-
+    if (unsubscribeActualites) { unsubscribeActualites(); unsubscribeActualites = null; }
+    const q = query(collection(db, 'actualites'), orderBy('timestamp', 'desc'));
     unsubscribeActualites = onSnapshot(q, (snapshot) => {
       const data = [];
       snapshot.forEach(doc => {
         const docData = doc.data();
-        data.push({
-          id: doc.id,
-          ...docData,
-          badgeClass: docData.badgeClass || '',
-          timestamp: docData.timestamp || docData.createdAt || Date.now()
-        });
+        data.push({ id: doc.id, ...docData, badgeClass: docData.badgeClass || '', timestamp: docData.timestamp || docData.createdAt || Date.now() });
       });
-
       actualites = data.length > 0 ? data : defaultActualites;
       currentActuIndex = 0;
       displayActu(0);
-    }, (error) => {
-      console.error('Erreur chargement actualités:', error);
-      actualites = defaultActualites;
-      currentActuIndex = 0;
-      displayActu(0);
-    });
+      // Notification push pour nouvelle actu
+      const lastActu = actualites[0];
+if (lastActu && 
+    sessionStorage.getItem('last_actu_id') !== lastActu.id &&
+    !lastActu.badge.includes('Bienvenue') &&
+    !lastActu.text.includes('Bienvenue')) {
+  showToast(`📢 ${lastActu.badge} ${lastActu.text.substring(0, 50)}...`, 'info');
+  sessionStorage.setItem('last_actu_id', lastActu.id);
+}
+    }, (error) => { console.error('Erreur actualités:', error); actualites = defaultActualites; currentActuIndex = 0; displayActu(0); });
   }
 
   // ================================================================
-  // 8. MENU - SWIPE INSTANTANÉ
+  // MENU - SWIPE
   // ================================================================
-  let touchStartX = 0;
-  let touchStartY = 0;
-  let isSwiping = false;
-  let swipeThreshold = 40;
-  let isMenuOpen = false;
-
-  function openMenu() {
-    if (isMenuOpen) return;
-    isMenuOpen = true;
-    menuOverlay.classList.add('active');
-    document.body.style.overflow = 'hidden';
-  }
-
-  function closeMenu() {
-    if (!isMenuOpen) return;
-    isMenuOpen = false;
-    menuOverlay.classList.remove('active');
-    document.body.style.overflow = '';
-  }
+  let touchStartX = 0, touchStartY = 0, isSwiping = false, isMenuOpen = false;
+  function openMenu() { if (isMenuOpen) return; isMenuOpen = true; menuOverlay.classList.add('active'); document.body.style.overflow = 'hidden'; }
+  function closeMenu() { if (!isMenuOpen) return; isMenuOpen = false; menuOverlay.classList.remove('active'); document.body.style.overflow = ''; }
 
   document.addEventListener('touchstart', (e) => {
     const touch = e.changedTouches[0];
-    touchStartX = touch.screenX;
-    touchStartY = touch.screenY;
-    isSwiping = false;
+    touchStartX = touch.screenX; touchStartY = touch.screenY; isSwiping = false;
   }, { passive: true });
 
   document.addEventListener('touchmove', (e) => {
     if (!e.cancelable) return;
-    
     const touch = e.changedTouches[0];
     const deltaX = touch.screenX - touchStartX;
     const deltaY = touch.screenY - touchStartY;
-
     if (Math.abs(deltaY) > Math.abs(deltaX) * 1.2) return;
-
-    if (Math.abs(deltaX) > 15) {
-      isSwiping = true;
-      e.preventDefault();
-    }
+    if (Math.abs(deltaX) > 15) { isSwiping = true; e.preventDefault(); }
   }, { passive: false });
 
   document.addEventListener('touchend', (e) => {
     if (!isSwiping) return;
     const deltaX = e.changedTouches[0].screenX - touchStartX;
-
-    if (deltaX < -swipeThreshold && !isMenuOpen) {
-      openMenu();
-    } else if (deltaX > swipeThreshold && isMenuOpen) {
-      closeMenu();
-    }
+    if (deltaX < -40 && !isMenuOpen) openMenu();
+    else if (deltaX > 40 && isMenuOpen) closeMenu();
     isSwiping = false;
   }, { passive: true });
 
-  // ================================================================
-  // 9. MENU - CLICS
-  // ================================================================
-  menuBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    isMenuOpen ? closeMenu() : openMenu();
-  });
-
-  menuCloseBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    closeMenu();
-  });
-
-  menuBackdrop.addEventListener('click', (e) => {
-    e.stopPropagation();
-    closeMenu();
-  });
-
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') closeMenu();
-  });
+  menuBtn.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); isMenuOpen ? closeMenu() : openMenu(); });
+  menuCloseBtn.addEventListener('click', () => closeMenu());
+  menuBackdrop.addEventListener('click', () => closeMenu());
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMenu(); });
 
   // ================================================================
-  // 10. ADMIN BUTTON
+  // ADMIN BUTTON
   // ================================================================
   function checkAdminButton(user) {
     if (!adminLockBtn) return;
     if (user && user.email === 'gagneavecia@gmail.com') {
       adminLockBtn.style.display = 'flex';
-      adminLockBtn.onclick = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        window.location.href = 'admin/index.html';
-      };
+      adminLockBtn.onclick = (e) => { e.preventDefault(); e.stopPropagation(); window.location.href = 'admin/index.html'; };
     } else {
       adminLockBtn.style.display = 'none';
     }
   }
 
   // ================================================================
-  // 11. DÉCONNEXION
+  // DÉCONNEXION
   // ================================================================
-  menuLogoutBtn.addEventListener('click', async (e) => {
-    e.preventDefault();
+  async function handleLogout() {
     if (confirm('Voulez-vous vous déconnecter ?')) {
       try {
         await signOut(auth);
@@ -1751,107 +943,94 @@
         localStorage.removeItem('ARVEXA_user_data');
         sessionStorage.clear();
         showToast('✅ Déconnexion réussie', 'success');
-        setTimeout(() => {
-          window.location.href = 'login.html';
-        }, 500);
+        setTimeout(() => { window.location.href = 'login.html'; }, 500);
       } catch (error) {
         console.error('Erreur déconnexion:', error);
         showToast('❌ Erreur lors de la déconnexion', 'error');
       }
     }
-  });
+  }
+  menuLogoutBtn.addEventListener('click', handleLogout);
 
   // ================================================================
-// 12. UPDATE UI
-// ================================================================
-function updateUI(data) {
-  if (!data) return;
-  
-  const prenom = data.prenom || '';
-  const displayName = prenom || 'Investisseur';
+  // UPDATE UI
+  // ================================================================
+  function updateUI(data) {
+    if (!data) return;
+    const prenom = data.prenom || '';
+    const displayName = prenom || 'Investisseur';
+    userNameEl.textContent = displayName;
+    userAvatarEl.textContent = displayName.charAt(0).toUpperCase();
+    menuAvatar.textContent = displayName.charAt(0).toUpperCase();
+    menuUsername.textContent = displayName;
+    menuUseremail.textContent = data.email || 'email@email.com';
 
-  userNameEl.textContent = displayName;
-  userAvatarEl.textContent = displayName.charAt(0).toUpperCase();
+    const balance = data.balance || 0;
+    statBalanceEl.textContent = `${balance.toLocaleString('fr-FR')} FCFA`;
 
-  menuAvatar.textContent = displayName.charAt(0).toUpperCase();
-  menuUsername.textContent = displayName;
-  menuUseremail.textContent = data.email || 'email@email.com';
+    const totalRevenus = data.gainsTotal || data.totalRevenus || 0;
+    statRevenueEl.textContent = `${totalRevenus.toLocaleString('fr-FR')} FCFA`;
 
-  const balance = data.balance || 0;
-  statBalanceEl.textContent = `${balance.toLocaleString('fr-FR')} FCFA`;
+    const investCount = data.investments ? data.investments.filter(i => i.status === 'active').length : 0;
+    statInvestmentsEl.textContent = investCount;
+    statReferralsEl.textContent = data.referralsCount || 0;
 
-  const totalRevenus = data.gainsTotal || data.totalRevenus || 0;
-  statRevenueEl.textContent = `${totalRevenus.toLocaleString('fr-FR')} FCFA`;
-
-  const investCount = data.investments ? data.investments.filter(i => i.status === 'active').length : 0;
-  statInvestmentsEl.textContent = investCount;
-
-  const referralsCount = data.referralsCount || 0;
-  statReferralsEl.textContent = referralsCount;
-
-  // ============================================================
-  // 🔥 CALCUL DU POURCENTAGE DYNAMIQUE
-  // ============================================================
-  let dailyReturn = 0;
-  if (data.investments && data.investments.length > 0) {
-    const activeInvests = data.investments.filter(i => i.status === 'active');
-    if (activeInvests.length > 0) {
-      const totalReturn = activeInvests.reduce((sum, inv) => sum + (inv.dailyReturn || 0), 0);
-      dailyReturn = totalReturn / activeInvests.length;
-    }
-  }
-
-  const displayPercent = dailyReturn > 0 ? (dailyReturn / 10).toFixed(1) : '0';
-
-  // ============================================================
-  // 🔥 MISE À JOUR DU POURCENTAGE DANS LE FOOTER
-  // ============================================================
-  const statFooter = document.querySelector('.main-stat-footer');
-  if (statFooter) {
-    const span = statFooter.querySelector('span:last-child');
-    if (span) {
-      if (parseFloat(displayPercent) > 0) {
-        span.innerHTML = `
-          <i class="fas fa-arrow-up"></i> +${displayPercent}% par jour
-        `;
-        span.style.color = 'var(--success)';
-      } else {
-        span.innerHTML = `
-          <i class="fas fa-minus"></i> 0% par jour
-        `;
-        span.style.color = 'var(--text-muted)';
+    // Pourcentage dynamique
+    let dailyReturn = 0;
+    if (data.investments && data.investments.length > 0) {
+      const activeInvests = data.investments.filter(i => i.status === 'active');
+      if (activeInvests.length > 0) {
+        const totalReturn = activeInvests.reduce((sum, inv) => sum + (inv.dailyPercent || inv.dailyReturn || 0), 0);
+        dailyReturn = totalReturn / activeInvests.length;
       }
     }
+    const displayPercent = dailyReturn > 0 ? (dailyReturn / 10).toFixed(1) : '0';
+    const statFooter = document.querySelector('.main-stat-footer');
+    if (statFooter) {
+      const span = statFooter.querySelector('span:last-child');
+      if (span) {
+        if (parseFloat(displayPercent) > 0) {
+          span.innerHTML = `<i class="fas fa-arrow-up"></i> +${displayPercent}% par jour`;
+          span.style.color = 'var(--success)';
+        } else {
+          span.innerHTML = `<i class="fas fa-minus"></i> 0% par jour`;
+          span.style.color = 'var(--text-muted)';
+        }
+      }
+    }
+    checkAdminButton(currentUser);
+    localStorage.setItem('ARVEXA_user_data', JSON.stringify(data));
+    
+    // Cacher l'écran de chargement si c'est le premier chargement
+    if (isFirstLoad) {
+      setTimeout(() => {
+        loadingScreen.classList.add('hide');
+        mainContent.style.display = 'block';
+        mainContent.style.opacity = '1';
+        document.body.style.overflow = '';
+        sessionStorage.setItem('arvexa_loaded', 'true');
+      }, 600);
+    }
   }
 
-  checkAdminButton(currentUser);
-  localStorage.setItem('ARVEXA_user_data', JSON.stringify(data));
-}
   // ================================================================
-  // 13. FORCE CHECK & CREDIT GAINS
+  // FORCE CHECK GAINS
   // ================================================================
   async function forceCheckAndCreditGains() {
     if (!currentUser || !userData) return false;
     if (!userData.investments || userData.investments.length === 0) return false;
-    
     const activeInvests = userData.investments.filter(i => i.status === 'active');
     if (activeInvests.length === 0) return false;
-    
     try {
       const userRef = doc(db, "users", currentUser.uid);
       const userDoc = await getDoc(userRef);
       if (!userDoc.exists()) return false;
-      
       const data = userDoc.data();
       const active = (data.investments || []).filter(i => i.status === 'active');
       if (active.length === 0) return false;
-      
-      let totalGain = 0;
-      let gainDetails = [];
+      let totalGain = 0, gainDetails = [], updated = false;
       const now = new Date();
-      let updated = false;
       const updatedInvests = [...data.investments];
-
       for (let i = 0; i < updatedInvests.length; i++) {
         const inv = updatedInvests[i];
         if (inv.status === 'active') {
@@ -1864,7 +1043,7 @@ function updateUI(data) {
             if (actual > 0) {
               const gain = inv.dailyReturn * actual;
               totalGain += gain;
-              gainDetails.push({ pack: inv.packName || 'Investissement', gain: gain, days: actual });
+              gainDetails.push({ pack: inv.packName || 'Investissement', gain, days: actual });
               inv.totalEarned = (inv.totalEarned || 0) + gain;
               inv.currentDay += actual;
               inv.lastPayout = now.toISOString();
@@ -1874,7 +1053,6 @@ function updateUI(data) {
           }
         }
       }
-      
       if (updated && totalGain > 0) {
         const newBalance = (data.balance || 0) + totalGain;
         await updateDoc(userRef, {
@@ -1888,16 +1066,28 @@ function updateUI(data) {
         return true;
       }
       return false;
-    } catch (error) {
-      console.error("❌ Erreur vérification gains:", error);
-      return false;
-    }
+    } catch (error) { console.error("❌ Erreur gains:", error); return false; }
   }
 
   // ================================================================
-  // 14. AUTH
+  // LISTENER USER
   // ================================================================
-  const sessionValidated = sessionStorage.getItem('status_validated');
+  function listenToUser(uid) {
+    if (unsubscribeUser) unsubscribeUser();
+    const userRef = doc(db, 'users', uid);
+    unsubscribeUser = onSnapshot(userRef, (snap) => {
+      if (snap.exists()) {
+        userData = snap.data();
+        updateUI(userData);
+        localStorage.setItem('ARVEXA_user_data', JSON.stringify(userData));
+        if (!isFirstLoad) setTimeout(() => forceCheckAndCreditGains(), 1500);
+      }
+    }, (error) => { console.error('Erreur onSnapshot:', error); });
+  }
+
+    // ================================================================
+  // AUTH
+  // ================================================================
   const sessionUid = sessionStorage.getItem('session_uid');
 
   onAuthStateChanged(auth, async (user) => {
@@ -1905,7 +1095,8 @@ function updateUI(data) {
       currentUser = user;
       localStorage.setItem('ARVEXA_current_user', user.uid);
       
-      if (sessionValidated === 'true' && sessionUid === user.uid) {
+      // Si déjà connecté dans cette session → chargement ultra rapide
+      if (sessionUid === user.uid) {
         console.log("✅ Session déjà validée, chargement rapide");
         const cached = localStorage.getItem('ARVEXA_user_data');
         if (cached) {
@@ -1921,25 +1112,14 @@ function updateUI(data) {
       try {
         const userRef = doc(db, 'users', user.uid);
         const docSnap = await getDoc(userRef);
-        
         if (!docSnap.exists()) {
           const newUser = {
-            uid: user.uid,
-            email: user.email || '',
-            prenom: user.displayName?.split(' ')[0] || 'Investisseur',
-            nom: user.displayName?.split(' ').slice(1).join(' ') || '',
-            fullName: user.displayName || 'Investisseur',
-            balance: 0,
-            gainsTotal: 0,
-            totalDepots: 0,
-            totalRetraits: 0,
-            investments: [],
-            referralsCount: 0,
-            referralEarnings: 0,
-            status: 'active',
-            role: 'user',
-            createdAt: new Date().toISOString(),
-            lastLogin: new Date().toISOString()
+            uid: user.uid, email: user.email || '', prenom: user.displayName?.split(' ')[0] || 'Investisseur',
+            nom: user.displayName?.split(' ').slice(1).join(' ') || '', fullName: user.displayName || 'Investisseur',
+            balance: 0, gainsTotal: 0, totalDepots: 0, totalRetraits: 0, investments: [],
+            referralsCount: 0, referralEarnings: 0, status: 'active', role: 'user',
+            createdAt: new Date().toISOString(), lastLogin: new Date().toISOString(),
+            hasDeposited: false, isUnlocked: false
           };
           await setDoc(userRef, newUser);
           userData = newUser;
@@ -1947,34 +1127,30 @@ function updateUI(data) {
           userData = docSnap.data();
           await updateDoc(userRef, { lastLogin: new Date().toISOString() });
         }
-
-        sessionStorage.setItem('status_validated', 'true');
         sessionStorage.setItem('session_uid', user.uid);
-
         updateUI(userData);
         listenToUser(user.uid);
         loadActualites();
-
         setTimeout(() => forceCheckAndCreditGains(), 2000);
-
       } catch (error) {
         console.error('Erreur Firestore:', error);
         const cached = localStorage.getItem('ARVEXA_user_data');
-        if (cached) {
-          userData = JSON.parse(cached);
-          updateUI(userData);
-        }
+        if (cached) { userData = JSON.parse(cached); updateUI(userData); }
         loadActualites();
+        if (isFirstLoad) {
+          setTimeout(() => {
+            loadingScreen.classList.add('hide');
+            mainContent.style.display = 'block';
+            mainContent.style.opacity = '1';
+            document.body.style.overflow = '';
+            sessionStorage.setItem('arvexa_loaded', 'true');
+          }, 800);
+        }
       }
     } else {
-      currentUser = null;
       const savedUid = localStorage.getItem('ARVEXA_current_user');
       if (savedUid) {
-        setTimeout(() => {
-          if (!auth.currentUser) {
-            window.location.href = 'login.html';
-          }
-        }, 2000);
+        setTimeout(() => { if (!auth.currentUser) { window.location.href = 'login.html'; } }, 2000);
       } else {
         window.location.href = 'login.html';
       }
@@ -1982,76 +1158,23 @@ function updateUI(data) {
   });
 
   // ================================================================
-  // 15. LISTENER EN TEMPS RÉEL
+  // NAVIGATION
   // ================================================================
-  function listenToUser(uid) {
-    if (unsubscribeUser) unsubscribeUser();
-    const userRef = doc(db, 'users', uid);
-    unsubscribeUser = onSnapshot(userRef, (snap) => {
-      if (snap.exists()) {
-        userData = snap.data();
-        updateUI(userData);
-        localStorage.setItem('ARVEXA_user_data', JSON.stringify(userData));
-      }
-    }, (error) => {
-      console.error('Erreur onSnapshot:', error);
-    });
-  }
+  document.getElementById('userProfileBtn').addEventListener('click', (e) => { e.preventDefault(); window.location.href = 'profil.html'; });
+  document.getElementById('logoLink').addEventListener('click', (e) => { e.preventDefault(); window.location.href = 'index.html'; });
 
   // ================================================================
-  // 16. NAVIGATION
-  // ================================================================
-  document.getElementById('userProfileBtn').addEventListener('click', (e) => {
-    e.preventDefault();
-    window.location.href = 'profil.html';
-  });
-
-  document.getElementById('logoLink').addEventListener('click', (e) => {
-    e.preventDefault();
-    window.location.href = 'index.html';
-  });
-
-  // ================================================================
-  // 17. GESTION RÉSEAU
-  // ================================================================
-  window.addEventListener('online', () => {
-    showToast('📶 Connexion Internet rétablie', 'success');
-    if (currentUser) {
-      const userRef = doc(db, 'users', currentUser.uid);
-      getDoc(userRef).then(docSnap => {
-        if (docSnap.exists()) {
-          userData = docSnap.data();
-          updateUI(userData);
-        }
-      });
-    }
-    loadActualites();
-  });
-
-  window.addEventListener('offline', () => {
-    showToast('📶 Connexion Internet perdue', 'error');
-  });
-
-  // ================================================================
-  // 18. SERVICE WORKER
+  // SERVICE WORKER
   // ================================================================
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      fetch('/sw.js')
-        .then(response => {
-          if (response.ok) {
-            navigator.serviceWorker.register('/sw.js')
-              .then(reg => console.log('✅ Service Worker enregistré'))
-              .catch(err => console.log('⚠️ Service Worker erreur:', err));
-          } else {
-            console.log('ℹ️ Service Worker non disponible');
-          }
-        })
-        .catch(() => console.log('ℹ️ Service Worker non disponible'));
+      fetch('/sw.js').then(response => {
+        if (response.ok) { navigator.serviceWorker.register('/sw.js').then(reg => console.log('✅ SW enregistré')).catch(err => console.log('⚠️ SW erreur:', err)); }
+      }).catch(() => console.log('ℹ️ SW non disponible'));
     });
   }
 
-  console.log("🚀 ARVEXA - Page d'accueil avec cache session et swipe instantané");
+  console.log("🚀 ARVEXA - Page d'accueil ultra optimisée");
 </script>
 </body>
 </html>
