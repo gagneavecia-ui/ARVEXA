@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+  <meta name="theme-color" content="#0A0A0A">
+  <meta name="description" content="ARVEXA - Mon activité, suivez vos performances">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3135/3135715.png">
+  
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <style>
+    /* ===== ROOT ===== */
+    :root {
+      --primary: #1A3A2A;
+      --primary-dark: #0A1A12;
+      --primary-light: #2A5A3A;
+      --accent: #B8860B;
+      --accent-dim: rgba(184, 134, 11, 0.08);
+      --success: #2D7D5A;
+      --bg-dark: #0A0A0A;
+      --bg-surface: #141414;
+      --bg-card: rgba(20, 20, 20, 0.7);
+      --text-light: #F5F0E8;
+      --text-dim: #8A8A7A;
+      --text-muted: #5A5A4A;
+      --card-border: rgba(184, 134, 11, 0.06);
+      --glass-bg: rgba(26, 58, 42, 0.15);
+      --glass-border: rgba(184, 134, 11, 0.04);
+      --transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+      --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      --radius: 16px;
+      --danger: #8A3A3A;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Inter', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-light);
+      font-size: 14px;
+      line-height: 1.6;
+      min-height: 100vh;
+      overflow-x: hidden;
+      opacity: 0;
+      animation: pageFadeIn 0.5s ease forwards;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 80px;
+    }
+
+    @keyframes pageFadeIn {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+
+    /* ===== BACKGROUND ===== */
+    .gradient-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -2;
+      background: radial-gradient(ellipse 40% 30% at 30% 20%, rgba(26, 58, 42, 0.10) 0%, transparent 70%),
+                  linear-gradient(180deg, #0A0A0A 0%, #060606 100%);
+      pointer-events: none;
+    }
+
+    .glow {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: -1;
+      opacity: 0.15;
+      animation: glowMove 10s ease-in-out infinite alternate;
+    }
+    .glow-1 { width: 350px; height: 350px; background: rgba(26, 58, 42, 0.15); top: -80px; right: -80px; }
+    .glow-2 { width: 200px; height: 200px; background: rgba(184, 134, 11, 0.03); bottom: 0; left: 0; animation-delay: -4s; }
+    .glow-3 { width: 250px; height: 250px; background: rgba(26, 58, 42, 0.08); top: 40%; left: 50%; transform: translate(-50%, -50%); animation-delay: -8s; }
+    @keyframes glowMove {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(30px, -20px) scale(1.1); }
+    }
+
+    /* ===== HEADER ===== */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 5%;
+      background: rgba(10, 10, 10, 0.95);
+      backdrop-filter: blur(12px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 1px solid rgba(184, 134, 11, 0.04);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+      color: var(--text-light);
+      font-size: clamp(16px, 2.5vw, 22px);
+      font-weight: 700;
+      font-family: 'Playfair Display', 'Georgia', serif;
+      letter-spacing: 2px;
+    }
+    .logo span {
+      color: var(--accent);
+      font-style: italic;
+    }
+
+    .back-btn {
+      width: clamp(32px, 4vw, 40px);
+      height: clamp(32px, 4vw, 40px);
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-light);
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s, border-color 0.2s;
+      flex-shrink: 0;
+    }
+    .back-btn:active {
+      transform: scale(0.94);
+      background: rgba(184, 134, 11, 0.08);
+    }
+    .back-btn i {
+      font-size: clamp(14px, 1.8vw, 18px);
+    }
+
+    .header-placeholder {
+      width: clamp(32px, 4vw, 40px);
+      flex-shrink: 0;
+    }
+
+    /* ===== CONTAINER ===== */
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 16px 16px 40px;
+      width: 100%;
+    }
+
+    /* ===== HERO ===== */
+    .hero-section {
+      margin-bottom: 24px;
+      text-align: center;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(184, 134, 11, 0.03);
+      border: 1px solid rgba(184, 134, 11, 0.04);
+      border-radius: 30px;
+      padding: 3px 12px;
+      margin-bottom: 14px;
+    }
+    .hero-badge span {
+      color: var(--text-dim);
+      font-size: 9px;
+      font-weight: 400;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    .hero-badge i {
+      color: var(--accent);
+      font-size: 8px;
+    }
+    .hero-title {
+      font-size: clamp(28px, 5vw, 36px);
+      font-weight: 700;
+      font-family: 'Playfair Display', 'Georgia', serif;
+      line-height: 1.2;
+      margin-bottom: 10px;
+      color: var(--text-light);
+    }
+    .hero-title span {
+      color: var(--accent);
+      font-style: italic;
+    }
+    .hero-description {
+      font-size: 14px;
+      color: var(--text-dim);
+      font-weight: 300;
+    }
+
+    /* ===== STATS GRID ===== */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 18px 14px;
+      text-align: center;
+      transition: var(--transition);
+      animation: fadeInUp 0.5s ease forwards;
+      opacity: 0;
+    }
+    .stat-card:nth-child(1) { animation-delay: 0.05s; }
+    .stat-card:nth-child(2) { animation-delay: 0.10s; }
+    .stat-card:nth-child(3) { animation-delay: 0.15s; }
+    .stat-card:nth-child(4) { animation-delay: 0.20s; }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .stat-card:hover {
+      border-color: rgba(184, 134, 11, 0.08);
+      transform: translateY(-2px);
+    }
+
+    .stat-card .stat-icon {
+      font-size: 24px;
+      color: var(--accent);
+      margin-bottom: 4px;
+      display: block;
+    }
+    .stat-card .stat-value {
+      font-size: 24px;
+      font-weight: 700;
+      font-family: 'Playfair Display', 'Georgia', serif;
+      color: var(--text-light);
+    }
+    .stat-card .stat-label {
+      font-size: 11px;
+      color: var(--text-dim);
+      font-weight: 300;
+    }
+
+    /* ===== TRANSACTIONS ===== */
+    .transactions-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 18px 16px;
+      margin-bottom: 20px;
+      transition: var(--transition);
+    }
+    .transactions-card:hover {
+      border-color: rgba(184, 134, 11, 0.08);
+    }
+
+    .transactions-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+    .transactions-header h3 {
+      font-size: 16px;
+      font-weight: 600;
+      font-family: 'Playfair Display', 'Georgia', serif;
+      color: var(--text-light);
+    }
+    .transactions-header h3 span {
+      color: var(--accent);
+      font-style: italic;
+    }
+    .transactions-header .filter-btns {
+      display: flex;
+      gap: 6px;
+    }
+    .transactions-header .filter-btn {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 10px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+      border: 1px solid var(--card-border);
+      background: transparent;
+      color: var(--text-dim);
+      font-family: 'Inter', sans-serif;
+    }
+    .transactions-header .filter-btn.active {
+      background: rgba(184, 134, 11, 0.12);
+      border-color: rgba(184, 134, 11, 0.2);
+      color: var(--accent);
+    }
+    .transactions-header .filter-btn:active {
+      transform: scale(0.95);
+    }
+
+    .transaction-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    }
+    .transaction-item:last-child {
+      border-bottom: none;
+    }
+
+    .transaction-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+    .transaction-icon.deposit {
+      background: rgba(45, 125, 90, 0.12);
+      color: var(--success);
+    }
+    .transaction-icon.withdrawal {
+      background: rgba(138, 58, 58, 0.12);
+      color: var(--danger);
+    }
+    .transaction-icon.referral {
+      background: rgba(184, 134, 11, 0.12);
+      color: var(--accent);
+    }
+    .transaction-icon.purchase {
+      background: rgba(74, 122, 106, 0.12);
+      color: #4A7A6A;
+    }
+    .transaction-icon.investment {
+      background: rgba(139, 63, 232, 0.12);
+      color: #8B3FE8;
+    }
+
+    .transaction-info {
+      flex: 1;
+    }
+    .transaction-info .trans-title {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-light);
+    }
+    .transaction-info .trans-desc {
+      font-size: 11px;
+      color: var(--text-dim);
+    }
+    .transaction-amount {
+      font-weight: 600;
+      font-size: 14px;
+    }
+    .transaction-amount.positive {
+      color: var(--success);
+    }
+    .transaction-amount.negative {
+      color: var(--danger);
+    }
+    .transaction-date {
+      font-size: 10px;
+      color: var(--text-muted);
+      text-align: right;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 30px 20px;
+      color: var(--text-dim);
+    }
+    .empty-state i {
+      font-size: 40px;
+      opacity: 0.2;
+      display: block;
+      margin-bottom: 12px;
+    }
+
+    /* ============================================================
+       TOAST
+       ============================================================ */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(120px);
+      max-width: 90%;
+      width: 400px;
+      padding: 14px 20px;
+      border-radius: 14px;
+      font-size: 13px;
+      font-weight: 500;
+      transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      z-index: 9999;
+      text-align: center;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      pointer-events: none;
+    }
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+    }
+    .toast.success {
+      background: #0D2A1F;
+      border: 1px solid #2D7D5A;
+      color: #2D7D5A;
+    }
+    .toast.error {
+      background: #2A0D0D;
+      border: 1px solid #8A3A3A;
+      color: #8A3A3A;
+    }
+    .toast.warning {
+      background: #2A1A0D;
+      border: 1px solid #B8860B;
+      color: #B8860B;
+    }
+    .toast.info {
+      background: #0D1A2A;
+      border: 1px solid #4A7A8A;
+      color: #4A7A8A;
+    }
+
+    /* ============================================================
+       RESPONSIVE
+       ============================================================ */
+    @media (max-width: 480px) {
+      .stats-grid {
+        gap: 8px;
+      }
+      .stat-card {
+        padding: 14px 10px;
+      }
+      .stat-card .stat-value {
+        font-size: 20px;
+      }
+      .container {
+        padding: 12px 12px 30px;
+      }
+      .transactions-header {
+        flex-direction: column;
+        gap: 8px;
+        align-items: flex-start;
+      }
+    }
+
+    @media (min-width: 768px) {
+      .container {
+        max-width: 700px;
+        padding: 24px 24px 40px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== BACKGROUND ===== -->
+<div class="gradient-bg"></div>
+<div class="glow glow-1"></div>
+<div class="glow glow-2"></div>
+<div class="glow glow-3"></div>
+
+<!-- ===== HEADER ===== -->
+<header class="header">
+  <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i></a>
+  <a href="index.html" class="logo">ARVE<span>XA</span></a>
+  <div class="header-placeholder"></div>
+</header>
+
+<!-- ===== MAIN ===== -->
+<main class="container">
+
+  <!-- ===== HERO ===== -->
+  <div class="hero-section">
+    <div class="hero-badge">
+      <i class="fas fa-chart-pie"></i>
+      <span>Mon Activité</span>
+    </div>
+    <h1 class="hero-title">📊 Mon <span>activité</span></h1>
+    <p class="hero-description">Suivez toutes vos transactions et performances en temps réel.</p>
+  </div>
+
+  <!-- ===== STATS ===== -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <span class="stat-icon"><i class="fas fa-coins"></i></span>
+      <div class="stat-value" id="statDepots">0 FCFA</div>
+      <div class="stat-label">Total dépôts</div>
+    </div>
+    <div class="stat-card">
+      <span class="stat-icon"><i class="fas fa-arrow-up"></i></span>
+      <div class="stat-value" id="statRetraits">0 FCFA</div>
+      <div class="stat-label">Total retraits</div>
+    </div>
+    <div class="stat-card">
+      <span class="stat-icon"><i class="fas fa-gift"></i></span>
+      <div class="stat-value" id="statParrainage">0 FCFA</div>
+      <div class="stat-label">Gains parrainage</div>
+    </div>
+    <div class="stat-card">
+      <span class="stat-icon"><i class="fas fa-shopping-cart"></i></span>
+      <div class="stat-value" id="statAchats">0 FCFA</div>
+      <div class="stat-label">Total achats</div>
+    </div>
+  </div>
+
+  <!-- ===== TRANSACTIONS ===== -->
+  <div class="transactions-card">
+    <div class="transactions-header">
+      <h3>📋 Dernières <span>transactions</span></h3>
+      <div class="filter-btns">
+        <button class="filter-btn active" data-filter="all">Tout</button>
+        <button class="filter-btn" data-filter="deposit">Dépôts</button>
+        <button class="filter-btn" data-filter="withdrawal">Retraits</button>
+        <button class="filter-btn" data-filter="referral">Parrainage</button>
+      </div>
+    </div>
+    <div id="transactionsList">
+      <div class="empty-state">
+        <i class="fas fa-inbox"></i>
+        <p>Aucune transaction pour le moment</p>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ===== TOAST ===== -->
+<div class="toast" id="toast"></div>
+
+<!-- ============================================================ -->
+<!-- ===== SCRIPTS ===== -->
+<!-- ============================================================ -->
+<script type="importmap">
+{
+  "imports": {
+    "firebase/app": "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js",
+    "firebase/auth": "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js",
+    "firebase/firestore": "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js"
+  }
+}
+</script>
+
+<script type="module">
+// ================================================================
+// IMPORTS FIREBASE
+// ================================================================
+import { initializeApp } from "firebase/app";
+import { 
+  getAuth, 
+  onAuthStateChanged,
+  setPersistence,
+  browserLocalPersistence
+} from "firebase/auth";
+import { 
+  getFirestore, 
+  doc, 
+  getDoc, 
+  onSnapshot,
+  collection,
+  query,
+  where,
+  orderBy,
+  getDocs
+} from "firebase/firestore";
+
+// ================================================================
+// CONFIGURATION FIREBASE
+// ================================================================
+const firebaseConfig = {
+  apiKey: "AIzaSyBEbYuuUlNCLMBUHClv4UnyownNHw2q3_g",
+  authDomain: "nexgen-39043.firebaseapp.com",
+  projectId: "nexgen-39043",
+  storageBucket: "nexgen-39043.firebasestorage.app",
+  messagingSenderId: "619390144325",
+  appId: "1:619390144325:web:35d96b125501e4e8b1782c",
+  measurementId: "G-HC2Q5DNKDR"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+setPersistence(auth, browserLocalPersistence);
+
+// ================================================================
+// DOM
+// ================================================================
+const statDepots = document.getElementById('statDepots');
+const statRetraits = document.getElementById('statRetraits');
+const statParrainage = document.getElementById('statParrainage');
+const statAchats = document.getElementById('statAchats');
+const transactionsList = document.getElementById('transactionsList');
+const toast = document.getElementById('toast');
+
+let currentUser = null;
+let allTransactions = [];
+let filter = 'all';
+
+// ================================================================
+// TOAST
+// ================================================================
+function showToast(message, type = 'info') {
+  toast.textContent = message;
+  toast.className = `toast ${type}`;
+  setTimeout(() => toast.classList.add('show'), 50);
+  setTimeout(() => toast.classList.remove('show'), 3500);
+}
+
+// ================================================================
+// FORMAT DATE
+// ================================================================
+function formatDate(dateStr) {
+  if (!dateStr) return 'Date inconnue';
+  try {
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diff = now - date;
+    if (diff < 60000) return 'À l\'instant';
+    if (diff < 3600000) return `Il y a ${Math.floor(diff / 60000)} min`;
+    if (diff < 86400000) return `Il y a ${Math.floor(diff / 3600000)}h`;
+    if (diff < 172800000) return 'Hier';
+    if (diff < 604800000) return `Il y a ${Math.floor(diff / 86400000)} jours`;
+    return date.toLocaleDateString('fr-FR');
+  } catch {
+    return 'Date inconnue';
+  }
+}
+
+// ================================================================
+// FORMAT MONNAIE
+// ================================================================
+function formatCurrency(amount) {
+  if (!amount) return '0 FCFA';
+  if (amount >= 1000000) return (amount / 1000000).toFixed(1) + 'M FCFA';
+  if (amount >= 1000) return (amount / 1000).toFixed(1) + 'K FCFA';
+  return amount.toLocaleString('fr-FR') + ' FCFA';
+}
+
+function formatCurrencyFull(amount) {
+  return (amount || 0).toLocaleString('fr-FR') + ' FCFA';
+}
+
+// ================================================================
+// RENDRE LES TRANSACTIONS
+// ================================================================
+function renderTransactions(transactions, filterType) {
+  let filtered = transactions;
+  
+  if (filterType === 'deposit') {
+    filtered = transactions.filter(t => t.type === 'deposit');
+  } else if (filterType === 'withdrawal') {
+    filtered = transactions.filter(t => t.type === 'withdrawal');
+  } else if (filterType === 'referral') {
+    filtered = transactions.filter(t => t.type === 'referral');
+  }
+  
+  if (filtered.length === 0) {
+    transactionsList.innerHTML = `
+      <div class="empty-state">
+        <i class="fas fa-inbox"></i>
+        <p>Aucune transaction ${filterType !== 'all' ? 'pour ce filtre' : ''}</p>
+      </div>
+    `;
+    return;
+  }
+  
+  transactionsList.innerHTML = filtered.slice(0, 20).map(trans => {
+    const iconMap = {
+      deposit: 'fa-arrow-down',
+      withdrawal: 'fa-arrow-up',
+      referral: 'fa-users',
+      purchase: 'fa-shopping-cart',
+      investment: 'fa-chart-line'
+    };
+    
+    const iconClass = trans.iconClass || trans.type || 'deposit';
+    const amountClass = trans.amount >= 0 ? 'positive' : 'negative';
+    const sign = trans.amount >= 0 ? '+' : '';
+    
+    return `
+      <div class="transaction-item">
+        <div class="transaction-icon ${iconClass}">
+          <i class="fas ${iconMap[iconClass] || 'fa-circle'}"></i>
+        </div>
+        <div class="transaction-info">
+          <div class="trans-title">${trans.title || 'Transaction'}</div>
+          <div class="trans-desc">${trans.description || ''}</div>
+        </div>
+        <div style="text-align:right;">
+          <div class="transaction-amount ${amountClass}">${sign}${formatCurrencyFull(trans.amount)}</div>
+          <div class="transaction-date">${formatDate(trans.date)}</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ================================================================
+// CHARGER LES DONNÉES UTILISATEUR
+// ================================================================
+async function loadUserData(uid) {
+  try {
+    const userRef = doc(db, "users", uid);
+    const userDoc = await getDoc(userRef);
+    
+    if (userDoc.exists()) {
+      const data = userDoc.data();
+      
+      statDepots.textContent = formatCurrency(data.totalDeposits || 0);
+      statRetraits.textContent = formatCurrency(data.totalRetraits || 0);
+      statParrainage.textContent = formatCurrency(data.referralEarnings || 0);
+      statAchats.textContent = formatCurrency(data.totalAchats || 0);
+      
+      return data;
+    }
+    return null;
+  } catch (error) {
+    console.error("❌ Erreur chargement utilisateur:", error);
+    return null;
+  }
+}
+
+// ================================================================
+// CHARGER LES TRANSACTIONS
+// ================================================================
+async function loadTransactions(uid) {
+  if (!uid) return;
+  
+  try {
+    // Dépôts
+   const depotsQuery = query(
+  collection(db, "depots"),
+  where("userId", "==", uid)
+);
+    
+    const depotsSnapshot = await getDocs(depotsQuery);
+    const deposits = [];
+    depotsSnapshot.forEach(doc => {
+      const data = doc.data();
+      deposits.push({
+        id: doc.id,
+        type: 'deposit',
+        iconClass: 'deposit',
+        title: 'Dépôt',
+        description: `Recharge de ${formatCurrencyFull(data.montant || 0)}`,
+        amount: data.montant || 0,
+        date: data.timestamp || data.date || new Date().toISOString(),
+        status: data.statut || 'validé'
+      });
+    });
+    
+    // Retraits
+    const retraitsQuery = query(
+      collection(db, "retraits"),
+      where("userId", "==", uid),
+      orderBy("timestamp", "desc")
+    );
+    
+    const retraitsSnapshot = await getDocs(retraitsQuery);
+    const retraits = [];
+    retraitsSnapshot.forEach(doc => {
+      const data = doc.data();
+      retraits.push({
+        id: doc.id,
+        type: 'withdrawal',
+        iconClass: 'withdrawal',
+        title: 'Retrait',
+        description: `Retrait de ${formatCurrencyFull(data.montant || 0)}`,
+        amount: -(data.montant || 0),
+        date: data.timestamp || data.date || new Date().toISOString(),
+        status: data.statut || 'validé'
+      });
+    });
+    
+    // Parrainages (à récupérer depuis les filleuls)
+    // On va les simuler depuis les données utilisateur
+    const userData = await getUserData(uid);
+    const referrals = [];
+    if (userData && userData.referralEarnings && userData.referralEarnings > 0) {
+      referrals.push({
+        id: 'referral_total',
+        type: 'referral',
+        iconClass: 'referral',
+        title: 'Parrainage',
+        description: `Gains totaux via parrainage`,
+        amount: userData.referralEarnings || 0,
+        date: userData.lastLogin || new Date().toISOString()
+      });
+    }
+    
+    // Achats
+    const achats = [];
+    if (userData && userData.totalAchats && userData.totalAchats > 0) {
+      achats.push({
+        id: 'achat_total',
+        type: 'purchase',
+        iconClass: 'purchase',
+        title: 'Achats',
+        description: `Total des achats`,
+        amount: -(userData.totalAchats || 0),
+        date: userData.lastLogin || new Date().toISOString()
+      });
+    }
+    
+    // Combiner toutes les transactions
+    allTransactions = [...deposits, ...retraits, ...referrals, ...achats];
+    
+    // Trier par date (plus récent en premier)
+    allTransactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+    
+    renderTransactions(allTransactions, filter);
+    
+  } catch (error) {
+    console.error("❌ Erreur chargement transactions:", error);
+    allTransactions = [];
+    renderTransactions([], filter);
+  }
+}
+
+// ================================================================
+// RÉCUPÉRER LES DONNÉES UTILISATEUR
+// ================================================================
+async function getUserData(uid) {
+  try {
+    const userRef = doc(db, "users", uid);
+    const userDoc = await getDoc(userRef);
+    if (userDoc.exists()) {
+      return userDoc.data();
+    }
+    return null;
+  } catch (error) {
+    console.error("Erreur:", error);
+    return null;
+  }
+}
+
+// ================================================================
+// FILTRES
+// ================================================================
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    filter = btn.dataset.filter;
+    renderTransactions(allTransactions, filter);
+  });
+});
+
+// ================================================================
+// AUTH
+// ================================================================
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    currentUser = user;
+    localStorage.setItem('ARVEXA_current_user', user.uid);
+    loadUserData(user.uid);
+    loadTransactions(user.uid);
+  } else {
+    const savedUid = localStorage.getItem('ARVEXA_current_user');
+    if (savedUid) {
+      setTimeout(() => {
+        if (!auth.currentUser) {
+          window.location.href = 'login.html';
+        }
+      }, 2000);
+    } else {
+      window.location.href = 'login.html';
+    }
+  }
+});
+
+console.log('📊 ARVEXA - Page Mon Activité chargée');
+</script>
+</body>
+</html>
