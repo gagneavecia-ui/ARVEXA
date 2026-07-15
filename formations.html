@@ -991,6 +991,7 @@ const DEFAULT_FORMATIONS = [
     coverImage: "https://images.pexels.com/photos/6266282/pexels-photo-6266282.jpeg",
     level: "Débutant",
     duration: "2h",
+    pdfUrl: "formation_001.pdf",
     isFree: false,
     createdAt: new Date().toISOString()
   },
@@ -1003,6 +1004,7 @@ const DEFAULT_FORMATIONS = [
     coverImage: "https://images.pexels.com/photos/186461/pexels-photo-186461.jpeg",
     level: "Débutant",
     duration: "3h",
+    pdfUrl: "formation_002.pdf",
     isFree: false,
     createdAt: new Date().toISOString()
   },
@@ -1015,6 +1017,7 @@ const DEFAULT_FORMATIONS = [
     coverImage: "https://images.pexels.com/photos/6771669/pexels-photo-6771669.jpeg",
     level: "Débutant",
     duration: "2h30",
+    pdfUrl: "formation_003.pdf",
     isFree: false,
     createdAt: new Date().toISOString()
   },
@@ -1027,6 +1030,7 @@ const DEFAULT_FORMATIONS = [
     coverImage: "https://images.pexels.com/photos/27960363/pexels-photo-27960363.jpeg",
     level: "Avancé",
     duration: "4h",
+    pdfUrl: "formation_004.pdf",
     isFree: false,
     createdAt: new Date().toISOString()
   },
@@ -1039,6 +1043,7 @@ const DEFAULT_FORMATIONS = [
     coverImage: "https://images.pexels.com/photos/9301316/pexels-photo-9301316.jpeg",
     level: "Débutant",
     duration: "2h30",
+    pdfUrl: "formation_005.pdf",
     isFree: false,
     createdAt: new Date().toISOString()
   },
@@ -1111,7 +1116,6 @@ async function initializeFormations() {
   try {
     const snapshot = await getDocs(collection(db, 'formations'));
     
-    // ✅ SEULEMENT SI LA COLLECTION EST VIDE
     if (snapshot.empty) {
       console.log('📚 Création des 10 formations par défaut...');
       for (const formation of DEFAULT_FORMATIONS) {
@@ -1120,12 +1124,10 @@ async function initializeFormations() {
       }
       console.log('✅ 10 formations créées');
     } else {
-      console.log('✅ Formations déjà existantes (' + snapshot.size + ' documents)');
+      console.log('✅ Formations déjà existantes');
     }
-    return true;
   } catch (error) {
     console.error('❌ Erreur initialisation formations:', error);
-    return false;
   }
 }
 

@@ -886,27 +886,23 @@ const DEFAULT_EBOOKS_FIRESTORE = [
 ];
 
 // ================================================================
-// INITIALISER LES E-BOOKS - RECRÉATION FORCÉE
+// INITIALISER LES E-BOOKS (SANS SUPPRIMER)
 // ================================================================
 async function initializeEbooks() {
   try {
-    // Supprimer tous les e-books existants
     const snapshot = await getDocs(collection(db, 'ebooks'));
     
-    if (!snapshot.empty) {
-      console.log('🗑️ Suppression des anciens e-books...');
-      for (const doc of snapshot.docs) {
-        await deleteDoc(doc.ref);
+    // ✅ SEULEMENT SI LA COLLECTION EST VIDE
+    if (snapshot.empty) {
+      console.log('📚 Création des 10 e-books par défaut...');
+      for (const ebook of DEFAULT_EBOOKS_FIRESTORE) {
+        const docRef = doc(db, 'ebooks', ebook.id);
+        await setDoc(docRef, ebook);
       }
-      console.log('✅ Anciens e-books supprimés');
+      console.log('✅ 10 e-books créés');
+    } else {
+      console.log('✅ E-books déjà existants (' + snapshot.size + ' documents)');
     }
-    
-    console.log('📚 Création des 10 nouveaux e-books...');
-    for (const ebook of DEFAULT_EBOOKS_FIRESTORE) {
-      const docRef = doc(db, 'ebooks', ebook.id);
-      await setDoc(docRef, ebook);
-    }
-    console.log('✅ 10 e-books créés avec les nouvelles images');
     return true;
   } catch (error) {
     console.error('❌ Erreur initialisation e-books:', error);

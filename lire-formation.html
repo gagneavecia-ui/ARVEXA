@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+  <meta name="theme-color" content="#0A0A0A">
+  <meta name="description" content="ARVEXA - Lire formation">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3135/3135715.png">
+  
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>">
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --primary: #1A3A2A;
+      --primary-dark: #0A1A12;
+      --primary-light: #2A5A3A;
+      --accent: #B8860B;
+      --accent-dim: rgba(184, 134, 11, 0.08);
+      --success: #2D7D5A;
+      --bg-dark: #0A0A0A;
+      --bg-surface: #141414;
+      --bg-card: rgba(20, 20, 20, 0.7);
+      --text-light: #F5F0E8;
+      --text-dim: #8A8A7A;
+      --text-muted: #5A5A4A;
+      --card-border: rgba(184, 134, 11, 0.06);
+      --glass-bg: rgba(26, 58, 42, 0.15);
+      --glass-border: rgba(184, 134, 11, 0.04);
+      --transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+      --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      --radius: 16px;
+      --danger: #8A3A3A;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      font-family: 'Inter', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-light);
+      font-size: 14px;
+      line-height: 1.6;
+      min-height: 100vh;
+      overflow-x: hidden;
+      opacity: 0;
+      animation: pageFadeIn 0.5s ease forwards;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 80px;
+    }
+
+    @keyframes pageFadeIn {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+
+    .gradient-bg {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: -2;
+      background: radial-gradient(ellipse 40% 30% at 30% 20%, rgba(26, 58, 42, 0.10) 0%, transparent 70%),
+                  linear-gradient(180deg, #0A0A0A 0%, #060606 100%);
+    }
+
+    .glow {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: -1;
+      opacity: 0.15;
+      animation: glowMove 10s ease-in-out infinite alternate;
+    }
+    .glow-1 { width: 350px; height: 350px; background: rgba(26, 58, 42, 0.15); top: -80px; right: -80px; }
+    .glow-2 { width: 200px; height: 200px; background: rgba(184, 134, 11, 0.03); bottom: 0; left: 0; animation-delay: -4s; }
+    .glow-3 { width: 250px; height: 250px; background: rgba(26, 58, 42, 0.08); top: 40%; left: 50%; transform: translate(-50%, -50%); animation-delay: -8s; }
+    @keyframes glowMove {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(30px, -20px) scale(1.1); }
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 5%;
+      background: rgba(10, 10, 10, 0.95);
+      backdrop-filter: blur(12px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 1px solid rgba(184, 134, 11, 0.04);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+      color: var(--text-light);
+      font-size: clamp(16px, 2.5vw, 22px);
+      font-weight: 700;
+      font-family: 'Playfair Display', 'Georgia', serif;
+      letter-spacing: 2px;
+    }
+    .logo span { color: var(--accent); font-style: italic; }
+
+    .back-btn {
+      width: clamp(32px, 4vw, 40px);
+      height: clamp(32px, 4vw, 40px);
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-light);
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s, border-color 0.2s;
+      flex-shrink: 0;
+    }
+    .back-btn:active {
+      transform: scale(0.94);
+      background: rgba(184, 134, 11, 0.08);
+    }
+    .back-btn i { font-size: clamp(14px, 1.8vw, 18px); }
+
+    .header-placeholder {
+      width: clamp(32px, 4vw, 40px);
+      flex-shrink: 0;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 16px 16px 40px;
+      width: 100%;
+    }
+
+    /* ===== LOADING ===== */
+    .loading {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-dim);
+    }
+    .loading i {
+      font-size: 40px;
+      opacity: 0.2;
+      display: block;
+      margin-bottom: 12px;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ===== PDF VIEWER ===== */
+    .pdf-container {
+      background: var(--bg-card);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin-top: 10px;
+    }
+
+    .pdf-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .pdf-header .title {
+      font-size: 18px;
+      font-weight: 700;
+      font-family: 'Playfair Display', 'Georgia', serif;
+      color: var(--text-light);
+    }
+    .pdf-header .title span {
+      color: var(--accent);
+      font-style: italic;
+    }
+
+    .pdf-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .pdf-actions .btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+    }
+    .pdf-actions .btn:active { transform: scale(0.95); }
+
+    .pdf-actions .btn-download {
+      background: var(--accent);
+      color: var(--bg-dark);
+    }
+    .pdf-actions .btn-download:hover { background: #9A7209; }
+
+    .pdf-actions .btn-view {
+      background: rgba(184, 134, 11, 0.08);
+      color: var(--text-light);
+      border: 1px solid rgba(184, 134, 11, 0.12);
+    }
+    .pdf-actions .btn-view:hover {
+      background: rgba(184, 134, 11, 0.15);
+    }
+
+    .pdf-iframe {
+      width: 100%;
+      height: 70vh;
+      border: none;
+      background: #0A0A0A;
+      min-height: 400px;
+    }
+
+    /* ===== BLOCAGE ===== */
+    .blocked {
+      text-align: center;
+      padding: 60px 20px;
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      border: 1px solid var(--card-border);
+      max-width: 500px;
+      margin: 20px auto;
+    }
+    .blocked .icon {
+      font-size: 56px;
+      color: var(--accent);
+      display: block;
+      margin-bottom: 16px;
+    }
+    .blocked h2 {
+      font-size: 24px;
+      font-family: 'Playfair Display', 'Georgia', serif;
+      color: var(--text-light);
+      margin-bottom: 8px;
+    }
+    .blocked h2 span { color: var(--accent); font-style: italic; }
+    .blocked p {
+      color: var(--text-dim);
+      margin-bottom: 8px;
+    }
+    .blocked .btn-premium {
+      display: inline-block;
+      margin-top: 16px;
+      padding: 14px 28px;
+      background: var(--accent);
+      color: var(--bg-dark);
+      border-radius: 12px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: var(--transition);
+    }
+    .blocked .btn-premium:active { transform: scale(0.97); }
+    .blocked .btn-premium:hover { background: #9A7209; }
+
+    /* ============================================================
+       TOAST
+       ============================================================ */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(120px);
+      max-width: 90%;
+      width: 400px;
+      padding: 14px 20px;
+      border-radius: 14px;
+      font-size: 13px;
+      font-weight: 500;
+      transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      z-index: 9999;
+      text-align: center;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      pointer-events: none;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .toast.success { background: #0D2A1F; border: 1px solid #2D7D5A; color: #2D7D5A; }
+    .toast.error { background: #2A0D0D; border: 1px solid #8A3A3A; color: #8A3A3A; }
+    .toast.warning { background: #2A1A0D; border: 1px solid #B8860B; color: #B8860B; }
+    .toast.info { background: #0D1A2A; border: 1px solid #4A7A8A; color: #4A7A8A; }
+
+    /* ============================================================
+       RESPONSIVE
+       ============================================================ */
+    @media (max-width: 600px) {
+      .container { padding: 12px 12px 30px; }
+      .pdf-iframe { height: 50vh; min-height: 300px; }
+      .pdf-header .title { font-size: 15px; }
+      .pdf-actions .btn { font-size: 11px; padding: 6px 12px; }
+    }
+
+    @media (min-width: 768px) {
+      .container { max-width: 900px; padding: 24px 24px 40px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="gradient-bg"></div>
+<div class="glow glow-1"></div>
+<div class="glow glow-2"></div>
+<div class="glow glow-3"></div>
+
+<!-- ===== HEADER ===== -->
+<header class="header">
+  <a href="formations.html" class="back-btn"><i class="fas fa-arrow-left"></i></a>
+  <a href="index.html" class="logo">ARVE<span>XA</span></a>
+  <div class="header-placeholder"></div>
+</header>
+
+<!-- ===== MAIN ===== -->
+<main class="container">
+  <div id="content">
+    <div class="loading">
+      <i class="fas fa-spinner"></i>
+      <p>Chargement de la formation...</p>
+    </div>
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script type="importmap">
+{
+  "imports": {
+    "firebase/app": "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js",
+    "firebase/auth": "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js",
+    "firebase/firestore": "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js"
+  }
+}
+</script>
+
+<script type="module">
+// ================================================================
+// IMPORTS
+// ================================================================
+import { initializeApp } from "firebase/app";
+import { 
+  getAuth, 
+  onAuthStateChanged,
+  setPersistence,
+  browserLocalPersistence
+} from "firebase/auth";
+import { 
+  getFirestore,
+  doc,
+  getDoc
+} from "firebase/firestore";
+
+// ================================================================
+// FIREBASE CONFIG
+// ================================================================
+const firebaseConfig = {
+  apiKey: "AIzaSyBEbYuuUlNCLMBUHClv4UnyownNHw2q3_g",
+  authDomain: "nexgen-39043.firebaseapp.com",
+  projectId: "nexgen-39043",
+  storageBucket: "nexgen-39043.firebasestorage.app",
+  messagingSenderId: "619390144325",
+  appId: "1:619390144325:web:35d96b125501e4e8b1782c",
+  measurementId: "G-HC2Q5DNKDR"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+setPersistence(auth, browserLocalPersistence);
+
+// ================================================================
+// HELPERS
+// ================================================================
+async function getDocument(collectionName, docId) {
+  const ref = doc(db, collectionName, docId);
+  const snap = await getDoc(ref);
+  if (!snap.exists()) return null;
+  return { id: snap.id, ...snap.data() };
+}
+
+function showToast(message, type = 'info') {
+  const toast = document.getElementById('toast');
+  toast.textContent = message;
+  toast.className = `toast ${type}`;
+  setTimeout(() => toast.classList.add('show'), 50);
+  setTimeout(() => toast.classList.remove('show'), 3500);
+}
+
+function getFormationId() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get('id');
+}
+
+// ================================================================
+// AFFICHER LA FORMATION
+// ================================================================
+function renderFormation(formation, isAchete) {
+  const content = document.getElementById('content');
+
+  if (!isAchete) {
+    content.innerHTML = `
+      <div class="blocked">
+        <span class="icon"><i class="fas fa-lock"></i></span>
+        <h2>🔒 Formation <span>non achetée</span></h2>
+        <p>Vous n'avez pas encore acheté cette formation.</p>
+        <a href="formations.html" class="btn-premium">
+          <i class="fas fa-shopping-cart"></i> Voir les formations
+        </a>
+      </div>
+    `;
+    return;
+  }
+
+  const pdfUrl = formation.pdfUrl || '';
+
+  content.innerHTML = `
+    <div class="pdf-container">
+      <div class="pdf-header">
+        <div class="title">🎓 ${formation.title}</div>
+        <div class="pdf-actions">
+          ${pdfUrl ? `
+            <button class="btn btn-download" id="downloadPdfBtn">
+              <i class="fas fa-download"></i> Télécharger PDF
+            </button>
+          ` : `
+            <span style="color:var(--text-dim);font-size:12px;">PDF non disponible</span>
+          `}
+        </div>
+      </div>
+      ${pdfUrl ? `
+        <div style="padding:20px;text-align:center;color:var(--text-dim);background:rgba(0,0,0,0.3);">
+          <i class="fas fa-file-pdf" style="font-size:48px;color:var(--accent);display:block;margin-bottom:8px;"></i>
+          <p style="font-size:13px;">📄 Cliquez sur "Télécharger PDF" pour obtenir votre formation</p>
+          <p style="font-size:11px;color:var(--text-muted);">Le fichier sera téléchargé sur votre téléphone</p>
+        </div>
+      ` : `
+        <div style="padding:40px 20px;text-align:center;color:var(--text-dim);">
+          <i class="fas fa-file-pdf" style="font-size:48px;opacity:0.2;display:block;margin-bottom:12px;"></i>
+          <p>Le PDF de cette formation n'est pas encore disponible.</p>
+        </div>
+      `}
+    </div>
+  `;
+
+  // ✅ BOUTON TÉLÉCHARGER UNIQUEMENT
+  setTimeout(() => {
+    const downloadBtn = document.getElementById('downloadPdfBtn');
+    if (downloadBtn) {
+      downloadBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        if (!pdfUrl) {
+          showToast('❌ PDF non disponible', 'error');
+          return;
+        }
+        
+        try {
+          const link = document.createElement('a');
+          link.href = pdfUrl;
+          link.download = formation.title + '.pdf';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          showToast('✅ Téléchargement démarré', 'success');
+        } catch (error) {
+          console.error('❌ Erreur:', error);
+          showToast('❌ Erreur lors du téléchargement', 'error');
+        }
+      });
+    }
+  }, 200);
+}
+
+// ================================================================
+// CHARGER LA FORMATION
+// ================================================================
+async function loadFormation(id) {
+  if (!id) {
+    document.getElementById('content').innerHTML = `
+      <div class="blocked">
+        <span class="icon"><i class="fas fa-exclamation-circle"></i></span>
+        <h2>Formation <span>introuvable</span></h2>
+        <a href="formations.html" class="btn-premium">Retour aux formations</a>
+      </div>
+    `;
+    return;
+  }
+
+  try {
+    const formation = await getDocument('formations', id);
+    if (!formation) {
+      document.getElementById('content').innerHTML = `
+        <div class="blocked">
+          <span class="icon"><i class="fas fa-exclamation-circle"></i></span>
+          <h2>Formation <span>introuvable</span></h2>
+          <a href="formations.html" class="btn-premium">Retour aux formations</a>
+        </div>
+      `;
+      return;
+    }
+
+    const user = auth.currentUser;
+    if (user) {
+      const userData = await getDocument('users', user.uid);
+      const achats = userData?.achats || [];
+      const isAchete = achats.includes(id);
+      renderFormation(formation, isAchete);
+    } else {
+      renderFormation(formation, false);
+    }
+
+  } catch (error) {
+    console.error('❌ Erreur:', error);
+    document.getElementById('content').innerHTML = `
+      <div class="blocked">
+        <span class="icon"><i class="fas fa-exclamation-circle"></i></span>
+        <h2>Erreur de <span>chargement</span></h2>
+        <a href="formations.html" class="btn-premium">Retour aux formations</a>
+      </div>
+    `;
+  }
+}
+
+// ================================================================
+// AUTH
+// ================================================================
+const formationId = getFormationId();
+
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    localStorage.setItem('ARVEXA_current_user', user.uid);
+    loadFormation(formationId);
+  } else {
+    const savedUid = localStorage.getItem('ARVEXA_current_user');
+    if (savedUid) {
+      setTimeout(() => {
+        if (!auth.currentUser) {
+          loadFormation(formationId);
+        }
+      }, 1000);
+    } else {
+      loadFormation(formationId);
+    }
+  }
+});
+
+console.log('🎓 ARVEXA - Lecteur formation chargé');
+</script>
+</body>
+</html>
