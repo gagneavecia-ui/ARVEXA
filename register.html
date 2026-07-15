@@ -977,63 +977,17 @@
 <div class="toast" id="toast"></div>
 
 <!-- ============================================================ -->
-<!-- ===== IMPORTS ===== -->
-<script type="importmap">
-  {
-    "imports": {
-      "firebase/app": "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js",
-      "firebase/auth": "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js",
-      "firebase/firestore": "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js"
-    }
-  }
-</script>
-
+<!-- ===== SUPABASE SCRIPT ===== -->
 <script type="module">
   // ================================================================
-  // IMPORTS
+  // SUPABASE CONFIG - VOS INFORMATIONS
   // ================================================================
-  import { initializeApp } from "firebase/app";
-  import { 
-    getAuth, 
-    createUserWithEmailAndPassword,
-    signInWithPopup,
-    GoogleAuthProvider,
-    sendEmailVerification,
-    setPersistence,
-    browserLocalPersistence,
-    onAuthStateChanged
-  } from "firebase/auth";
-  import { 
-    getFirestore, 
-    doc, 
-    setDoc, 
-    getDoc, 
-    collection, 
-    query, 
-    where, 
-    getDocs,
-    updateDoc
-  } from "firebase/firestore";
+  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.47.0/+esm';
 
-  // ================================================================
-  // FIREBASE CONFIG
-  // ================================================================
-  const firebaseConfig = {
-    apiKey: "AIzaSyBEbYuuUlNCLMBUHClv4UnyownNHw2q3_g",
-    authDomain: "nexgen-39043.firebaseapp.com",
-    projectId: "nexgen-39043",
-    storageBucket: "nexgen-39043.firebasestorage.app",
-    messagingSenderId: "619390144325",
-    appId: "1:619390144325:web:35d96b125501e4e8b1782c",
-    measurementId: "G-HC2Q5DNKDR"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
-
-  // Persistance locale
-  setPersistence(auth, browserLocalPersistence);
+  const supabaseUrl = 'https://fvyjruesrmyaktfsjjgi.supabase.co';
+  const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ2eWpydWVzcm15YWt0ZnNqamdpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQwNDU1MDAsImV4cCI6MjA5OTYyMTUwMH0.EnqwRuRpUSsrECoERfkrYzu_kv_oT6l04lZqjOtDDxA';
+  
+  const supabase = createClient(supabaseUrl, supabaseKey);
 
   // ================================================================
   // DOM
@@ -1074,26 +1028,6 @@
   }
 
   // ================================================================
-  // REDIRECTION SI DÉJÀ CONNECTÉ
-  // ================================================================
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      localStorage.setItem('ARVEXA_current_user', user.uid);
-      window.location.href = 'index.html';
-    }
-  });
-
-  // ================================================================
-  // TOGGLE PASSWORD
-  // ================================================================
-  togglePassword.addEventListener('click', () => {
-    const type = passwordInput.type === 'password' ? 'text' : 'password';
-    passwordInput.type = type;
-    togglePassword.classList.toggle('fa-eye');
-    togglePassword.classList.toggle('fa-eye-slash');
-  });
-
-  // ================================================================
   // MESSAGE
   // ================================================================
   function showMessage(text, type = 'error') {
@@ -1110,6 +1044,16 @@
   function hideMessage() {
     messageBanner.classList.add('hidden');
   }
+
+  // ================================================================
+  // TOGGLE PASSWORD
+  // ================================================================
+  togglePassword.addEventListener('click', () => {
+    const type = passwordInput.type === 'password' ? 'text' : 'password';
+    passwordInput.type = type;
+    togglePassword.classList.toggle('fa-eye');
+    togglePassword.classList.toggle('fa-eye-slash');
+  });
 
   // ================================================================
   // PAYS
@@ -1201,7 +1145,7 @@
   });
 
   // ================================================================
-  // VÉRIFICATION CODE PARRAINAGE
+  // VÉRIFICATION CODE PARRAINAGE (Supabase)
   // ================================================================
   async function checkReferralCode(code) {
     if (!code || code.length < 4) {
@@ -1214,15 +1158,24 @@
 
     try {
       const normalizedCode = code.trim().toUpperCase();
-      const usersRef = collection(db, "users");
-      const q = query(usersRef, where("referralCode", "==", normalizedCode));
-      const snapshot = await getDocs(q);
+      
+      const { data, error } = await supabase
+        .from('users')
+        .select('id')
+        .eq('referral_code', normalizedCode)
+        .maybeSingle();
 
-      if (!snapshot.empty) {
-        const parrainId = snapshot.docs[0].id;
+      if (error) {
+        console.error("❌ Erreur Supabase:", error);
+        referralMessage.innerHTML = '<i class="fas fa-exclamation-circle"></i> Erreur de vérification';
+        referralInfo.className = 'referral-info invalid';
+        return null;
+      }
+
+      if (data) {
         referralMessage.innerHTML = '<i class="fas fa-check-circle"></i> ✅ Code valide ! +500 FCFA offerts';
         referralInfo.className = 'referral-info valid';
-        return parrainId;
+        return data.id;
       } else {
         referralMessage.innerHTML = '<i class="fas fa-exclamation-triangle"></i> ⚠️ Code invalide.';
         referralInfo.className = 'referral-info invalid';
@@ -1253,22 +1206,32 @@
     referralCodeInput.value = refCode;
     setTimeout(() => checkReferralCode(refCode), 300);
   }
-
-  // ================================================================
+  
+    // ================================================================
   // GÉNÉRATION CODE PARRAINAGE UNIQUE
   // ================================================================
-  async function generateUniqueReferralCode(uid, prenom, nom) {
-    const base = (prenom.substring(0, 3) + nom.substring(0, 3) + uid.substring(0, 4)).toUpperCase().replace(/[^A-Z0-9]/g, '');
-    let code = base.length >= 4 ? base.substring(0, 8) : base + uid.substring(0, 4);
+  async function generateUniqueReferralCode(prenom, nom) {
+    const base = (prenom.substring(0, 3) + nom.substring(0, 3) + Math.random().toString(36).substring(2, 6)).toUpperCase().replace(/[^A-Z0-9]/g, '');
+    let code = base.length >= 4 ? base.substring(0, 8) : base + Math.random().toString(36).substring(2, 6).toUpperCase();
     if (code.length < 4) code = code + Math.random().toString(36).substring(2, 6).toUpperCase();
+    
     let isUnique = false;
     let attempts = 0;
     let finalCode = code;
+    
     while (!isUnique && attempts < 5) {
-      const usersRef = collection(db, "users");
-      const q = query(usersRef, where("referralCode", "==", finalCode));
-      const snapshot = await getDocs(q);
-      if (snapshot.empty) {
+      const { data, error } = await supabase
+        .from('users')
+        .select('id')
+        .eq('referral_code', finalCode)
+        .maybeSingle();
+      
+      if (error) {
+        console.error("❌ Erreur vérification code:", error);
+        break;
+      }
+      
+      if (!data) {
         isUnique = true;
       } else {
         finalCode = code + Math.random().toString(36).substring(2, 5).toUpperCase();
@@ -1284,17 +1247,35 @@
   async function creditReferralReward(parrainUid) {
     if (!parrainUid) return false;
     try {
-      const parrainRef = doc(db, "users", parrainUid);
-      const parrainDoc = await getDoc(parrainRef);
-      if (!parrainDoc.exists()) return false;
-      const data = parrainDoc.data();
-      await updateDoc(parrainRef, {
-        balance: (data.balance || 0) + 500,
-        referralBalance: (data.referralBalance || 0) + 500,
-        referralsCount: (data.referralsCount || 0) + 1,
-        referralEarnings: (data.referralEarnings || 0) + 500,
-        lastReferral: new Date().toISOString()
-      });
+      // Récupérer le parrain
+      const { data: parrainData, error: fetchError } = await supabase
+        .from('users')
+        .select('balance, referral_balance, referrals_count, referral_earnings')
+        .eq('id', parrainUid)
+        .single();
+
+      if (fetchError || !parrainData) {
+        console.error("❌ Erreur récupération parrain:", fetchError);
+        return false;
+      }
+
+      // Mettre à jour
+      const { error: updateError } = await supabase
+        .from('users')
+        .update({
+          balance: (parrainData.balance || 0) + 500,
+          referral_balance: (parrainData.referral_balance || 0) + 500,
+          referrals_count: (parrainData.referrals_count || 0) + 1,
+          referral_earnings: (parrainData.referral_earnings || 0) + 500,
+          last_referral: new Date().toISOString()
+        })
+        .eq('id', parrainUid);
+
+      if (updateError) {
+        console.error("❌ Erreur mise à jour parrain:", updateError);
+        return false;
+      }
+
       return true;
     } catch (error) {
       console.error("❌ Erreur crédit parrain:", error);
@@ -1303,7 +1284,7 @@
   }
 
   // ================================================================
-  // INSCRIPTION (CORRIGÉE AVEC hasDeposited ET isUnlocked)
+  // INSCRIPTION (SUPABASE)
   // ================================================================
   registerForm.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -1319,9 +1300,8 @@
     const indicatif = document.getElementById('indicatif').value;
     const referralCode = document.getElementById('referralCode').value.trim().toUpperCase();
 
-    console.log("📝 === DÉBUT INSCRIPTION ===");
+    console.log("📝 === DÉBUT INSCRIPTION SUPABASE ===");
     console.log("📧 Email:", email);
-    console.log("👤 Nom:", nom, "Prénom:", prenom);
 
     // Validations
     if (!nom || !prenom || !email || !telephone || !password) {
@@ -1366,97 +1346,109 @@
     registerBtn.innerHTML = '<span class="loader"></span> Création...';
 
     try {
-      console.log("📝 ÉTAPE 1: Création de l'utilisateur dans Firebase Auth...");
+      // 1. Créer l'utilisateur dans Supabase Auth
+      console.log("📝 ÉTAPE 1: Création de l'utilisateur dans Supabase Auth...");
       
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-      console.log("✅ Utilisateur créé dans Auth:", user.uid, user.email);
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: email,
+        password: password,
+        options: {
+          data: {
+            nom: nom,
+            prenom: prenom,
+            full_name: `${prenom} ${nom}`
+          }
+        }
+      });
 
-      try {
-        await sendEmailVerification(user);
-        console.log("✅ Email de vérification envoyé à:", email);
-      } catch (verifError) {
-        console.warn("⚠️ Erreur envoi email vérification:", verifError);
+      if (authError) {
+        console.error("❌ Erreur Auth:", authError);
+        throw new Error(authError.message);
       }
 
+      const user = authData.user;
+      console.log("✅ Utilisateur créé dans Auth:", user.id, user.email);
+
+      // 2. Générer le code de parrainage
       console.log("📝 ÉTAPE 2: Génération du code de parrainage...");
-      const generatedReferralCode = await generateUniqueReferralCode(user.uid, prenom, nom);
+      const generatedReferralCode = await generateUniqueReferralCode(prenom, nom);
       console.log("✅ Code parrainage généré:", generatedReferralCode);
-      
+
       const fullPhone = `${indicatif} ${telephone}`;
       const now = new Date().toISOString();
 
-      // ============================================================
-      // ⚠️ POINT CRITIQUE: Données utilisateur COMPLÈTES
-      // ============================================================
+      // 3. Créer l'utilisateur dans la table users
+      console.log("📝 ÉTAPE 3: Sauvegarde dans la table users...");
+
       const userData = {
-        uid: user.uid,
+        id: user.id,
         email: email,
         nom: nom,
         prenom: prenom,
-        fullName: `${prenom} ${nom}`,
+        full_name: `${prenom} ${nom}`,
         pays: pays,
         phone: fullPhone,
         balance: 0,
-        realBalance: 0,
-        totalDepots: 0,
-        totalRetraits: 0,
-        totalAchats: 0,
-        totalVentes: 0,
-        totalRevenus: 0,
-        gainsTotal: 0,
+        real_balance: 0,
+        total_depots: 0,
+        total_retraits: 0,
+        total_achats: 0,
+        total_ventes: 0,
+        total_revenus: 0,
+        gains_total: 0,
         investments: [],
         achats: [],
-        referralsCount: 0,
-        referralEarnings: 0,
-        referralCode: generatedReferralCode,
-        referredBy: referralCode || null,
-        status: "active",
-        role: "user",
-        // ===== CHAMPS ESSENTIELS POUR LE DÉVERROUILLAGE =====
-        hasDeposited: false,
-        isUnlocked: false,
-        // =======================================================
-        registrationDate: now,
-        createdAt: now,
-        lastLogin: now,
-        emailVerified: false
+        referrals_count: 0,
+        referral_earnings: 0,
+        referral_code: generatedReferralCode,
+        referred_by: referralCode || null,
+        status: 'active',
+        role: 'user',
+        has_deposited: false,
+        is_unlocked: false,
+        registration_date: now,
+        created_at: now,
+        last_login: now,
+        email_verified: false
       };
 
-      console.log("📝 ÉTAPE 3: Sauvegarde dans Firestore...");
-      console.log("📦 Données complètes:", JSON.stringify(userData, null, 2));
+      console.log("📦 Données utilisateur:", userData);
 
-      const userRef = doc(db, "users", user.uid);
-      
-      // Sauvegarde avec merge pour éviter d'écraser des champs existants
-      await setDoc(userRef, userData, { merge: true });
-      console.log("✅ Document utilisateur créé dans Firestore:", user.uid);
+      const { error: insertError } = await supabase
+        .from('users')
+        .insert([userData]);
 
-      // ============================================================
-      // VÉRIFICATION CRITIQUE: Le document existe-t-il ?
-      // ============================================================
-      console.log("📝 ÉTAPE 4: Vérification du document...");
-      const verifyDoc = await getDoc(userRef);
-      if (verifyDoc.exists()) {
-        console.log("✅ VÉRIFICATION RÉUSSIE: Document existe bien dans Firestore !");
-        console.log("📦 Contenu vérifié:", verifyDoc.data());
-        console.log("🔑 hasDeposited:", verifyDoc.data().hasDeposited);
-        console.log("🔓 isUnlocked:", verifyDoc.data().isUnlocked);
-      } else {
-        console.error("❌ VÉRIFICATION ÉCHOUÉE: Document NON trouvé dans Firestore !");
-        throw new Error("Le document n'a pas été créé dans Firestore.");
+      if (insertError) {
+        console.error("❌ Erreur insertion:", insertError);
+        throw new Error(insertError.message);
       }
 
-      // 6. Créditer le parrain si code valide
+      console.log("✅ Document utilisateur créé dans Supabase:", user.id);
+
+      // 4. Vérification
+      console.log("📝 ÉTAPE 4: Vérification du document...");
+      const { data: verifyData, error: verifyError } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
+      if (verifyError) {
+        console.error("❌ Erreur vérification:", verifyError);
+      } else {
+        console.log("✅ VÉRIFICATION RÉUSSIE:", verifyData);
+      }
+
+      // 5. Créditer le parrain
       if (parrainId) {
         console.log("📝 ÉTAPE 5: Crédit du parrain...");
         await creditReferralReward(parrainId);
-        console.log(`✅ ${500} FCFA crédités au parrain ${parrainId}`);
+        console.log(`✅ 500 FCFA crédités au parrain ${parrainId}`);
       }
 
-      // 7. Sauvegarde locale
-      localStorage.setItem('ARVEXA_current_user', user.uid);
-      localStorage.setItem('ARVEXA_user_name', userData.fullName);
+      // 6. Sauvegarde locale
+      localStorage.setItem('ARVEXA_current_user', user.id);
+      localStorage.setItem('ARVEXA_user_name', userData.full_name);
       localStorage.setItem('ARVEXA_is_unlocked', 'false');
       localStorage.setItem('ARVEXA_user_data', JSON.stringify(userData));
 
@@ -1469,113 +1461,45 @@
 
     } catch (error) {
       console.error("❌ ERREUR INSCRIPTION:", error);
-      console.error("📋 Code:", error.code);
-      console.error("📋 Message:", error.message);
       
       let errorMsg = 'Erreur lors de l\'inscription.';
-      switch (error.code) {
-        case 'auth/email-already-in-use':
-          errorMsg = 'Cet email est déjà utilisé. Connectez-vous.';
-          break;
-        case 'auth/invalid-email':
-          errorMsg = 'Email invalide.';
-          break;
-        case 'auth/weak-password':
-          errorMsg = 'Mot de passe trop faible (minimum 6 caractères).';
-          break;
-        case 'auth/network-request-failed':
-          errorMsg = '⚠️ Problème réseau. Vérifiez votre connexion Internet.';
-          break;
-        case 'permission-denied':
-          errorMsg = '⚠️ Erreur de permissions Firestore. Vérifiez les règles de sécurité.';
-          break;
-        default:
-          errorMsg = error.message || 'Erreur inconnue. Réessayez.';
+      if (error.message) {
+        errorMsg = error.message;
       }
       showMessage(errorMsg, 'error');
+      
       registerBtn.disabled = false;
       registerBtn.innerHTML = '<i class="fas fa-user-plus"></i> Créer mon compte';
     }
   });
 
   // ================================================================
-  // CONNEXION GOOGLE
+  // CONNEXION GOOGLE (Supabase)
   // ================================================================
   googleBtn.addEventListener('click', async () => {
     googleBtn.disabled = true;
     googleBtn.innerHTML = '<span class="loader"></span> Connexion...';
 
     try {
-      const provider = new GoogleAuthProvider();
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
-      console.log("✅ Connexion Google réussie:", user.email);
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: window.location.origin + '/index.html'
+        }
+      });
 
-      const userRef = doc(db, "users", user.uid);
-      const docSnap = await getDoc(userRef);
-
-      if (!docSnap.exists()) {
-        console.log("📝 Création du document pour l'utilisateur Google...");
-        const displayName = user.displayName || "Utilisateur";
-        const [prenom, ...nomParts] = displayName.split(' ');
-        const nom = nomParts.join(' ') || "Google";
-        const now = new Date().toISOString();
-        const generatedReferralCode = await generateUniqueReferralCode(user.uid, prenom || "Utilisateur", nom);
-
-        const userData = {
-          uid: user.uid,
-          email: user.email,
-          nom: nom,
-          prenom: prenom || "Google",
-          fullName: displayName,
-          pays: "Niger",
-          phone: user.phoneNumber || "",
-          balance: 0,
-          realBalance: 0,
-          totalDepots: 0,
-          totalRetraits: 0,
-          totalAchats: 0,
-          totalVentes: 0,
-          totalRevenus: 0,
-          gainsTotal: 0,
-          investments: [],
-          achats: [],
-          referralsCount: 0,
-          referralEarnings: 0,
-          referralCode: generatedReferralCode,
-          referredBy: null,
-          status: "active",
-          role: "user",
-          hasDeposited: false,
-          isUnlocked: false,
-          registrationDate: now,
-          createdAt: now,
-          lastLogin: now,
-          emailVerified: user.emailVerified || false
-        };
-        await setDoc(userRef, userData, { merge: true });
-        console.log("✅ Document Google créé dans Firestore");
-      } else {
-        await updateDoc(userRef, { lastLogin: new Date().toISOString() });
-        console.log("✅ Document Google mis à jour");
+      if (error) {
+        console.error("❌ Erreur Google:", error);
+        throw new Error(error.message);
       }
 
-      localStorage.setItem('ARVEXA_current_user', user.uid);
-      localStorage.setItem('ARVEXA_is_unlocked', 'false');
-      
-      showMessage('✅ Connexion Google réussie !', 'success');
-      setTimeout(() => window.location.href = 'index.html', 1000);
+      console.log("✅ Connexion Google initiée");
+      showMessage('✅ Redirection vers Google...', 'success');
 
     } catch (error) {
       console.error("❌ Erreur Google:", error);
-      let errorMsg = 'Erreur lors de la connexion avec Google.';
-      if (error.code === 'auth/popup-closed-by-user') {
-        errorMsg = 'Fenêtre popup fermée. Réessayez.';
-      } else if (error.code === 'auth/network-request-failed') {
-        errorMsg = 'Problème réseau. Vérifiez votre connexion Internet.';
-      }
-      showMessage(errorMsg, 'error');
-    } finally {
+      showMessage('Erreur lors de la connexion avec Google.', 'error');
+      
       googleBtn.disabled = false;
       googleBtn.innerHTML = `<svg class="google-icon" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
           <path fill="#4285F4" d="M45.12 24.5c0-1.56-.14-3.06-.4-4.5H24v8.51h11.84c-.51 2.75-2.06 5.08-4.39 6.64v5.52h7.11c4.16-3.83 6.56-9.47 6.56-16.17z"/>
@@ -1592,8 +1516,9 @@
   window.addEventListener('online', () => showToast('📶 Connexion Internet rétablie', 'success'));
   window.addEventListener('offline', () => showToast('📶 Connexion Internet perdue', 'error'));
 
-  console.log("🌿 ARVEXA - Page d'inscription chargée");
-  console.log("🔥 Ouvrez la console (F12) pour voir les logs de débogage");
+  console.log("🌿 ARVEXA - Page d'inscription avec Supabase chargée");
+  console.log("🔗 Supabase URL:", supabaseUrl);
 </script>
 </body>
 </html>
+  

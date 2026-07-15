@@ -10,7 +10,6 @@
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3135/3135715.png">
   
-  <!-- Favicon -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>">
   
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -40,12 +39,7 @@
       --danger: #8A3A3A;
     }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
     body {
       font-family: 'Inter', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
@@ -66,13 +60,10 @@
       100% { opacity: 1; }
     }
 
-    /* ===== BACKGROUND ===== */
     .gradient-bg {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
       z-index: -2;
       background: radial-gradient(ellipse 40% 30% at 30% 20%, rgba(26, 58, 42, 0.10) 0%, transparent 70%),
                   linear-gradient(180deg, #0A0A0A 0%, #060606 100%);
@@ -120,10 +111,7 @@
       font-family: 'Playfair Display', 'Georgia', serif;
       letter-spacing: 2px;
     }
-    .logo span {
-      color: var(--accent);
-      font-style: italic;
-    }
+    .logo span { color: var(--accent); font-style: italic; }
 
     .back-btn {
       width: clamp(32px, 4vw, 40px);
@@ -144,9 +132,7 @@
       transform: scale(0.94);
       background: rgba(184, 134, 11, 0.08);
     }
-    .back-btn i {
-      font-size: clamp(14px, 1.8vw, 18px);
-    }
+    .back-btn i { font-size: clamp(14px, 1.8vw, 18px); }
 
     .header-placeholder {
       width: clamp(32px, 4vw, 40px);
@@ -155,9 +141,9 @@
 
     /* ===== CONTAINER ===== */
     .container {
-      max-width: 700px;
+      max-width: 1000px;
       margin: 0 auto;
-      padding: 16px 5% 40px;
+      padding: 16px 20px 40px;
       width: 100%;
     }
 
@@ -183,51 +169,42 @@
       letter-spacing: 1px;
       text-transform: uppercase;
     }
-    .hero-badge i {
-      color: var(--accent);
-      font-size: 8px;
-    }
+    .hero-badge i { color: var(--accent); font-size: 8px; }
     .hero-title {
-      font-size: clamp(28px, 5vw, 36px);
+      font-size: clamp(28px, 5vw, 42px);
       font-weight: 700;
       font-family: 'Playfair Display', 'Georgia', serif;
       line-height: 1.2;
       margin-bottom: 10px;
       color: var(--text-light);
     }
-    .hero-title span {
-      color: var(--accent);
-      font-style: italic;
-    }
+    .hero-title span { color: var(--accent); font-style: italic; }
     .hero-description {
       font-size: 14px;
       color: var(--text-dim);
       font-weight: 300;
-      max-width: 500px;
+      max-width: 600px;
       margin: 0 auto;
     }
 
-    /* ===== EBOOKS GRID ===== */
-    .ebooks-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 16px;
-      margin-bottom: 24px;
-    }
-
+    /* ================================================================
+       EBOOK CARD - STYLE HORIZONTAL (comme index)
+       ================================================================ */
     .ebook-card {
+      display: flex;
       background: var(--bg-card);
       backdrop-filter: blur(8px);
       border: 1px solid var(--card-border);
       border-radius: var(--radius);
       overflow: hidden;
-      transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+      transition: all 0.3s ease;
       cursor: pointer;
+      margin-bottom: 20px;
       animation: fadeInUp 0.5s ease forwards;
-      display: flex;
-      flex-direction: column;
-      position: relative;
+      opacity: 0;
+      height: 200px;
     }
+
     .ebook-card:nth-child(1) { animation-delay: 0.05s; }
     .ebook-card:nth-child(2) { animation-delay: 0.10s; }
     .ebook-card:nth-child(3) { animation-delay: 0.15s; }
@@ -240,25 +217,26 @@
     .ebook-card:nth-child(10) { animation-delay: 0.50s; }
 
     @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(25px); }
+      from { opacity: 0; transform: translateY(20px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
-    .ebook-card:active {
-      transform: scale(0.97);
-    }
     .ebook-card:hover {
-      border-color: rgba(184, 134, 11, 0.12);
-      transform: translateY(-4px);
-      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.35);
+      border-color: rgba(184, 134, 11, 0.15);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
     }
+    .ebook-card:active { transform: scale(0.98); }
 
     .ebook-card .image-wrap {
+      width: 200px;
+      min-width: 200px;
       position: relative;
       overflow: hidden;
-      aspect-ratio: 3/4;
       background: var(--bg-dark);
+      flex-shrink: 0;
     }
+
     .ebook-card .ebook-image {
       width: 100%;
       height: 100%;
@@ -267,25 +245,28 @@
       transition: transform 0.5s ease;
       filter: brightness(0.75) saturate(0.9);
     }
-    .ebook-card .ebook-image:hover {
+
+    .ebook-card:hover .ebook-image {
       filter: brightness(0.85) saturate(1);
+      transform: scale(1.05);
     }
 
     .ebook-card .ebook-badge {
       position: absolute;
       top: 10px;
       left: 10px;
-      font-size: 8px;
+      font-size: 9px;
       font-weight: 600;
-      padding: 3px 10px;
+      padding: 4px 12px;
       border-radius: 20px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      background: rgba(10, 10, 10, 0.8);
-      border: 1px solid rgba(184, 134, 11, 0.1);
+      background: rgba(10, 10, 10, 0.85);
+      border: 1px solid rgba(184, 134, 11, 0.15);
       color: var(--accent);
       backdrop-filter: blur(4px);
     }
+
     .ebook-card .ebook-badge.premium {
       background: rgba(184, 134, 11, 0.15);
       color: var(--accent);
@@ -296,83 +277,73 @@
       position: absolute;
       top: 10px;
       right: 10px;
-      font-size: 14px;
+      font-size: 16px;
       color: var(--accent);
       opacity: 0.7;
       background: rgba(10, 10, 10, 0.7);
-      padding: 4px 8px;
+      padding: 4px 10px;
       border-radius: 8px;
       backdrop-filter: blur(4px);
     }
 
     .ebook-card .ebook-content {
-      padding: 14px 16px 16px;
       flex: 1;
+      padding: 20px 24px;
       display: flex;
       flex-direction: column;
+      justify-content: space-between;
     }
+
     .ebook-card .ebook-category {
-      font-size: 9px;
+      font-size: 11px;
       font-weight: 500;
       color: var(--accent);
       text-transform: uppercase;
-      letter-spacing: 0.5px;
-      padding: 2px 8px;
-      border-radius: 12px;
-      background: rgba(184, 134, 11, 0.04);
-      align-self: flex-start;
-      margin-bottom: 6px;
-      border: 1px solid rgba(184, 134, 11, 0.04);
+      letter-spacing: 0.8px;
+      margin-bottom: 4px;
     }
+
     .ebook-card .ebook-title {
-      font-size: 15px;
+      font-size: 20px;
       font-weight: 700;
       font-family: 'Playfair Display', 'Georgia', serif;
       color: var(--text-light);
       line-height: 1.3;
-      margin-bottom: 4px;
+      margin-bottom: 6px;
       display: -webkit-box;
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
     }
+
     .ebook-card .ebook-description {
-      font-size: 11px;
+      font-size: 14px;
       color: var(--text-dim);
       font-weight: 300;
-      line-height: 1.4;
+      line-height: 1.6;
       display: -webkit-box;
-      -webkit-line-clamp: 2;
+      -webkit-line-clamp: 3;
       -webkit-box-orient: vertical;
       overflow: hidden;
       flex: 1;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
+
     .ebook-card .ebook-footer {
       display: flex;
-      justify-content: space-between;
+      justify-content: flex-end;
       align-items: center;
-      padding-top: 10px;
-      border-top: 1px solid rgba(255, 255, 255, 0.02);
+      padding-top: 12px;
+      border-top: 1px solid rgba(255, 255, 255, 0.03);
     }
-    .ebook-card .ebook-price {
-      font-size: 14px;
-      font-weight: 700;
-      font-family: 'Playfair Display', 'Georgia', serif;
-      color: var(--accent);
-    }
-    .ebook-card .ebook-price.free {
-      color: var(--success);
-    }
-    .ebook-card .ebook-actions {
-      display: flex;
-      gap: 6px;
-    }
+
+    .ebook-card .ebook-actions { display: flex; gap: 8px; }
+
     .ebook-card .ebook-btn {
-      padding: 6px 12px;
+      padding: 8px 20px;
       border: none;
       border-radius: 8px;
-      font-size: 10px;
+      font-size: 13px;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.2s;
@@ -380,26 +351,27 @@
       text-decoration: none;
       display: inline-flex;
       align-items: center;
-      gap: 4px;
+      gap: 6px;
     }
+
     .ebook-card .ebook-btn.primary {
       background: var(--accent);
       color: var(--bg-dark);
     }
-    .ebook-card .ebook-btn.primary:active {
-      transform: scale(0.95);
-    }
-    .ebook-card .ebook-btn.primary:hover {
-      background: #9A7209;
-    }
+    .ebook-card .ebook-btn.primary:active { transform: scale(0.95); }
+    .ebook-card .ebook-btn.primary:hover { background: #9A7209; }
+
     .ebook-card .ebook-btn.locked {
       background: rgba(184, 134, 11, 0.12);
       color: var(--accent);
       border: 1px solid rgba(184, 134, 11, 0.15);
     }
+    .ebook-card .ebook-btn.locked:hover {
+      background: rgba(184, 134, 11, 0.2);
+    }
 
     /* ============================================================
-       POPUP PREMIUM "OPPORTUNITÉ EN OR"
+       POPUP PREMIUM GLOBAL
        ============================================================ */
     .premium-popup-overlay {
       position: fixed;
@@ -407,7 +379,7 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background: rgba(0, 0, 0, 0.85);
+      background: rgba(0, 0, 0, 0.88);
       backdrop-filter: blur(16px);
       z-index: 9999;
       display: flex;
@@ -427,8 +399,8 @@
       background: linear-gradient(145deg, #141414, #0A0A0A);
       border: 1px solid var(--accent);
       border-radius: var(--radius);
-      padding: 36px 28px;
-      max-width: 420px;
+      padding: 40px 36px;
+      max-width: 500px;
       width: 100%;
       text-align: center;
       transform: scale(0.9) translateY(30px);
@@ -452,67 +424,74 @@
     }
 
     .premium-popup .popup-icon {
-      font-size: 48px;
+      font-size: 52px;
       display: block;
       margin-bottom: 12px;
       animation: pulseGold 2s ease-in-out infinite;
     }
     @keyframes pulseGold {
       0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.1); }
+      50% { transform: scale(1.08); }
     }
 
     .premium-popup h2 {
-      font-size: 26px;
+      font-size: 28px;
       font-weight: 700;
       font-family: 'Playfair Display', 'Georgia', serif;
       color: var(--text-light);
-      margin-bottom: 8px;
+      margin-bottom: 4px;
     }
-    .premium-popup h2 span {
-      color: var(--accent);
-      font-style: italic;
-    }
+    .premium-popup h2 span { color: var(--accent); font-style: italic; }
 
     .premium-popup .popup-subtitle {
       font-size: 14px;
       color: var(--text-dim);
       line-height: 1.6;
-      margin-bottom: 18px;
+      margin-bottom: 16px;
     }
-    .premium-popup .popup-subtitle strong {
-      color: var(--accent);
-    }
+    .premium-popup .popup-subtitle strong { color: var(--accent); }
 
-    .premium-popup .features-list {
+    .premium-popup .features-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
       text-align: left;
-      margin: 12px 0 20px;
-      padding: 0 12px;
+      margin: 16px 0 20px;
     }
-    .premium-popup .features-list li {
-      list-style: none;
-      padding: 6px 0;
-      color: var(--text-dim);
-      font-size: 13px;
+    .premium-popup .features-grid .feature {
       display: flex;
       align-items: center;
       gap: 10px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+      padding: 8px 12px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.02);
+      font-size: 13px;
+      color: var(--text-dim);
     }
-    .premium-popup .features-list li:last-child {
-      border-bottom: none;
-    }
-    .premium-popup .features-list li i {
+    .premium-popup .features-grid .feature i {
       color: var(--success);
       font-size: 14px;
-      width: 20px;
+      width: 18px;
+    }
+
+    .premium-popup .popup-price {
+      font-size: 22px;
+      font-weight: 700;
+      font-family: 'Playfair Display', 'Georgia', serif;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+    .premium-popup .popup-price small {
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--text-dim);
+      font-family: 'Inter', sans-serif;
     }
 
     .premium-popup .popup-buttons {
       display: flex;
       flex-direction: column;
       gap: 10px;
-      margin-top: 6px;
     }
     .premium-popup .popup-buttons .btn-recharge {
       padding: 14px 20px;
@@ -531,9 +510,7 @@
       gap: 8px;
       font-family: 'Inter', sans-serif;
     }
-    .premium-popup .popup-buttons .btn-recharge:active {
-      transform: scale(0.96);
-    }
+    .premium-popup .popup-buttons .btn-recharge:active { transform: scale(0.96); }
     .premium-popup .popup-buttons .btn-recharge:hover {
       background: #9A7209;
       box-shadow: 0 0 30px rgba(184, 134, 11, 0.15);
@@ -549,9 +526,7 @@
       font-family: 'Inter', sans-serif;
       font-weight: 400;
     }
-    .premium-popup .popup-buttons .btn-later:hover {
-      color: var(--text-dim);
-    }
+    .premium-popup .popup-buttons .btn-later:hover { color: var(--text-dim); }
 
     /* ============================================================
        TOAST
@@ -573,99 +548,94 @@
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
       pointer-events: none;
     }
-    .toast.show {
-      transform: translateX(-50%) translateY(0);
-    }
-    .toast.success {
-      background: #0D2A1F;
-      border: 1px solid #2D7D5A;
-      color: #2D7D5A;
-    }
-    .toast.error {
-      background: #2A0D0D;
-      border: 1px solid #8A3A3A;
-      color: #8A3A3A;
-    }
-    .toast.warning {
-      background: #2A1A0D;
-      border: 1px solid #B8860B;
-      color: #B8860B;
-    }
-    .toast.info {
-      background: #0D1A2A;
-      border: 1px solid #4A7A8A;
-      color: #4A7A8A;
-    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .toast.success { background: #0D2A1F; border: 1px solid #2D7D5A; color: #2D7D5A; }
+    .toast.error { background: #2A0D0D; border: 1px solid #8A3A3A; color: #8A3A3A; }
+    .toast.warning { background: #2A1A0D; border: 1px solid #B8860B; color: #B8860B; }
+    .toast.info { background: #0D1A2A; border: 1px solid #4A7A8A; color: #4A7A8A; }
 
     /* ============================================================
        RESPONSIVE
        ============================================================ */
-    @media (max-width: 480px) {
-      .ebooks-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 10px;
+    @media (max-width: 600px) {
+      .container { padding: 12px 12px 30px; }
+      .hero-title { font-size: 24px; }
+      
+      .ebook-card { 
+        flex-direction: column; 
+        height: auto; 
       }
-      .ebook-card .ebook-content {
-        padding: 10px 12px 12px;
+      .ebook-card .image-wrap {
+        width: 100%;
+        min-width: 100%;
+        aspect-ratio: 16/9;
+        height: auto;
+        max-height: 200px;
       }
-      .ebook-card .ebook-title {
-        font-size: 13px;
+      .ebook-card .ebook-content { 
+        padding: 14px 16px; 
+        min-height: auto; 
       }
-      .ebook-card .ebook-description {
-        font-size: 10px;
-        display: none;
+      .ebook-card .ebook-title { font-size: 16px; }
+      .ebook-card .ebook-description { 
+        font-size: 12px; 
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
       }
-      .container {
-        padding: 12px 4% 30px;
+      .ebook-card .ebook-footer { 
+        justify-content: flex-end; 
+        padding-top: 8px;
       }
-      .premium-popup {
-        padding: 24px 18px;
-        margin: 10px;
+      .ebook-card .ebook-actions { 
+        width: 100%; 
+        justify-content: stretch; 
       }
-      .premium-popup h2 {
-        font-size: 22px;
+      .ebook-card .ebook-actions .ebook-btn { 
+        flex: 1; 
+        justify-content: center; 
       }
-      .ebook-card .ebook-footer {
-        flex-direction: column;
-        gap: 6px;
-        align-items: stretch;
-      }
-      .ebook-card .ebook-actions {
-        justify-content: stretch;
-      }
-      .ebook-card .ebook-actions .ebook-btn {
-        flex: 1;
-        justify-content: center;
-      }
+      
+      .premium-popup { padding: 24px 18px; margin: 10px; }
+      .premium-popup h2 { font-size: 22px; }
+      .premium-popup .features-grid { grid-template-columns: 1fr 1fr; gap: 6px; }
+      .premium-popup .features-grid .feature { font-size: 11px; padding: 6px 10px; }
+      .premium-popup .popup-price { font-size: 18px; }
     }
 
-    @media (min-width: 601px) and (max-width: 768px) {
-      .ebooks-grid {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 14px;
-      }
+    @media (max-width: 400px) {
+      .premium-popup .features-grid { grid-template-columns: 1fr; }
+      .hero-title { font-size: 20px; }
     }
 
-    @media (min-width: 769px) {
-      .container {
-        max-width: 850px;
-        padding: 24px 5%;
-      }
-      .ebooks-grid {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 18px;
-      }
+    @media (min-width: 601px) and (max-width: 900px) {
+      .container { padding: 16px 16px 30px; }
+      .ebook-card { height: 180px; }
+      .ebook-card .image-wrap { width: 160px; min-width: 160px; }
+      .ebook-card .ebook-content { padding: 16px 18px; }
+      .ebook-card .ebook-title { font-size: 17px; }
+      .ebook-card .ebook-description { font-size: 13px; }
+      .premium-popup { padding: 30px 24px; max-width: 450px; }
     }
 
-    @media (min-width: 1024px) {
-      .container {
-        max-width: 1050px;
-        padding: 32px 5%;
-      }
-      .ebooks-grid {
-        grid-template-columns: repeat(4, 1fr);
-        gap: 20px;
-      }
+    @media (min-width: 901px) {
+      .container { max-width: 1000px; padding: 24px 32px 40px; }
+      .ebook-card { height: 220px; }
+      .ebook-card .image-wrap { width: 200px; min-width: 200px; }
+      .ebook-card .ebook-content { padding: 22px 26px; }
+      .ebook-card .ebook-title { font-size: 20px; }
+      .ebook-card .ebook-description { font-size: 14px; }
+      .premium-popup { padding: 40px 36px; max-width: 520px; }
+    }
+
+    @media (min-width: 1200px) {
+      .container { max-width: 1200px; padding: 32px 40px 40px; }
+      .ebook-card { height: 240px; }
+      .ebook-card .image-wrap { width: 220px; min-width: 220px; }
+      .ebook-card .ebook-content { padding: 24px 30px; }
+      .ebook-card .ebook-title { font-size: 22px; }
+      .ebook-card .ebook-description { font-size: 15px; }
     }
   </style>
 </head>
@@ -677,25 +647,28 @@
 <div class="glow glow-2"></div>
 <div class="glow glow-3"></div>
 
-<!-- ===== POPUP PREMIUM ===== -->
+<!-- ===== POPUP PREMIUM GLOBAL ===== -->
 <div class="premium-popup-overlay" id="premiumPopup">
   <div class="premium-popup">
-    <span class="popup-icon">💰</span>
-    <h2>Opportunité en <span>Or</span></h2>
+    <span class="popup-icon">🚀</span>
+    <h2>Débloquez le <span>Premium</span></h2>
     <p class="popup-subtitle">
-      🔥 Rechargez <strong>3 000 FCFA</strong> et débloquez <strong>TOUT</strong> le contenu premium ARVEXA !
+      Faites votre premier dépôt de <strong>3 000 FCFA</strong> et accédez à <strong>tous</strong> les services ARVEXA !
     </p>
-    <ul class="features-list">
-      <li><i class="fas fa-check-circle"></i> E-books illimités</li>
-      <li><i class="fas fa-check-circle"></i> Formations exclusives</li>
-      <li><i class="fas fa-check-circle"></i> Investissements</li>
-      <li><i class="fas fa-check-circle"></i> Parrainage & bonus</li>
-    </ul>
+    <div class="features-grid">
+      <div class="feature"><i class="fas fa-check-circle"></i> 10+ E-books</div>
+      <div class="feature"><i class="fas fa-check-circle"></i> Formations vidéo</div>
+      <div class="feature"><i class="fas fa-check-circle"></i> Investissements</div>
+      <div class="feature"><i class="fas fa-check-circle"></i> Parrainage 500 FCFA</div>
+      <div class="feature"><i class="fas fa-check-circle"></i> Retraits rapides</div>
+      <div class="feature"><i class="fas fa-check-circle"></i> Forum communautaire</div>
+    </div>
+    <div class="popup-price">3 000 FCFA <small>→ Tout débloqué</small></div>
     <div class="popup-buttons">
       <a href="recharger.html" class="btn-recharge">
-        <i class="fas fa-plus-circle"></i> Recharger maintenant
+        <i class="fas fa-plus-circle"></i> Débloquer maintenant
       </a>
-      <button class="btn-later" id="popupLaterBtn">✕ Plus tard</button>
+      <button class="btn-later" id="popupLaterBtn">✕ Explorer sans débloquer</button>
     </div>
   </div>
 </div>
@@ -721,7 +694,7 @@
   </div>
 
   <!-- ===== EBOOKS ===== -->
-  <div class="ebooks-grid" id="ebooksGrid">
+  <div id="ebooksGrid">
     <!-- Rempli par JavaScript -->
   </div>
 
@@ -736,16 +709,16 @@
 <script type="importmap">
 {
   "imports": {
-    "firebase/app": "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js",
-    "firebase/auth": "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js",
-    "firebase/firestore": "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js"
+    "firebase/app": "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js",
+    "firebase/auth": "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js",
+    "firebase/firestore": "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js"
   }
 }
 </script>
 
 <script type="module">
 // ================================================================
-// IMPORTS FIREBASE
+// IMPORTS
 // ================================================================
 import { initializeApp } from "firebase/app";
 import { 
@@ -755,14 +728,20 @@ import {
   browserLocalPersistence
 } from "firebase/auth";
 import { 
-  getFirestore, 
-  doc, 
-  getDoc, 
-  onSnapshot 
+  getFirestore,
+  doc,
+  getDoc,
+  getDocs,
+  collection,
+  query,
+  orderBy,
+  onSnapshot,
+  setDoc,
+  deleteDoc
 } from "firebase/firestore";
 
 // ================================================================
-// CONFIGURATION FIREBASE
+// FIREBASE CONFIG
 // ================================================================
 const firebaseConfig = {
   apiKey: "AIzaSyBEbYuuUlNCLMBUHClv4UnyownNHw2q3_g",
@@ -777,8 +756,17 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-
 setPersistence(auth, browserLocalPersistence);
+
+// ================================================================
+// HELPERS
+// ================================================================
+async function getDocument(collectionName, docId) {
+  const ref = doc(db, collectionName, docId);
+  const snap = await getDoc(ref);
+  if (!snap.exists()) return null;
+  return { id: snap.id, ...snap.data() };
+}
 
 // ================================================================
 // DOM
@@ -789,6 +777,7 @@ const popupLaterBtn = document.getElementById('popupLaterBtn');
 const toast = document.getElementById('toast');
 
 let isUnlocked = false;
+let currentUser = null;
 
 // ================================================================
 // TOAST
@@ -801,17 +790,16 @@ function showToast(message, type = 'info') {
 }
 
 // ================================================================
-// E-BOOKS PAR DÉFAUT
+// E-BOOKS PAR DÉFAUT (AVEC BONNES IMAGES)
 // ================================================================
-const DEFAULT_EBOOKS = [
+const DEFAULT_EBOOKS_FIRESTORE = [
   {
     id: 'ebook_001',
     title: "Investir avec 5 000 FCFA",
     category: "Investissement",
     description: "Découvrez comment commencer à investir avec un petit capital.",
-    price: 0,
-    isFree: true,
-    coverImage: "https://images.pexels.com/photos/4386367/pexels-photo-4386367.jpeg?auto=compress&cs=tinysrgb&w=300&h=400&fit=crop",
+    coverImage: "https://images.pexels.com/photos/4386367/pexels-photo-4386367.jpeg?auto=compress&cs=tinysrgb&w=200&h=270&fit=crop",
+    isPremium: false,
     createdAt: new Date().toISOString()
   },
   {
@@ -819,9 +807,8 @@ const DEFAULT_EBOOKS = [
     title: "Les secrets des intérêts composés",
     category: "Finance",
     description: "Comprenez le pouvoir des intérêts composés.",
-    price: 3000,
-    isFree: false,
-    coverImage: "https://images.pexels.com/photos/5849577/pexels-photo-5849577.jpeg?auto=compress&cs=tinysrgb&w=300&h=400&fit=crop",
+    coverImage: "https://images.pexels.com/photos/5849577/pexels-photo-5849577.jpeg?auto=compress&cs=tinysrgb&w=200&h=270&fit=crop",
+    isPremium: true,
     createdAt: new Date().toISOString()
   },
   {
@@ -829,9 +816,8 @@ const DEFAULT_EBOOKS = [
     title: "Comment économiser 1 000 000 FCFA",
     category: "Épargne",
     description: "Apprenez les techniques d'épargne efficaces.",
-    price: 3000,
-    isFree: false,
-    coverImage: "https://images.pexels.com/photos/3183197/pexels-photo-3183197.jpeg?auto=compress&cs=tinysrgb&w=300&h=400&fit=crop",
+    coverImage: "https://images.pexels.com/photos/3183197/pexels-photo-3183197.jpeg?auto=compress&cs=tinysrgb&w=200&h=270&fit=crop",
+    isPremium: true,
     createdAt: new Date().toISOString()
   },
   {
@@ -839,9 +825,8 @@ const DEFAULT_EBOOKS = [
     title: "Le guide du débutant en crypto",
     category: "Crypto",
     description: "Un guide simple pour comprendre les cryptomonnaies.",
-    price: 3000,
-    isFree: false,
-    coverImage: "https://images.pexels.com/photos/669615/pexels-photo-669615.jpeg?auto=compress&cs=tinysrgb&w=300&h=400&fit=crop",
+    coverImage: "https://images.pexels.com/photos/669615/pexels-photo-669615.jpeg?auto=compress&cs=tinysrgb&w=200&h=270&fit=crop",
+    isPremium: true,
     createdAt: new Date().toISOString()
   },
   {
@@ -849,9 +834,8 @@ const DEFAULT_EBOOKS = [
     title: "10 erreurs à éviter en investissement",
     category: "Investissement",
     description: "Les pièges les plus courants des investisseurs.",
-    price: 3000,
-    isFree: false,
-    coverImage: "https://images.pexels.com/photos/4386366/pexels-photo-4386366.jpeg?auto=compress&cs=tinysrgb&w=300&h=400&fit=crop",
+    coverImage: "https://images.pexels.com/photos/4386366/pexels-photo-4386366.jpeg?auto=compress&cs=tinysrgb&w=200&h=270&fit=crop",
+    isPremium: true,
     createdAt: new Date().toISOString()
   },
   {
@@ -859,9 +843,8 @@ const DEFAULT_EBOOKS = [
     title: "Devenir rentier en Afrique",
     category: "Finance",
     description: "Bâtissez un patrimoine qui génère des revenus passifs.",
-    price: 3000,
-    isFree: false,
-    coverImage: "https://images.pexels.com/photos/5849577/pexels-photo-5849577.jpeg?auto=compress&cs=tinysrgb&w=300&h=400&fit=crop",
+    coverImage: "https://images.pexels.com/photos/5849577/pexels-photo-5849577.jpeg?auto=compress&cs=tinysrgb&w=200&h=270&fit=crop",
+    isPremium: true,
     createdAt: new Date().toISOString()
   },
   {
@@ -869,9 +852,8 @@ const DEFAULT_EBOOKS = [
     title: "Le marketing digital pour les nuls",
     category: "Marketing",
     description: "Maîtrisez les bases du marketing digital.",
-    price: 3000,
-    isFree: false,
-    coverImage: "https://images.pexels.com/photos/3183197/pexels-photo-3183197.jpeg?auto=compress&cs=tinysrgb&w=300&h=400&fit=crop",
+    coverImage: "https://images.pexels.com/photos/3183197/pexels-photo-3183197.jpeg?auto=compress&cs=tinysrgb&w=200&h=270&fit=crop",
+    isPremium: true,
     createdAt: new Date().toISOString()
   },
   {
@@ -879,9 +861,8 @@ const DEFAULT_EBOOKS = [
     title: "Comment gérer son budget",
     category: "Finance",
     description: "Maîtrisez vos finances personnelles.",
-    price: 3000,
-    isFree: false,
-    coverImage: "https://images.pexels.com/photos/4386367/pexels-photo-4386367.jpeg?auto=compress&cs=tinysrgb&w=300&h=400&fit=crop",
+    coverImage: "https://images.pexels.com/photos/4386367/pexels-photo-4386367.jpeg?auto=compress&cs=tinysrgb&w=200&h=270&fit=crop",
+    isPremium: true,
     createdAt: new Date().toISOString()
   },
   {
@@ -889,9 +870,8 @@ const DEFAULT_EBOOKS = [
     title: "L'entrepreneuriat sans capital",
     category: "Entrepreneuriat",
     description: "Démarrer une activité rentable sans argent.",
-    price: 3000,
-    isFree: false,
-    coverImage: "https://images.pexels.com/photos/669615/pexels-photo-669615.jpeg?auto=compress&cs=tinysrgb&w=300&h=400&fit=crop",
+    coverImage: "https://images.pexels.com/photos/669615/pexels-photo-669615.jpeg?auto=compress&cs=tinysrgb&w=200&h=270&fit=crop",
+    isPremium: true,
     createdAt: new Date().toISOString()
   },
   {
@@ -899,20 +879,48 @@ const DEFAULT_EBOOKS = [
     title: "Les 7 habitudes des investisseurs",
     category: "Développement",
     description: "Les habitudes des investisseurs qui réussissent.",
-    price: 3000,
-    isFree: false,
-    coverImage: "https://images.pexels.com/photos/4386367/pexels-photo-4386367.jpeg?auto=compress&cs=tinysrgb&w=300&h=400&fit=crop",
+    coverImage: "https://images.pexels.com/photos/4386367/pexels-photo-4386367.jpeg?auto=compress&cs=tinysrgb&w=200&h=270&fit=crop",
+    isPremium: true,
     createdAt: new Date().toISOString()
   }
 ];
 
 // ================================================================
-// RENDRE LES E-BOOKS
+// INITIALISER LES E-BOOKS - RECRÉATION FORCÉE
+// ================================================================
+async function initializeEbooks() {
+  try {
+    // Supprimer tous les e-books existants
+    const snapshot = await getDocs(collection(db, 'ebooks'));
+    
+    if (!snapshot.empty) {
+      console.log('🗑️ Suppression des anciens e-books...');
+      for (const doc of snapshot.docs) {
+        await deleteDoc(doc.ref);
+      }
+      console.log('✅ Anciens e-books supprimés');
+    }
+    
+    console.log('📚 Création des 10 nouveaux e-books...');
+    for (const ebook of DEFAULT_EBOOKS_FIRESTORE) {
+      const docRef = doc(db, 'ebooks', ebook.id);
+      await setDoc(docRef, ebook);
+    }
+    console.log('✅ 10 e-books créés avec les nouvelles images');
+    return true;
+  } catch (error) {
+    console.error('❌ Erreur initialisation e-books:', error);
+    return false;
+  }
+}
+
+// ================================================================
+// RENDRE LES E-BOOKS (SANS PRIX)
 // ================================================================
 function renderEbooks(ebooks) {
   if (!ebooks || ebooks.length === 0) {
     ebooksGrid.innerHTML = `
-      <div style="grid-column:1/-1;text-align:center;padding:40px 20px;color:var(--text-dim);">
+      <div style="text-align:center;padding:40px 20px;color:var(--text-dim);">
         <i class="fas fa-book-open" style="font-size:40px;opacity:0.2;display:block;margin-bottom:12px;"></i>
         <p>Aucun e-book disponible pour le moment.</p>
       </div>
@@ -921,25 +929,13 @@ function renderEbooks(ebooks) {
   }
 
   ebooksGrid.innerHTML = ebooks.map((ebook, index) => {
-    const isFree = ebook.isFree || ebook.price === 0;
+    const isPremium = ebook.isPremium || false;
     
-    let priceText = '';
-    let priceClass = '';
-    
-    if (isFree) {
-      priceText = '🎁 GRATUIT';
-      priceClass = 'free';
-    } else if (isUnlocked) {
-      priceText = '✅ DÉBLOQUÉ';
-      priceClass = 'free';
-    } else {
-      priceText = `${ebook.price.toLocaleString('fr-FR')} FCFA`;
-      priceClass = '';
-    }
-    
-    const showPremiumBadge = !isFree && !isUnlocked;
-    const showLock = !isFree && !isUnlocked;
-    const btnClass = (isFree || isUnlocked) ? 'primary' : 'locked';
+    // Si premium ET non débloqué → badge et cadenas
+    const showPremiumBadge = isPremium && !isUnlocked;
+    const showLock = isPremium && !isUnlocked;
+    const btnClass = (!isPremium || isUnlocked) ? 'primary' : 'locked';
+    const btnText = (!isPremium || isUnlocked) ? '📖 Lire' : '🔓 Débloquer';
 
     const safeTitle = (ebook.title || '').replace(/"/g, '&quot;');
     const safeDescription = (ebook.description || '').replace(/"/g, '&quot;');
@@ -948,23 +944,24 @@ function renderEbooks(ebooks) {
     return `
       <div class="ebook-card" data-id="${ebook.id}" style="animation-delay: ${index * 0.05}s;">
         <div class="image-wrap">
-          <img src="${ebook.coverImage || 'https://via.placeholder.com/300x400/1A3A2A/B8860B?text=ARVEXA'}" 
+          <img src="${ebook.coverImage || 'https://via.placeholder.com/200x270/1A3A2A/B8860B?text=📚'}" 
                alt="${safeTitle}" 
                class="ebook-image"
                loading="lazy"
-               onerror="this.src='https://via.placeholder.com/300x400/1A3A2A/B8860B?text=📚'">
+               onerror="this.src='https://via.placeholder.com/200x270/1A3A2A/B8860B?text=📚'">
           ${showPremiumBadge ? '<span class="ebook-badge premium">🔒 Premium</span>' : ''}
           ${showLock ? '<span class="premium-lock"><i class="fas fa-lock"></i></span>' : ''}
         </div>
         <div class="ebook-content">
-          <span class="ebook-category">${safeCategory}</span>
-          <h3 class="ebook-title">${safeTitle}</h3>
-          <p class="ebook-description">${safeDescription}</p>
+          <div>
+            <div class="ebook-category">${safeCategory}</div>
+            <h3 class="ebook-title">${safeTitle}</h3>
+            <p class="ebook-description">${safeDescription}</p>
+          </div>
           <div class="ebook-footer">
-            <span class="ebook-price ${priceClass}">${priceText}</span>
             <div class="ebook-actions">
               <button class="ebook-btn ${btnClass}" data-id="${ebook.id}">
-                📖 Lire
+                ${btnText}
               </button>
             </div>
           </div>
@@ -998,26 +995,23 @@ function renderEbooks(ebooks) {
 }
 
 // ================================================================
-// GESTION DU CLIC SUR UN E-BOOK
+// GESTION DU CLIC
 // ================================================================
 function handleEbookClick(ebook) {
-  const isFree = ebook.isFree || ebook.price === 0;
+  const isPremium = ebook.isPremium || false;
 
-  if (isFree) {
+  // Si non premium ou débloqué → accès direct
+  if (!isPremium || isUnlocked) {
     window.location.href = `lire-ebook.html?id=${ebook.id}`;
     return;
   }
 
-  if (isUnlocked) {
-    window.location.href = `lire-ebook.html?id=${ebook.id}`;
-    return;
-  }
-
+  // Sinon → popup premium
   showPremiumPopup();
 }
 
 // ================================================================
-// GESTION DU POPUP PREMIUM
+// POPUP PREMIUM
 // ================================================================
 function showPremiumPopup() {
   premiumPopup.classList.add('show');
@@ -1040,27 +1034,24 @@ document.addEventListener('keydown', (e) => {
 });
 
 // ================================================================
-// CHARGER E-BOOKS
+// CHARGER LES E-BOOKS (Firestore + fallback)
 // ================================================================
-async function loadEbooks() {
-  try {
-    // Essayer de charger depuis Firestore
-    const q = query(collection(db, 'ebooks'), orderBy('createdAt', 'desc'));
-    onSnapshot(q, (snapshot) => {
-      const ebooks = [];
-      snapshot.forEach(doc => {
-        ebooks.push({ id: doc.id, ...doc.data() });
-      });
-      if (ebooks.length > 0) {
-        renderEbooks(ebooks);
-      } else {
-        renderEbooks(DEFAULT_EBOOKS);
-      }
+function loadEbooks() {
+  const q = query(collection(db, 'ebooks'), orderBy('createdAt', 'desc'));
+  onSnapshot(q, (snapshot) => {
+    const ebooks = [];
+    snapshot.forEach(doc => {
+      ebooks.push({ id: doc.id, ...doc.data() });
     });
-  } catch (error) {
-    console.warn('Erreur chargement e-books, fallback:', error);
-    renderEbooks(DEFAULT_EBOOKS);
-  }
+    if (ebooks.length > 0) {
+      renderEbooks(ebooks);
+    } else {
+      renderEbooks(DEFAULT_EBOOKS_FIRESTORE);
+    }
+  }, (error) => {
+    console.error('Erreur chargement e-books:', error);
+    renderEbooks(DEFAULT_EBOOKS_FIRESTORE);
+  });
 }
 
 // ================================================================
@@ -1068,17 +1059,14 @@ async function loadEbooks() {
 // ================================================================
 async function loadUser(uid) {
   try {
-    const userRef = doc(db, 'users', uid);
-    const docSnap = await getDoc(userRef);
-    if (docSnap.exists()) {
-      const data = docSnap.data();
+    const data = await getDocument('users', uid);
+    if (data) {
       isUnlocked = data.isUnlocked === true || data.hasDeposited === true;
       if (isUnlocked && premiumPopup.classList.contains('show')) {
         hidePremiumPopup();
       }
-      return data;
     }
-    return null;
+    return data;
   } catch (error) {
     console.error('Erreur chargement utilisateur:', error);
     return null;
@@ -1086,49 +1074,24 @@ async function loadUser(uid) {
 }
 
 // ================================================================
-// ÉCOUTER UTILISATEUR EN TEMPS RÉEL
-// ================================================================
-function listenUser(uid) {
-  if (!uid) return;
-  const userRef = doc(db, 'users', uid);
-  onSnapshot(userRef, (snap) => {
-    if (snap.exists()) {
-      const data = snap.data();
-      const wasUnlocked = isUnlocked;
-      isUnlocked = data.isUnlocked === true || data.hasDeposited === true;
-      
-      if (isUnlocked && !wasUnlocked) {
-        if (premiumPopup.classList.contains('show')) {
-          hidePremiumPopup();
-          showToast('🎉 Compte débloqué ! Accédez à tous les e-books !', 'success');
-        }
-      }
-      
-      if (isUnlocked !== wasUnlocked) {
-        loadEbooks();
-      }
-    }
-  }, (error) => {
-    console.error('Erreur onSnapshot:', error);
-  });
-}
-
-// ================================================================
 // AUTH
 // ================================================================
-onAuthStateChanged(auth, (user) => {
+onAuthStateChanged(auth, async (user) => {
   if (user) {
+    currentUser = user;
     localStorage.setItem('ARVEXA_current_user', user.uid);
-    loadUser(user.uid);
-    listenUser(user.uid);
+    
+    // RECRÉER LES E-BOOKS (supprime les anciens et crée les nouveaux avec bonnes images)
+    await initializeEbooks();
+    
+    await loadUser(user.uid);
     loadEbooks();
-
+    
     if (!isUnlocked) {
       setTimeout(() => {
         showPremiumPopup();
-      }, 1000);
+      }, 800);
     }
-
   } else {
     const savedUid = localStorage.getItem('ARVEXA_current_user');
     if (savedUid) {
@@ -1143,7 +1106,7 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
-console.log('📚 ARVEXA - Bibliothèque numérique chargée');
+console.log('📚 ARVEXA - Bibliothèque numérique chargée (avec recréation forcée)');
 </script>
 </body>
 </html>
