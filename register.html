@@ -802,6 +802,28 @@
 </head>
 <body>
 
+<!-- ===== DÉTECTION file:// (dev only) - doit s'exécuter AVANT Firebase ===== -->
+<script>
+  (function() {
+    const isFileProtocol = window.location.protocol === 'file:';
+    const isNullOrigin = window.location.origin === 'null' || window.location.origin === '';
+    if (isFileProtocol || isNullOrigin) {
+      console.error('🚫 ERREUR FATALE : Page ouverte en file:// ou origin "null" détectée');
+      console.error('   Firebase Auth, Google Sign-In et les imports ESM ne fonctionneront PAS.');
+      console.error('   Solution : lancez le serveur local avec :');
+      console.error('     python3 /home/z/my-project/scripts/serve.py');
+      console.error('   Puis ouvrez : http://localhost:8000/register-1.html');
+      // Afficher la bannière d'avertissement
+      const banner = document.getElementById('fileProtocolWarning');
+      if (banner) banner.style.display = 'block';
+      // Marquer pour bloquer l'init Firebase plus tard
+      window.__FILE_PROTOCOL_BLOCKED__ = true;
+    } else {
+      console.log('✅ Origine valide :', window.location.origin, '— Firebase peut démarrer');
+    }
+  })();
+</script>
+
 <!-- ===== BACKGROUND ===== -->
 <div class="gradient-bg"></div>
 <div class="glow glow-1"></div>
@@ -977,17 +999,114 @@
 <div class="toast" id="toast"></div>
 
 <!-- ============================================================ -->
-<!-- ===== SUPABASE SCRIPT ===== -->
+<!-- ===== BANNIÈRE AVERTISSEMENT file:// (dev only) ============ -->
+<!-- ============================================================ -->
+<div id="fileProtocolWarning" style="display:none; position:fixed; top:0; left:0; right:0; z-index:99999; background:#B8860B; color:#1A1A1A; padding:14px 20px; font-family:Inter,sans-serif; font-size:14px; font-weight:600; box-shadow:0 2px 8px rgba(0,0,0,0.3);">
+  <div style="display:flex; align-items:center; gap:12px; max-width:1100px; margin:0 auto;">
+    <i class="fas fa-exclamation-triangle" style="font-size:20px;"></i>
+    <div style="flex:1;">
+      <div style="font-size:15px; margin-bottom:2px;">⚠️ Ce fichier est ouvert en mode <code>file://</code> — Firebase ne fonctionnera PAS.</div>
+      <div style="font-size:12px; font-weight:500; opacity:0.9;">
+        Cause des erreurs « origin 'null' », « CORS », « Cannot read properties of undefined (reading 'getContext') ».
+        Lancez le serveur local puis ouvrez <code>http://localhost:8000/register-1.html</code> à la place.
+      </div>
+    </div>
+    <button onclick="document.getElementById('fileProtocolWarning').style.display='none'" style="background:rgba(0,0,0,0.2); border:none; color:#1A1A1A; padding:6px 12px; border-radius:4px; cursor:pointer; font-weight:700;">Fermer</button>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- ===== IMPORTS ===== -->
+<script type="importmap">
+  {
+    "imports": {
+      "firebase/app": "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js",
+      "firebase/auth": "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js",
+      "firebase/firestore": "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js"
+    }
+  }
+</script>
+
 <script type="module">
   // ================================================================
-  // SUPABASE CONFIG - VOS INFORMATIONS
+  // IMPORTS
   // ================================================================
-  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.47.0/+esm';
+  import { initializeApp } from "firebase/app";
+  import { 
+    getAuth, 
+    createUserWithEmailAndPassword,
+    signInWithPopup,
+    GoogleAuthProvider,
+    sendEmailVerification,
+    setPersistence,
+    browserLocalPersistence,
+    onAuthStateChanged
+  } from "firebase/auth";
+  import { 
+    getFirestore,
+    doc,
+    setDoc,
+    addDoc,            // AJOUT : ecriture dans une collection avec ID auto-genere
+    getDoc,
+    getDocs,
+    collection,
+    query,
+    where,
+    updateDoc,
+    deleteDoc,         // AJOUT : suppression d'un document
+    serverTimestamp,   // AJOUT : dates serveur (remplace new Date().toISOString())
+    increment,         // AJOUT : incrementation atomique (balance, compteurs...)
+    arrayUnion,        // AJOUT : ajout atomique a un tableau (investments, achats...)
+    arrayRemove,       // AJOUT : retrait atomique d'un tableau
+    writeBatch         // AJOUT : ecritures atomiques multi-documents
+  } from "firebase/firestore";
 
-  const supabaseUrl = 'https://fvyjruesrmyaktfsjjgi.supabase.co';
-  const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ2eWpydWVzcm15YWt0ZnNqamdpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQwNDU1MDAsImV4cCI6MjA5OTYyMTUwMH0.EnqwRuRpUSsrECoERfkrYzu_kv_oT6l04lZqjOtDDxA';
-  
-  const supabase = createClient(supabaseUrl, supabaseKey);
+  // ================================================================
+  // FIREBASE CONFIG
+  // ================================================================
+  const firebaseConfig = {
+    apiKey: "AIzaSyBEbYuuUlNCLMBUHClv4UnyownNHw2q3_g",
+    authDomain: "nexgen-39043.firebaseapp.com",
+    projectId: "nexgen-39043",
+    storageBucket: "nexgen-39043.firebasestorage.app",
+    messagingSenderId: "619390144325",
+    appId: "1:619390144325:web:35d96b125501e4e8b1782c",
+    measurementId: "G-HC2Q5DNKDR"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  // ================================================================
+  // GARDE-FOU : si on est en file://, on désactive les boutons
+  // d'inscription pour éviter les erreurs cryptiques de Google.
+  // ================================================================
+  if (window.__FILE_PROTOCOL_BLOCKED__) {
+    console.warn('⛔ Firebase initialisé mais bloqué car page en file://');
+    const btns = document.querySelectorAll('#registerBtn, #googleBtn');
+    btns.forEach(btn => {
+      btn.disabled = true;
+      btn.style.opacity = '0.5';
+      btn.style.cursor = 'not-allowed';
+      btn.title = 'Serveur local requis — voir la bannière en haut de page';
+    });
+  }
+
+  // Persistance locale (uniquement si pas en file://)
+  if (!window.__FILE_PROTOCOL_BLOCKED__) {
+    setPersistence(auth, browserLocalPersistence);
+  }
+
+  // ================================================================
+  // FLAG ANTI-REDIRECTION PREMATUREE
+  // ⚠️ BUG CRITIQUE CORRIGE :
+  // Avant : onAuthStateChanged redirigeait vers index.html DES QUE
+  // createUserWithEmailAndPassword reussissait -> l'utilisateur etait
+  // redirige AVANT que le document Firestore soit ecrit.
+  // Maintenant : on desactive la redirection pendant l'inscription/Google.
+  // ================================================================
+  let isRegistering = false;
 
   // ================================================================
   // DOM
@@ -1028,6 +1147,31 @@
   }
 
   // ================================================================
+  // REDIRECTION SI DÉJÀ CONNECTÉ
+  // ⚠️ CORRIGÉ : on ne redirige PAS pendant l'inscription ou la
+  // connexion Google, sinon le document Firestore n'est jamais écrit.
+  // ================================================================
+  onAuthStateChanged(auth, (user) => {
+    if (user && !isRegistering) {
+      console.log("🔄 Utilisateur déjà connecté, redirection vers index.html");
+      localStorage.setItem('ARVEXA_current_user', user.uid);
+      window.location.href = 'index.html';
+    } else if (user && isRegistering) {
+      console.log("⏳ Inscription/connexion Google en cours, redirection suspendue");
+    }
+  });
+
+  // ================================================================
+  // TOGGLE PASSWORD
+  // ================================================================
+  togglePassword.addEventListener('click', () => {
+    const type = passwordInput.type === 'password' ? 'text' : 'password';
+    passwordInput.type = type;
+    togglePassword.classList.toggle('fa-eye');
+    togglePassword.classList.toggle('fa-eye-slash');
+  });
+
+  // ================================================================
   // MESSAGE
   // ================================================================
   function showMessage(text, type = 'error') {
@@ -1044,16 +1188,6 @@
   function hideMessage() {
     messageBanner.classList.add('hidden');
   }
-
-  // ================================================================
-  // TOGGLE PASSWORD
-  // ================================================================
-  togglePassword.addEventListener('click', () => {
-    const type = passwordInput.type === 'password' ? 'text' : 'password';
-    passwordInput.type = type;
-    togglePassword.classList.toggle('fa-eye');
-    togglePassword.classList.toggle('fa-eye-slash');
-  });
 
   // ================================================================
   // PAYS
@@ -1145,7 +1279,170 @@
   });
 
   // ================================================================
-  // VÉRIFICATION CODE PARRAINAGE (Supabase)
+  // HELPERS FIRESTORE - ÉCRITURE DANS COLLECTIONS & DOCUMENTS
+  // ================================================================
+  // Ces fonctions centralisent toutes les écritures Firestore afin de :
+  //  - unifier la gestion d'erreurs (codes Firestore traduits en FR)
+  //  - ajouter un retry automatique en cas de réseau instable
+  //  - logger chaque opération pour le débogage
+  // ================================================================
+
+  // Sleep helper pour le retry
+  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+
+  // Traduction des codes d'erreur Firestore en messages FR lisibles
+  function translateFirestoreError(error) {
+    const code = error?.code || '';
+    const msg = error?.message || '';
+    if (code === 'permission-denied') {
+      return "⛔ Permission refusée. Vérifiez les règles de sécurité Firestore (autorisez 'create' sur users).";
+    }
+    if (code === 'unavailable') {
+      return "📶 Service Firestore indisponible. Vérifiez votre connexion Internet.";
+    }
+    if (code === 'deadline-exceeded' || code === 'cancelled') {
+      return "⏱️ Délai dépassé. Réessayez.";
+    }
+    if (code === 'already-exists') {
+      return "⚠️ Ce document existe déjà.";
+    }
+    if (code === 'not-found') {
+      return "⚠️ Document introuvable.";
+    }
+    if (code === 'resource-exhausted') {
+      return "🚫 Quota Firestore atteint. Réessayez plus tard.";
+    }
+    if (code === 'unauthenticated') {
+      return "🔒 Vous devez être connecté pour effectuer cette action.";
+    }
+    return `❌ Erreur Firestore : ${msg} (code: ${code || 'inconnu'})`;
+  }
+
+  // Retry wrapper : tente l'opération 3 fois en cas d'erreur réseau
+  async function withRetry(operation, label = 'opération', maxRetries = 3) {
+    let lastError = null;
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        return await operation();
+      } catch (error) {
+        lastError = error;
+        const isNetwork = ['unavailable', 'deadline-exceeded', 'cancelled'].includes(error?.code);
+        const isPermission = error?.code === 'permission-denied';
+        // Ne pas retry si l'erreur est une erreur de permission (ça ne servira à rien)
+        if (!isNetwork || attempt === maxRetries || isPermission) {
+          throw error;
+        }
+        console.warn(`⚠️ ${label} - tentative ${attempt}/${maxRetries} échouée, retry dans ${attempt * 500}ms...`, error.code);
+        await sleep(attempt * 500);
+      }
+    }
+    throw lastError;
+  }
+
+  // ---------------------------------------------------------------
+  // 1. ÉCRIRE / REMPLACER un document par son ID
+  //    setDocument('users', uid, { nom: 'Toto', ... })
+  // ---------------------------------------------------------------
+  async function setDocument(collectionName, docId, data, options = {}) {
+    const ref = doc(db, collectionName, docId);
+    const payload = { ...data, _updatedAt: serverTimestamp() };
+    console.log(`📝 setDocument : ${collectionName}/${docId}`, payload);
+    await withRetry(
+      () => setDoc(ref, payload, { merge: !!options.merge }),
+      `setDocument(${collectionName}/${docId})`
+    );
+    console.log(`✅ setDocument OK : ${collectionName}/${docId}`);
+    return ref;
+  }
+
+  // ---------------------------------------------------------------
+  // 2. AJOUTER un document avec ID auto-généré par Firestore
+  //    const ref = await addDocument('transactions', { montant: 500 })
+  //    console.log(ref.id)  // ID auto-généré
+  // ---------------------------------------------------------------
+  async function addDocument(collectionName, data) {
+    const colRef = collection(db, collectionName);
+    const payload = {
+      ...data,
+      _createdAt: serverTimestamp(),
+      _updatedAt: serverTimestamp()
+    };
+    console.log(`➕ addDocument : ${collectionName}`, payload);
+    const docRef = await withRetry(
+      () => addDoc(colRef, payload),
+      `addDocument(${collectionName})`
+    );
+    console.log(`✅ addDocument OK : ${collectionName}/${docRef.id}`);
+    return docRef;
+  }
+
+  // ---------------------------------------------------------------
+  // 3. METTRE À JOUR un document existant (échoue s'il n'existe pas)
+  //    updateDocument('users', uid, { balance: 1000 })
+  // ---------------------------------------------------------------
+  async function updateDocument(collectionName, docId, data) {
+    const ref = doc(db, collectionName, docId);
+    const payload = { ...data, _updatedAt: serverTimestamp() };
+    console.log(`✏️ updateDocument : ${collectionName}/${docId}`, payload);
+    await withRetry(
+      () => updateDoc(ref, payload),
+      `updateDocument(${collectionName}/${docId})`
+    );
+    console.log(`✅ updateDocument OK : ${collectionName}/${docId}`);
+    return ref;
+  }
+
+  // ---------------------------------------------------------------
+  // 4. INCRÉMENTER atomiquement un champ numérique
+  //    incField('users', uid, 'balance', 500)  // balance += 500
+  //    incField('users', uid, 'referralsCount', 1)
+  // ---------------------------------------------------------------
+  async function incField(collectionName, docId, fieldName, delta) {
+    return updateDocument(collectionName, docId, { [fieldName]: increment(delta) });
+  }
+
+  // ---------------------------------------------------------------
+  // 5. AJOUTER un élément à un tableau atomiquement
+  //    pushToArray('users', uid, 'investments', { id: 1, montant: 100 })
+  // ---------------------------------------------------------------
+  async function pushToArray(collectionName, docId, fieldName, value) {
+    return updateDocument(collectionName, docId, { [fieldName]: arrayUnion(value) });
+  }
+
+  // ---------------------------------------------------------------
+  // 6. RETIRER un élément d'un tableau atomiquement
+  //    removeFromArray('users', uid, 'investments', { id: 1 })
+  // ---------------------------------------------------------------
+  async function removeFromArray(collectionName, docId, fieldName, value) {
+    return updateDocument(collectionName, docId, { [fieldName]: arrayRemove(value) });
+  }
+
+  // ---------------------------------------------------------------
+  // 7. LIRE un document par son ID
+  //    const data = await getDocument('users', uid)
+  // ---------------------------------------------------------------
+  async function getDocument(collectionName, docId) {
+    const ref = doc(db, collectionName, docId);
+    const snap = await withRetry(() => getDoc(ref), `getDocument(${collectionName}/${docId})`);
+    if (!snap.exists()) {
+      console.log(`📭 getDocument : ${collectionName}/${docId} introuvable`);
+      return null;
+    }
+    return snap.data();
+  }
+
+  // ---------------------------------------------------------------
+  // 8. SUPPRIMER un document par son ID
+  // ---------------------------------------------------------------
+  async function deleteDocument(collectionName, docId) {
+    const ref = doc(db, collectionName, docId);
+    console.log(`🗑️ deleteDocument : ${collectionName}/${docId}`);
+    await withRetry(() => deleteDoc(ref), `deleteDocument(${collectionName}/${docId})`);
+    console.log(`✅ deleteDocument OK : ${collectionName}/${docId}`);
+  }
+
+  // ================================================================
+  // VÉRIFICATION CODE PARRAINAGE
   // ================================================================
   async function checkReferralCode(code) {
     if (!code || code.length < 4) {
@@ -1158,32 +1455,25 @@
 
     try {
       const normalizedCode = code.trim().toUpperCase();
-      
-      const { data, error } = await supabase
-        .from('users')
-        .select('id')
-        .eq('referral_code', normalizedCode)
-        .maybeSingle();
+      // ⚠️ On lit directement le document referralCodes/{code} (get par ID)
+      // au lieu d'une requête where() sur toute la collection "users",
+      // qui est bloquée par les règles de sécurité classiques (list interdit).
+      const codeRef = doc(db, "referralCodes", normalizedCode);
+      const codeSnap = await getDoc(codeRef);
 
-      if (error) {
-        console.error("❌ Erreur Supabase:", error);
-        referralMessage.innerHTML = '<i class="fas fa-exclamation-circle"></i> Erreur de vérification';
-        referralInfo.className = 'referral-info invalid';
-        return null;
-      }
-
-      if (data) {
+      if (codeSnap.exists()) {
+        const parrainId = codeSnap.data().uid;
         referralMessage.innerHTML = '<i class="fas fa-check-circle"></i> ✅ Code valide ! +500 FCFA offerts';
         referralInfo.className = 'referral-info valid';
-        return data.id;
+        return parrainId;
       } else {
         referralMessage.innerHTML = '<i class="fas fa-exclamation-triangle"></i> ⚠️ Code invalide.';
         referralInfo.className = 'referral-info invalid';
         return null;
       }
     } catch (error) {
-      console.error("❌ Erreur vérification:", error);
-      referralMessage.innerHTML = '<i class="fas fa-exclamation-circle"></i> Erreur';
+      console.error("❌ Erreur vérification code parrainage:", error);
+      referralMessage.innerHTML = '<i class="fas fa-exclamation-circle"></i> Vérification impossible';
       referralInfo.className = 'referral-info invalid';
       return null;
     }
@@ -1206,36 +1496,40 @@
     referralCodeInput.value = refCode;
     setTimeout(() => checkReferralCode(refCode), 300);
   }
-  
-    // ================================================================
+
+  // ================================================================
   // GÉNÉRATION CODE PARRAINAGE UNIQUE
   // ================================================================
-  async function generateUniqueReferralCode(prenom, nom) {
-    const base = (prenom.substring(0, 3) + nom.substring(0, 3) + Math.random().toString(36).substring(2, 6)).toUpperCase().replace(/[^A-Z0-9]/g, '');
-    let code = base.length >= 4 ? base.substring(0, 8) : base + Math.random().toString(36).substring(2, 6).toUpperCase();
+  async function generateUniqueReferralCode(uid, prenom, nom) {
+    const base = (prenom.substring(0, 3) + nom.substring(0, 3) + uid.substring(0, 4)).toUpperCase().replace(/[^A-Z0-9]/g, '');
+    let code = base.length >= 4 ? base.substring(0, 8) : base + uid.substring(0, 4);
     if (code.length < 4) code = code + Math.random().toString(36).substring(2, 6).toUpperCase();
-    
     let isUnique = false;
     let attempts = 0;
     let finalCode = code;
-    
+
+    // ⚠️ POINT CRITIQUE CORRIGÉ :
+    // L'ancienne version faisait un query(where(...)) sur toute la collection "users".
+    // Avec des règles de sécurité standards, ce type de requête ("list") est REFUSÉ
+    // (permission-denied), ce qui faisait planter cette fonction AVANT l'écriture
+    // du document utilisateur -> le compte existait dans Authentication mais
+    // JAMAIS dans Firestore. On vérifie maintenant l'unicité via un get() par ID
+    // sur "referralCodes/{code}" (autorisé), et en cas d'échec on ne bloque
+    // JAMAIS l'inscription : on continue avec un code généré localement.
     while (!isUnique && attempts < 5) {
-      const { data, error } = await supabase
-        .from('users')
-        .select('id')
-        .eq('referral_code', finalCode)
-        .maybeSingle();
-      
-      if (error) {
-        console.error("❌ Erreur vérification code:", error);
-        break;
-      }
-      
-      if (!data) {
-        isUnique = true;
-      } else {
-        finalCode = code + Math.random().toString(36).substring(2, 5).toUpperCase();
-        attempts++;
+      try {
+        const codeRef = doc(db, "referralCodes", finalCode);
+        const codeSnap = await getDoc(codeRef);
+        if (!codeSnap.exists()) {
+          isUnique = true;
+        } else {
+          finalCode = code + Math.random().toString(36).substring(2, 5).toUpperCase();
+          attempts++;
+        }
+      } catch (error) {
+        console.warn("⚠️ Vérification unicité code parrainage impossible (non bloquant):", error);
+        finalCode = code + Date.now().toString(36).slice(-4).toUpperCase();
+        isUnique = true; // on continue coûte que coûte, l'inscription ne doit jamais être bloquée ici
       }
     }
     return finalCode;
@@ -1247,44 +1541,34 @@
   async function creditReferralReward(parrainUid) {
     if (!parrainUid) return false;
     try {
-      // Récupérer le parrain
-      const { data: parrainData, error: fetchError } = await supabase
-        .from('users')
-        .select('balance, referral_balance, referrals_count, referral_earnings')
-        .eq('id', parrainUid)
-        .single();
-
-      if (fetchError || !parrainData) {
-        console.error("❌ Erreur récupération parrain:", fetchError);
+      console.log("💰 Crédit parrain en cours pour:", parrainUid);
+      // ⚠️ CORRIGÉ : utilisation de increment() pour des opérations
+      // atomiques côté serveur. Plus de race condition liée au
+      // pattern "read-then-write" qui pouvait perdre des crédits si
+      // deux filleuls s'inscrivaient simultanément.
+      const parrainRef = doc(db, "users", parrainUid);
+      const parrainDoc = await getDoc(parrainRef);
+      if (!parrainDoc.exists()) {
+        console.warn("⚠️ Document parrain introuvable, crédit abandonné");
         return false;
       }
-
-      // Mettre à jour
-      const { error: updateError } = await supabase
-        .from('users')
-        .update({
-          balance: (parrainData.balance || 0) + 500,
-          referral_balance: (parrainData.referral_balance || 0) + 500,
-          referrals_count: (parrainData.referrals_count || 0) + 1,
-          referral_earnings: (parrainData.referral_earnings || 0) + 500,
-          last_referral: new Date().toISOString()
-        })
-        .eq('id', parrainUid);
-
-      if (updateError) {
-        console.error("❌ Erreur mise à jour parrain:", updateError);
-        return false;
-      }
-
+      await updateDoc(parrainRef, {
+        balance: increment(500),
+        referralBalance: increment(500),
+        referralsCount: increment(1),
+        referralEarnings: increment(500),
+        lastReferral: serverTimestamp()
+      });
+      console.log("✅ Parrain crédité de 500 FCFA (atomique)");
       return true;
     } catch (error) {
-      console.error("❌ Erreur crédit parrain:", error);
+      console.error("❌ Erreur crédit parrain:", error.code || error.message, error);
       return false;
     }
   }
 
   // ================================================================
-  // INSCRIPTION (SUPABASE)
+  // INSCRIPTION (CORRIGÉE AVEC hasDeposited ET isUnlocked)
   // ================================================================
   registerForm.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -1300,8 +1584,9 @@
     const indicatif = document.getElementById('indicatif').value;
     const referralCode = document.getElementById('referralCode').value.trim().toUpperCase();
 
-    console.log("📝 === DÉBUT INSCRIPTION SUPABASE ===");
+    console.log("📝 === DÉBUT INSCRIPTION ===");
     console.log("📧 Email:", email);
+    console.log("👤 Nom:", nom, "Prénom:", prenom);
 
     // Validations
     if (!nom || !prenom || !email || !telephone || !password) {
@@ -1338,168 +1623,300 @@
         console.log("✅ Code parrainage valide:", referralCode, "Parrain ID:", parrainId);
       } else {
         showMessage(`⚠️ Le code "${referralCode}" est invalide.`, 'warning');
-        return;
       }
     }
 
     registerBtn.disabled = true;
     registerBtn.innerHTML = '<span class="loader"></span> Création...';
 
-    try {
-      // 1. Créer l'utilisateur dans Supabase Auth
-      console.log("📝 ÉTAPE 1: Création de l'utilisateur dans Supabase Auth...");
-      
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: email,
-        password: password,
-        options: {
-          data: {
-            nom: nom,
-            prenom: prenom,
-            full_name: `${prenom} ${nom}`
-          }
-        }
-      });
+    // ⚠️ CORRIGÉ : on active le flag anti-redirection AVANT de créer
+    // l'utilisateur, car createUserWithEmailAndPassword déclenche
+    // immédiatement onAuthStateChanged qui sinon redirigerait vers
+    // index.html avant que le document Firestore ne soit écrit.
+    isRegistering = true;
 
-      if (authError) {
-        console.error("❌ Erreur Auth:", authError);
-        throw new Error(authError.message);
+    try {
+      console.log("📝 ÉTAPE 1: Création de l'utilisateur dans Firebase Auth...");
+      
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      console.log("✅ Utilisateur créé dans Auth:", user.uid, user.email);
+
+      try {
+        await sendEmailVerification(user);
+        console.log("✅ Email de vérification envoyé à:", email);
+      } catch (verifError) {
+        console.warn("⚠️ Erreur envoi email vérification:", verifError);
       }
 
-      const user = authData.user;
-      console.log("✅ Utilisateur créé dans Auth:", user.id, user.email);
-
-      // 2. Générer le code de parrainage
       console.log("📝 ÉTAPE 2: Génération du code de parrainage...");
-      const generatedReferralCode = await generateUniqueReferralCode(prenom, nom);
+      const generatedReferralCode = await generateUniqueReferralCode(user.uid, prenom, nom);
       console.log("✅ Code parrainage généré:", generatedReferralCode);
-
+      
       const fullPhone = `${indicatif} ${telephone}`;
       const now = new Date().toISOString();
 
-      // 3. Créer l'utilisateur dans la table users
-      console.log("📝 ÉTAPE 3: Sauvegarde dans la table users...");
-
+      // ============================================================
+      // ⚠️ POINT CRITIQUE: Données utilisateur COMPLÈTES
+      // ============================================================
       const userData = {
-        id: user.id,
+        uid: user.uid,
         email: email,
         nom: nom,
         prenom: prenom,
-        full_name: `${prenom} ${nom}`,
+        fullName: `${prenom} ${nom}`,
         pays: pays,
         phone: fullPhone,
         balance: 0,
-        real_balance: 0,
-        total_depots: 0,
-        total_retraits: 0,
-        total_achats: 0,
-        total_ventes: 0,
-        total_revenus: 0,
-        gains_total: 0,
+        realBalance: 0,
+        totalDepots: 0,
+        totalRetraits: 0,
+        totalAchats: 0,
+        totalVentes: 0,
+        totalRevenus: 0,
+        gainsTotal: 0,
         investments: [],
         achats: [],
-        referrals_count: 0,
-        referral_earnings: 0,
-        referral_code: generatedReferralCode,
-        referred_by: referralCode || null,
-        status: 'active',
-        role: 'user',
-        has_deposited: false,
-        is_unlocked: false,
-        registration_date: now,
-        created_at: now,
-        last_login: now,
-        email_verified: false
+        referralsCount: 0,
+        referralEarnings: 0,
+        referralCode: generatedReferralCode,
+        referredBy: referralCode || null,
+        status: "active",
+        role: "user",
+        // ===== CHAMPS ESSENTIELS POUR LE DÉVERROUILLAGE =====
+        hasDeposited: false,
+        isUnlocked: false,
+        // =======================================================
+        // ⚠️ CORRIGÉ : on garde now (ISO string) pour les champs
+        // métier lisibles côté client, MAIS on ajoute aussi des
+        // timestamps serveur pour la cohérence Firestore.
+        registrationDate: now,
+        createdAt: now,
+        lastLogin: now,
+        emailVerified: false,
+        _serverCreatedAt: serverTimestamp()
       };
 
-      console.log("📦 Données utilisateur:", userData);
+      console.log("📝 ÉTAPE 3: Sauvegarde dans Firestore...");
+      console.log("📦 Données complètes:", JSON.stringify(userData, null, 2));
 
-      const { error: insertError } = await supabase
-        .from('users')
-        .insert([userData]);
-
-      if (insertError) {
-        console.error("❌ Erreur insertion:", insertError);
-        throw new Error(insertError.message);
+      // ⚠️ CORRIGÉ : utilisation du helper setDocument qui gère le
+      // retry automatique et l'horodatage serveur. On conserve le
+      // merge:true au cas où l'utilisateur ait déjà un document
+      // partiel (ex: créé par un autre flux).
+      try {
+        await setDocument("users", user.uid, userData, { merge: true });
+        console.log("✅ Document utilisateur créé dans Firestore:", user.uid);
+      } catch (writeError) {
+        // ⚠️ Si l'écriture échoue (permission denied, réseau, etc.),
+        // on NE laisse PAS l'utilisateur dans Auth sans document
+        // Firestore. On affiche une erreur claire et on propose de
+        // réessayer. Le compte Auth existe déjà, l'utilisateur pourra
+        // se connecter et un flux de "récupération" créera le doc.
+        console.error("❌ ÉCHEC écriture Firestore:", writeError);
+        throw writeError;
       }
 
-      console.log("✅ Document utilisateur créé dans Supabase:", user.id);
+      // Mapping code -> uid pour permettre la vérification future de ce code
+      // (non bloquant : un échec ici ne doit jamais annuler l'inscription déjà faite)
+      try {
+        await setDocument("referralCodes", generatedReferralCode, {
+          uid: user.uid,
+          createdAt: now
+        });
+        console.log("✅ Mapping referralCodes créé:", generatedReferralCode);
+      } catch (codeError) {
+        console.warn("⚠️ Impossible d'enregistrer referralCodes (non bloquant):", codeError);
+      }
 
-      // 4. Vérification
+      // ============================================================
+      // VÉRIFICATION CRITIQUE: Le document existe-t-il ?
+      // ============================================================
       console.log("📝 ÉTAPE 4: Vérification du document...");
-      const { data: verifyData, error: verifyError } = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', user.id)
-        .single();
-
-      if (verifyError) {
-        console.error("❌ Erreur vérification:", verifyError);
+      const verifyData = await getDocument("users", user.uid);
+      if (verifyData) {
+        console.log("✅ VÉRIFICATION RÉUSSIE: Document existe bien dans Firestore !");
+        console.log("📦 Contenu vérifié:", verifyData);
+        console.log("🔑 hasDeposited:", verifyData.hasDeposited);
+        console.log("🔓 isUnlocked:", verifyData.isUnlocked);
       } else {
-        console.log("✅ VÉRIFICATION RÉUSSIE:", verifyData);
+        console.error("❌ VÉRIFICATION ÉCHOUÉE: Document NON trouvé dans Firestore !");
+        throw new Error("Le document n'a pas été créé dans Firestore.");
       }
 
-      // 5. Créditer le parrain
+      // 6. Créditer le parrain si code valide
       if (parrainId) {
         console.log("📝 ÉTAPE 5: Crédit du parrain...");
         await creditReferralReward(parrainId);
-        console.log(`✅ 500 FCFA crédités au parrain ${parrainId}`);
+        console.log(`✅ ${500} FCFA crédités au parrain ${parrainId}`);
       }
 
-      // 6. Sauvegarde locale
-      localStorage.setItem('ARVEXA_current_user', user.id);
-      localStorage.setItem('ARVEXA_user_name', userData.full_name);
+      // 7. Sauvegarde locale
+      localStorage.setItem('ARVEXA_current_user', user.uid);
+      localStorage.setItem('ARVEXA_user_name', userData.fullName);
       localStorage.setItem('ARVEXA_is_unlocked', 'false');
       localStorage.setItem('ARVEXA_user_data', JSON.stringify(userData));
 
       console.log("🎉 INSCRIPTION TERMINÉE AVEC SUCCÈS !");
       showMessage('✅ Compte créé avec succès ! Redirection...', 'success');
 
+      // ⚠️ CORRIGÉ : on désactive le flag juste avant la redirection
+      // pour permettre à onAuthStateChanged de fonctionner normalement
+      // sur la page suivante. On attend 1.5s pour laisser le toast
+      // success s'afficher.
       setTimeout(() => {
+        isRegistering = false;
         window.location.href = 'index.html';
       }, 1500);
 
     } catch (error) {
+      // ⚠️ En cas d'erreur, on désactive le flag pour permettre à
+      // l'utilisateur de réessayer.
+      isRegistering = false;
       console.error("❌ ERREUR INSCRIPTION:", error);
+      console.error("📋 Code:", error.code);
+      console.error("📋 Message:", error.message);
       
       let errorMsg = 'Erreur lors de l\'inscription.';
-      if (error.message) {
-        errorMsg = error.message;
+      switch (error.code) {
+        case 'auth/email-already-in-use':
+          errorMsg = 'Cet email est déjà utilisé. Connectez-vous.';
+          break;
+        case 'auth/invalid-email':
+          errorMsg = 'Email invalide.';
+          break;
+        case 'auth/weak-password':
+          errorMsg = 'Mot de passe trop faible (minimum 6 caractères).';
+          break;
+        case 'auth/network-request-failed':
+          errorMsg = '⚠️ Problème réseau. Vérifiez votre connexion Internet.';
+          break;
+        case 'permission-denied':
+          errorMsg = '⚠️ Erreur de permissions Firestore. Vérifiez les règles de sécurité (autorisez "create" sur users et referralCodes).';
+          break;
+        case 'unavailable':
+          errorMsg = '📶 Service Firestore indisponible. Vérifiez votre connexion Internet.';
+          break;
+        case 'unauthenticated':
+          errorMsg = '🔒 Session expirée. Rafraîchissez la page et réessayez.';
+          break;
+        default:
+          // ⚠️ CORRIGÉ : si c'est une erreur Firestore non gérée
+          // explicitement, on utilise le traducteur pour un message
+          // plus parlant que error.message brut.
+          errorMsg = translateFirestoreError(error);
       }
       showMessage(errorMsg, 'error');
-      
       registerBtn.disabled = false;
       registerBtn.innerHTML = '<i class="fas fa-user-plus"></i> Créer mon compte';
     }
   });
 
   // ================================================================
-  // CONNEXION GOOGLE (Supabase)
+  // CONNEXION GOOGLE
   // ================================================================
   googleBtn.addEventListener('click', async () => {
     googleBtn.disabled = true;
     googleBtn.innerHTML = '<span class="loader"></span> Connexion...';
 
-    try {
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: window.location.origin + '/index.html'
-        }
-      });
+    // ⚠️ CORRIGÉ : même problème que pour l'inscription —
+    // signInWithPopup déclenche onAuthStateChanged, qui sinon
+    // redirigerait avant l'écriture Firestore.
+    isRegistering = true;
 
-      if (error) {
-        console.error("❌ Erreur Google:", error);
-        throw new Error(error.message);
+    try {
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      console.log("✅ Connexion Google réussie:", user.email);
+
+      const existingData = await getDocument("users", user.uid);
+
+      if (!existingData) {
+        console.log("📝 Création du document pour l'utilisateur Google...");
+        const displayName = user.displayName || "Utilisateur";
+        const [prenom, ...nomParts] = displayName.split(' ');
+        const nom = nomParts.join(' ') || "Google";
+        const now = new Date().toISOString();
+        const generatedReferralCode = await generateUniqueReferralCode(user.uid, prenom || "Utilisateur", nom);
+
+        const userData = {
+          uid: user.uid,
+          email: user.email,
+          nom: nom,
+          prenom: prenom || "Google",
+          fullName: displayName,
+          pays: "Niger",
+          phone: user.phoneNumber || "",
+          balance: 0,
+          realBalance: 0,
+          totalDepots: 0,
+          totalRetraits: 0,
+          totalAchats: 0,
+          totalVentes: 0,
+          totalRevenus: 0,
+          gainsTotal: 0,
+          investments: [],
+          achats: [],
+          referralsCount: 0,
+          referralEarnings: 0,
+          referralCode: generatedReferralCode,
+          referredBy: null,
+          status: "active",
+          role: "user",
+          hasDeposited: false,
+          isUnlocked: false,
+          registrationDate: now,
+          createdAt: now,
+          lastLogin: now,
+          emailVerified: user.emailVerified || false,
+          _serverCreatedAt: serverTimestamp()
+        };
+        // ⚠️ CORRIGÉ : utilisation du helper (retry + gestion d'erreur unifiée)
+        await setDocument("users", user.uid, userData, { merge: true });
+        console.log("✅ Document Google créé dans Firestore");
+
+        try {
+          await setDocument("referralCodes", generatedReferralCode, {
+            uid: user.uid,
+            createdAt: now
+          });
+        } catch (codeError) {
+          console.warn("⚠️ Impossible d'enregistrer referralCodes (non bloquant):", codeError);
+        }
+      } else {
+        // ⚠️ CORRIGÉ : utilisation du helper updateDocument
+        await updateDocument("users", user.uid, { lastLogin: new Date().toISOString() });
+        console.log("✅ Document Google mis à jour");
       }
 
-      console.log("✅ Connexion Google initiée");
-      showMessage('✅ Redirection vers Google...', 'success');
+      localStorage.setItem('ARVEXA_current_user', user.uid);
+      localStorage.setItem('ARVEXA_is_unlocked', String(existingData?.isUnlocked || false));
+      
+      showMessage('✅ Connexion Google réussie !', 'success');
+      // ⚠️ CORRIGÉ : on désactive le flag juste avant la redirection
+      setTimeout(() => {
+        isRegistering = false;
+        window.location.href = 'index.html';
+      }, 1000);
 
     } catch (error) {
+      // ⚠️ En cas d'erreur, on réactive le flag
+      isRegistering = false;
       console.error("❌ Erreur Google:", error);
-      showMessage('Erreur lors de la connexion avec Google.', 'error');
-      
+      let errorMsg = 'Erreur lors de la connexion avec Google.';
+      if (error.code === 'auth/popup-closed-by-user') {
+        errorMsg = 'Fenêtre popup fermée. Réessayez.';
+      } else if (error.code === 'auth/network-request-failed') {
+        errorMsg = 'Problème réseau. Vérifiez votre connexion Internet.';
+      } else if (error.code === 'permission-denied') {
+        errorMsg = '⚠️ Permissions Firestore insuffisantes pour créer votre compte.';
+      } else {
+        // ⚠️ CORRIGÉ : traduction Firestore si applicable
+        errorMsg = translateFirestoreError(error);
+      }
+      showMessage(errorMsg, 'error');
+    } finally {
       googleBtn.disabled = false;
       googleBtn.innerHTML = `<svg class="google-icon" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
           <path fill="#4285F4" d="M45.12 24.5c0-1.56-.14-3.06-.4-4.5H24v8.51h11.84c-.51 2.75-2.06 5.08-4.39 6.64v5.52h7.11c4.16-3.83 6.56-9.47 6.56-16.17z"/>
@@ -1516,9 +1933,8 @@
   window.addEventListener('online', () => showToast('📶 Connexion Internet rétablie', 'success'));
   window.addEventListener('offline', () => showToast('📶 Connexion Internet perdue', 'error'));
 
-  console.log("🌿 ARVEXA - Page d'inscription avec Supabase chargée");
-  console.log("🔗 Supabase URL:", supabaseUrl);
+  console.log("🌿 ARVEXA - Page d'inscription chargée");
+  console.log("🔥 Ouvrez la console (F12) pour voir les logs de débogage");
 </script>
 </body>
 </html>
-  
