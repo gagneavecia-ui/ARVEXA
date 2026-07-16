@@ -390,6 +390,60 @@
         gap: 18px;
       }
     }
+    
+    /* ===== SKELETON LOADING ===== */
+.skeleton-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+.skeleton-card {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: var(--radius);
+  padding: 20px 14px;
+  height: 140px;
+  border: 1px solid rgba(255, 255, 255, 0.02);
+  animation: skeletonPulse 1.5s ease-in-out infinite;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.skeleton-card .skeleton-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+}
+.skeleton-card .skeleton-line {
+  height: 12px;
+  width: 60%;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.04);
+}
+.skeleton-card .skeleton-line.short {
+  width: 40%;
+  height: 10px;
+}
+
+@keyframes skeletonPulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.6; }
+}
+
+@media (max-width: 480px) {
+  .skeleton-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .skeleton-card { height: 100px; padding: 14px 10px; }
+  .skeleton-card .skeleton-icon { width: 32px; height: 32px; }
+  .skeleton-card .skeleton-line { height: 10px; }
+}
+@media (min-width: 769px) {
+  .skeleton-grid { grid-template-columns: repeat(3, 1fr); gap: 16px; }
+}
+@media (min-width: 1024px) {
+  .skeleton-grid { grid-template-columns: repeat(4, 1fr); gap: 18px; }
+}
   </style>
 </head>
 <body>
@@ -423,9 +477,14 @@
     </div>
   </div>
 
-  <div class="services-grid" id="servicesGrid">
-    <!-- Rempli par JavaScript -->
-  </div>
+  <div class="services-grid skeleton-grid" id="servicesGrid">
+  <div class="skeleton-card"><div class="skeleton-icon"></div><div class="skeleton-line"></div><div class="skeleton-line short"></div></div>
+  <div class="skeleton-card"><div class="skeleton-icon"></div><div class="skeleton-line"></div><div class="skeleton-line short"></div></div>
+  <div class="skeleton-card"><div class="skeleton-icon"></div><div class="skeleton-line"></div><div class="skeleton-line short"></div></div>
+  <div class="skeleton-card"><div class="skeleton-icon"></div><div class="skeleton-line"></div><div class="skeleton-line short"></div></div>
+  <div class="skeleton-card"><div class="skeleton-icon"></div><div class="skeleton-line"></div><div class="skeleton-line short"></div></div>
+  <div class="skeleton-card"><div class="skeleton-icon"></div><div class="skeleton-line"></div><div class="skeleton-line short"></div></div>
+</div>
 
   <div class="section-header" id="comingSoonHeader">
     <div class="section-header-left">
@@ -630,8 +689,10 @@ function renderServices(services, unlocked) {
   const available = services.filter(s => !s.isComing).sort((a, b) => (a.order || 0) - (b.order || 0));
   const coming = services.filter(s => s.isComing).sort((a, b) => (a.order || 0) - (b.order || 0));
   
+  // Retirer la classe skeleton-grid et afficher les vrais services
+  servicesGrid.classList.remove('skeleton-grid');
   servicesGrid.innerHTML = available.map(s => renderServiceCard(s, unlocked)).join('');
-
+  
   if (coming.length > 0) {
     comingSoonHeader.style.display = 'block';
     comingSoonGrid.innerHTML = coming.map(s => renderServiceCard(s, unlocked)).join('');

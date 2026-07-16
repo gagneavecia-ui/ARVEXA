@@ -637,6 +637,56 @@
       .ebook-card .ebook-title { font-size: 22px; }
       .ebook-card .ebook-description { font-size: 15px; }
     }
+    
+    /* ===== SKELETON LOADING ===== */
+.skeleton-ebook {
+  display: flex;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: var(--radius);
+  overflow: hidden;
+  height: 200px;
+  border: 1px solid rgba(255, 255, 255, 0.02);
+  animation: skeletonPulse 1.5s ease-in-out infinite;
+}
+.skeleton-ebook .skeleton-img {
+  width: 200px;
+  min-width: 200px;
+  background: rgba(255, 255, 255, 0.03);
+}
+.skeleton-ebook .skeleton-content {
+  flex: 1;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+}
+.skeleton-ebook .skeleton-line {
+  height: 14px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.04);
+}
+.skeleton-ebook .skeleton-line.large { width: 70%; }
+.skeleton-ebook .skeleton-line.medium { width: 50%; }
+.skeleton-ebook .skeleton-line.small { width: 30%; height: 10px; }
+
+@keyframes skeletonPulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.6; }
+}
+
+@media (max-width: 600px) {
+  .skeleton-ebook { flex-direction: column; height: auto; }
+  .skeleton-ebook .skeleton-img { width: 100%; min-width: 100%; height: 120px; }
+  .skeleton-ebook .skeleton-content { padding: 14px 16px; }
+}
+@media (min-width: 601px) and (max-width: 900px) {
+  .skeleton-ebook { height: 180px; }
+  .skeleton-ebook .skeleton-img { width: 160px; min-width: 160px; }
+}
+@media (min-width: 901px) {
+  .skeleton-ebook { height: 220px; }
+}
   </style>
 </head>
 <body>
@@ -693,10 +743,12 @@
     <p class="hero-description">Découvrez notre collection d'e-books sur la finance, l'investissement et l'entrepreneuriat.</p>
   </div>
 
-  <!-- ===== EBOOKS ===== -->
   <div id="ebooksGrid">
-    <!-- Rempli par JavaScript -->
-  </div>
+  <div class="skeleton-ebook"><div class="skeleton-img"></div><div class="skeleton-content"><div class="skeleton-line large"></div><div class="skeleton-line medium"></div><div class="skeleton-line small"></div></div></div>
+  <div class="skeleton-ebook"><div class="skeleton-img"></div><div class="skeleton-content"><div class="skeleton-line large"></div><div class="skeleton-line medium"></div><div class="skeleton-line small"></div></div></div>
+  <div class="skeleton-ebook"><div class="skeleton-img"></div><div class="skeleton-content"><div class="skeleton-line large"></div><div class="skeleton-line medium"></div><div class="skeleton-line small"></div></div></div>
+  <div class="skeleton-ebook"><div class="skeleton-img"></div><div class="skeleton-content"><div class="skeleton-line large"></div><div class="skeleton-line medium"></div><div class="skeleton-line small"></div></div></div>
+</div>
 
 </main>
 
@@ -927,7 +979,6 @@ function renderEbooks(ebooks) {
   ebooksGrid.innerHTML = ebooks.map((ebook, index) => {
     const isPremium = ebook.isPremium || false;
     
-    // Si premium ET non débloqué → badge et cadenas
     const showPremiumBadge = isPremium && !isUnlocked;
     const showLock = isPremium && !isUnlocked;
     const btnClass = (!isPremium || isUnlocked) ? 'primary' : 'locked';
@@ -989,6 +1040,8 @@ function renderEbooks(ebooks) {
     });
   });
 }
+
+  
 
 // ================================================================
 // GESTION DU CLIC
