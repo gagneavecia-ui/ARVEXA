@@ -508,24 +508,51 @@
 <script type="importmap">
 {
   "imports": {
-    "firebase/app": "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js",
-    "firebase/auth": "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js",
-    "firebase/firestore": "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js"
+    "firebase/app": "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js",
+    "firebase/auth": "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js",
+    "firebase/firestore": "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js"
   }
 }
 </script>
 
+<!-- ================================================================ -->
+<!-- ERUDA - Console mobile (développement uniquement) -->
+<!-- ================================================================ -->
+<script>
+(function() {
+  var isLocal = location.hostname === "localhost" || location.hostname === "127.0.0.1";
+  var isDebug = location.search.indexOf("debug=true") !== -1 || location.search.indexOf("eruda=true") !== -1;
+  
+  if (isLocal || isDebug) {
+    if (document.querySelector('script[data-eruda]')) return;
+    var s = document.createElement("script");
+    s.setAttribute("data-eruda", "true");
+    s.src = "https://cdn.jsdelivr.net/npm/eruda";
+    s.onload = function() {
+      if (typeof eruda !== 'undefined') {
+        eruda.init({
+          tool: ['console', 'network', 'elements', 'resources'],
+          defaults: { displaySize: 40 }
+        });
+        console.log("🐞 Eruda active - Services");
+      }
+    };
+    document.head.appendChild(s);
+  }
+})();
+</script>
+
 <script type="module">
 // ================================================================
-// IMPORTS
+// IMPORTS FIREBASE v12
 // ================================================================
-import { initializeApp } from "firebase/app";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
 import { 
   getAuth, 
   onAuthStateChanged,
   setPersistence,
   browserLocalPersistence
-} from "firebase/auth";
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
 import { 
   getFirestore,
   doc,
@@ -537,12 +564,12 @@ import {
   onSnapshot,
   setDoc,
   serverTimestamp
-} from "firebase/firestore";
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
 // ================================================================
-// FIREBASE CONFIG
+// CONFIGURATION FIREBASE
 // ================================================================
-const firebaseConfig = {
+var firebaseConfig = {
   apiKey: "AIzaSyBEbYuuUlNCLMBUHClv4UnyownNHw2q3_g",
   authDomain: "nexgen-39043.firebaseapp.com",
   projectId: "nexgen-39043",
@@ -552,150 +579,172 @@ const firebaseConfig = {
   measurementId: "G-HC2Q5DNKDR"
 };
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+var app = initializeApp(firebaseConfig);
+var auth = getAuth(app);
+var db = getFirestore(app);
 setPersistence(auth, browserLocalPersistence);
-
-// ================================================================
-// HELPERS (copiés depuis register.html)
-// ================================================================
-const sleep = (ms) => new Promise(r => setTimeout(r, ms));
-
-async function withRetry(operation, label = 'opération', maxRetries = 3) {
-  let lastError = null;
-  for (let attempt = 1; attempt <= maxRetries; attempt++) {
-    try {
-      return await operation();
-    } catch (error) {
-      lastError = error;
-      const isNetwork = ['unavailable', 'deadline-exceeded', 'cancelled'].includes(error?.code);
-      if (!isNetwork || attempt === maxRetries) throw error;
-      console.warn(`⚠️ ${label} - tentative ${attempt}/${maxRetries} échouée, retry...`, error.code);
-      await sleep(attempt * 500);
-    }
-  }
-  throw lastError;
-}
-
-async function setDocument(collectionName, docId, data) {
-  const ref = doc(db, collectionName, docId);
-  const payload = { ...data, _updatedAt: serverTimestamp() };
-  console.log(`📝 setDocument : ${collectionName}/${docId}`, payload);
-  await withRetry(
-    () => setDoc(ref, payload, { merge: true }),
-    `setDocument(${collectionName}/${docId})`
-  );
-  console.log(`✅ setDocument OK : ${collectionName}/${docId}`);
-  return ref;
-}
 
 // ================================================================
 // DOM
 // ================================================================
-const servicesGrid = document.getElementById('servicesGrid');
-const comingSoonGrid = document.getElementById('comingSoonGrid');
-const comingSoonHeader = document.getElementById('comingSoonHeader');
-const toast = document.getElementById('toast');
+var servicesGrid = document.getElementById('servicesGrid');
+var comingSoonGrid = document.getElementById('comingSoonGrid');
+var comingSoonHeader = document.getElementById('comingSoonHeader');
+var toast = document.getElementById('toast');
 
-let isUnlocked = false;
+var isUnlocked = false;
+var notificationTimeout = null;
 
 // ================================================================
 // TOAST
 // ================================================================
-function showToast(message, type = 'info') {
+function showToast(message, type) {
+  type = type || 'info';
   toast.textContent = message;
-  toast.className = `toast ${type}`;
-  setTimeout(() => toast.classList.add('show'), 50);
-  setTimeout(() => toast.classList.remove('show'), 4000);
+  toast.className = 'toast ' + type;
+  clearTimeout(notificationTimeout);
+  setTimeout(function() {
+    toast.classList.add('show');
+  }, 50);
+  notificationTimeout = setTimeout(function() {
+    toast.classList.remove('show');
+  }, 4000);
 }
 
 // ================================================================
-// DONNÉES PAR DÉFAUT - SERVICES
+// HELPERS
 // ================================================================
-const DEFAULT_SERVICES = [
-  { id: 'service_001', name: 'E-books', icon: 'fa-book', iconClass: 'blue', description: 'Lisez et apprenez à votre rythme', page: 'ebooks.html', isPremium: true, isComing: false, order: 1, createdAt: new Date().toISOString() },
-  { id: 'service_002', name: 'Formations', icon: 'fa-graduation-cap', iconClass: 'purple', description: 'Cours vidéo pour maîtriser la finance', page: 'formations.html', isPremium: true, isComing: false, order: 2, createdAt: new Date().toISOString() },
+function sleep(ms) {
+  return new Promise(function(r) { setTimeout(r, ms); });
+}
+
+function withRetry(operation, label, maxRetries) {
+  label = label || 'operation';
+  maxRetries = maxRetries || 3;
+  var lastError = null;
+  
+  function attempt(attemptNumber) {
+    return operation().catch(function(error) {
+      lastError = error;
+      var isNetwork = error && (error.code === 'unavailable' || error.code === 'deadline-exceeded' || error.code === 'cancelled');
+      if (!isNetwork || attemptNumber === maxRetries) {
+        throw error;
+      }
+      console.warn('⚠️ ' + label + ' - tentative ' + attemptNumber + '/' + maxRetries + ' echouee, retry...', error.code);
+      return sleep(attemptNumber * 500).then(function() {
+        return attempt(attemptNumber + 1);
+      });
+    });
+  }
+  return attempt(1);
+}
+
+function setDocument(collectionName, docId, data) {
+  var ref = doc(db, collectionName, docId);
+  var payload = Object.assign({}, data, { _updatedAt: serverTimestamp() });
+  console.log('📝 setDocument : ' + collectionName + '/' + docId);
+  return withRetry(function() {
+    return setDoc(ref, payload, { merge: true });
+  }, 'setDocument(' + collectionName + '/' + docId + ')').then(function() {
+    console.log('✅ setDocument OK : ' + collectionName + '/' + docId);
+    return ref;
+  });
+}
+
+// ================================================================
+// DONNEES PAR DEFAUT - SERVICES
+// ================================================================
+var DEFAULT_SERVICES = [
+  { id: 'service_001', name: 'E-books', icon: 'fa-book', iconClass: 'blue', description: 'Lisez et apprenez a votre rythme', page: 'ebooks.html', isPremium: true, isComing: false, order: 1, createdAt: new Date().toISOString() },
+  { id: 'service_002', name: 'Formations', icon: 'fa-graduation-cap', iconClass: 'purple', description: 'Cours video pour maitriser la finance', page: 'formations.html', isPremium: true, isComing: false, order: 2, createdAt: new Date().toISOString() },
   { id: 'service_003', name: 'Achat', icon: 'fa-shopping-cart', iconClass: 'gold', description: 'E-books, formations et services', page: 'boutique.html', isPremium: true, isComing: false, order: 3, createdAt: new Date().toISOString() },
   { id: 'service_004', name: 'Investir', icon: 'fa-chart-line', iconClass: 'gold', description: 'Packs d\'investissement avec rendements', page: 'investir.html', isPremium: true, isComing: false, order: 4, createdAt: new Date().toISOString() },
-  { id: 'service_005', name: 'Vendre', icon: 'fa-store', iconClass: 'green', description: 'Monétisez vos compétences', page: 'vendre.html', isPremium: true, isComing: false, order: 5, createdAt: new Date().toISOString() },
-  { id: 'service_006', name: 'Parrainage', icon: 'fa-users', iconClass: 'gold', description: 'Gagnez jusqu\'à 500 FCFA par filleul', page: 'parrainage.html', isPremium: true, isComing: false, order: 6, createdAt: new Date().toISOString() },
+  { id: 'service_005', name: 'Vendre', icon: 'fa-store', iconClass: 'green', description: 'Monetisez vos competences', page: 'vendre.html', isPremium: true, isComing: false, order: 5, createdAt: new Date().toISOString() },
+  { id: 'service_006', name: 'Parrainage', icon: 'fa-users', iconClass: 'gold', description: 'Gagnez jusqu\'a 500 FCFA par filleul', page: 'parrainage.html', isPremium: true, isComing: false, order: 6, createdAt: new Date().toISOString() },
   { id: 'service_007', name: 'Recharger', icon: 'fa-plus-circle', iconClass: 'green', description: 'Alimentez votre compte ARVEXA', page: 'recharger.html', isPremium: false, isComing: false, order: 7, createdAt: new Date().toISOString() },
-  { id: 'service_008', name: 'Retrait', icon: 'fa-arrow-down', iconClass: 'red', description: 'Retirez vos gains en toute sécurité', page: 'retrait.html', isPremium: true, isComing: false, order: 8, createdAt: new Date().toISOString() },
-  { id: 'service_009', name: 'Forum', icon: 'fa-comments', iconClass: 'blue', description: 'Échangez avec la communauté', page: 'forum.html', isPremium: true, isComing: false, order: 9, createdAt: new Date().toISOString() },
-  { id: 'service_010', name: 'Mon Activité', icon: 'fa-chart-pie', iconClass: 'purple', description: 'Suivez vos performances en temps réel', page: 'activite.html', isPremium: false, isComing: false, order: 10, createdAt: new Date().toISOString() }
+  { id: 'service_008', name: 'Retrait', icon: 'fa-arrow-down', iconClass: 'red', description: 'Retirez vos gains en toute securite', page: 'retrait.html', isPremium: true, isComing: false, order: 8, createdAt: new Date().toISOString() },
+  { id: 'service_009', name: 'Forum', icon: 'fa-comments', iconClass: 'blue', description: 'Echangez avec la communaute', page: 'forum.html', isPremium: true, isComing: false, order: 9, createdAt: new Date().toISOString() },
+  { id: 'service_010', name: 'Mon Activite', icon: 'fa-chart-pie', iconClass: 'purple', description: 'Suivez vos performances en temps reel', page: 'activite.html', isPremium: false, isComing: false, order: 10, createdAt: new Date().toISOString() }
 ];
 
 // ================================================================
-// INITIALISER LES SERVICES (créer la collection si vide)
+// INITIALISER LES SERVICES
 // ================================================================
-async function initializeServices() {
-  try {
-    console.log('🔄 Vérification de la collection services...');
-    const servicesRef = collection(db, 'services');
-    const snapshot = await getDocs(servicesRef);
-    
+function initializeServices() {
+  console.log('🔄 Verification de la collection services...');
+  var servicesRef = collection(db, 'services');
+  
+  return getDocs(servicesRef).then(function(snapshot) {
     if (snapshot.empty) {
-      console.log('📝 Création des 10 services par défaut...');
-      for (const service of DEFAULT_SERVICES) {
-        await setDocument('services', service.id, service);
-      }
-      console.log('✅ 10 services créés avec succès');
-      return true;
+      console.log('📝 Creation des ' + DEFAULT_SERVICES.length + ' services par defaut...');
+      var promises = DEFAULT_SERVICES.map(function(service) {
+        return setDocument('services', service.id, service);
+      });
+      return Promise.all(promises).then(function() {
+        console.log('✅ ' + DEFAULT_SERVICES.length + ' services crees avec succes');
+        return true;
+      });
     }
-    console.log('✅ Services déjà existants (' + snapshot.size + ' documents)');
+    console.log('✅ Services deja existants (' + snapshot.size + ' documents)');
     return false;
-  } catch (error) {
+  }).catch(function(error) {
     console.error('❌ Erreur initialisation services:', error);
     return false;
-  }
+  });
 }
 
 // ================================================================
 // RENDRE UNE CARTE SERVICE
 // ================================================================
 function renderServiceCard(service, unlocked) {
-  const isPremium = service.isPremium || false;
-  const isComing = service.isComing || false;
+  var isPremium = service.isPremium || false;
+  var isComing = service.isComing || false;
   
-  let badgeText = '';
-  let badgeClass = '';
+  var badgeText = '';
+  var badgeClass = '';
   
   if (isComing) {
-    badgeText = '🔜 À venir';
+    badgeText = '🔜 A venir';
     badgeClass = 'coming';
   } else if (isPremium && !unlocked) {
     badgeText = '🔒 Premium';
     badgeClass = 'premium';
   }
 
-  const showLock = isPremium && !unlocked && !isComing;
+  var showLock = isPremium && !unlocked && !isComing;
+  var delay = (service.order || 0) * 0.05;
 
-  return `
-    <a href="${service.page || '#'}" class="service-card" style="animation-delay: ${(service.order || 0) * 0.05}s;">
-      ${showLock ? '<span class="premium-lock"><i class="fas fa-lock"></i></span>' : ''}
-      <div class="icon ${service.iconClass || 'blue'}"><i class="fas ${service.icon || 'fa-circle'}"></i></div>
-      <div class="name">${service.name || 'Service'}</div>
-      <div class="desc">${service.description || ''}</div>
-      ${badgeText ? `<span class="badge ${badgeClass}">${badgeText}</span>` : ''}
-    </a>
-  `;
+  var html = '<a href="' + (service.page || '#') + '" class="service-card" style="animation-delay: ' + delay + 's;">';
+  
+  if (showLock) {
+    html += '<span class="premium-lock"><i class="fas fa-lock"></i></span>';
+  }
+  
+  html += '<div class="icon ' + (service.iconClass || 'blue') + '"><i class="fas ' + (service.icon || 'fa-circle') + '"></i></div>';
+  html += '<div class="name">' + (service.name || 'Service') + '</div>';
+  html += '<div class="desc">' + (service.description || '') + '</div>';
+  
+  if (badgeText) {
+    html += '<span class="badge ' + badgeClass + '">' + badgeText + '</span>';
+  }
+  
+  html += '</a>';
+  return html;
 }
 
 // ================================================================
 // AFFICHER LES SERVICES
 // ================================================================
 function renderServices(services, unlocked) {
-  const available = services.filter(s => !s.isComing).sort((a, b) => (a.order || 0) - (b.order || 0));
-  const coming = services.filter(s => s.isComing).sort((a, b) => (a.order || 0) - (b.order || 0));
+  var available = services.filter(function(s) { return !s.isComing; }).sort(function(a, b) { return (a.order || 0) - (b.order || 0); });
+  var coming = services.filter(function(s) { return s.isComing; }).sort(function(a, b) { return (a.order || 0) - (b.order || 0); });
   
-  // Retirer la classe skeleton-grid et afficher les vrais services
   servicesGrid.classList.remove('skeleton-grid');
-  servicesGrid.innerHTML = available.map(s => renderServiceCard(s, unlocked)).join('');
+  servicesGrid.innerHTML = available.map(function(s) { return renderServiceCard(s, unlocked); }).join('');
   
   if (coming.length > 0) {
     comingSoonHeader.style.display = 'block';
-    comingSoonGrid.innerHTML = coming.map(s => renderServiceCard(s, unlocked)).join('');
+    comingSoonGrid.innerHTML = coming.map(function(s) { return renderServiceCard(s, unlocked); }).join('');
   } else {
     comingSoonHeader.style.display = 'none';
     comingSoonGrid.innerHTML = '';
@@ -706,18 +755,19 @@ function renderServices(services, unlocked) {
 // CHARGER LES SERVICES DEPUIS FIRESTORE
 // ================================================================
 function loadServices() {
-  const q = query(collection(db, 'services'), orderBy('order', 'asc'));
-  return onSnapshot(q, (snapshot) => {
-    const services = [];
-    snapshot.forEach(doc => {
-      services.push({ id: doc.id, ...doc.data() });
+  var q = query(collection(db, 'services'), orderBy('order', 'asc'));
+  
+  return onSnapshot(q, function(snapshot) {
+    var services = [];
+    snapshot.forEach(function(doc) {
+      services.push(Object.assign({ id: doc.id }, doc.data()));
     });
     if (services.length > 0) {
       renderServices(services, isUnlocked);
     } else {
       renderServices(DEFAULT_SERVICES, isUnlocked);
     }
-  }, (error) => {
+  }, function(error) {
     console.error('Erreur chargement services:', error);
     renderServices(DEFAULT_SERVICES, isUnlocked);
   });
@@ -726,45 +776,63 @@ function loadServices() {
 // ================================================================
 // CHARGER UTILISATEUR
 // ================================================================
-async function loadUser(uid) {
-  try {
-    const userRef = doc(db, 'users', uid);
-    const userSnap = await getDoc(userRef);
+function loadUser(uid) {
+  var userRef = doc(db, 'users', uid);
+  return getDoc(userRef).then(function(userSnap) {
     if (userSnap.exists()) {
-      const data = userSnap.data();
+      var data = userSnap.data();
       isUnlocked = data.isUnlocked === true || data.hasDeposited === true;
+      localStorage.setItem('ARVEXA_user_data', JSON.stringify(data));
+      sessionStorage.setItem('arvexa_loaded', 'true');
     }
     return null;
-  } catch (error) {
+  }).catch(function(error) {
     console.error('Erreur chargement utilisateur:', error);
     return null;
-  }
+  });
 }
 
 // ================================================================
 // AUTH
 // ================================================================
-onAuthStateChanged(auth, async (user) => {
+var authChecked = false;
+
+onAuthStateChanged(auth, function(user) {
   if (user) {
     localStorage.setItem('ARVEXA_current_user', user.uid);
-    await loadUser(user.uid);
-    await initializeServices();  // ← CRÉE LA COLLECTION SI VIDE
-    loadServices();
+    
+    // Chargement rapide depuis cache
+    var cached = localStorage.getItem('ARVEXA_user_data');
+    if (cached) {
+      try {
+        var data = JSON.parse(cached);
+        isUnlocked = data.isUnlocked === true || data.hasDeposited === true;
+      } catch(e) {}
+    }
+    
+    loadUser(user.uid).then(function() {
+      return initializeServices();
+    }).then(function() {
+      loadServices();
+    });
+    
+    authChecked = true;
   } else {
-    const savedUid = localStorage.getItem('ARVEXA_current_user');
-    if (savedUid) {
-      setTimeout(() => {
+    var saved = localStorage.getItem('ARVEXA_current_user');
+    if (saved && !authChecked) {
+      setTimeout(function() {
         if (!auth.currentUser) {
           window.location.href = 'login.html';
         }
       }, 2000);
-    } else {
+    } else if (!authChecked) {
       window.location.href = 'login.html';
     }
+    authChecked = true;
   }
 });
 
-console.log('🛠️ ARVEXA - Page des services chargée');
+console.log('🛠️ ARVEXA - Page des services chargee (version optimisee)');
 </script>
 </body>
 </html>

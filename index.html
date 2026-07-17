@@ -725,583 +725,778 @@
   }
 </script>
 
-<script type="module">
-    // ================================================================
-  // CHARGEMENT RAPIDE - VÉRIFICATION DU CACHE SESSION
-  // ================================================================
-  const loadingScreen = document.getElementById('loadingScreen');
-  const mainContent = document.getElementById('mainContent');
+<!-- ================================================================ -->
+<!-- ERUDA - Console mobile (développement uniquement) -->
+<!-- ================================================================ -->
+<script>
+// ERUDA - Activation conditionnelle
+(function initEruda() {
+  const isLocal = location.hostname === "localhost" || location.hostname === "127.0.0.1";
+  const isDebug = location.search.includes("debug=true") || location.search.includes("eruda=true");
   
-  // Vérifier si le site a déjà été chargé dans cette session
-  const isFirstLoad = !sessionStorage.getItem('arvexa_loaded');
-  
-  // Si déjà chargé → affichage instantané
-  if (!isFirstLoad) {
-    loadingScreen.classList.add('hide');
-    mainContent.style.display = 'block';
-    mainContent.style.opacity = '1';
-    document.body.style.overflow = '';
-  } else {
-    // Premier chargement → barre de chargement
-    loadingScreen.classList.remove('hide');
-    mainContent.style.display = 'none';
-  }
-  
-    // ================================================================
-  // IMPORTS
-  // ================================================================
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
-  import { 
-    getAuth, onAuthStateChanged, signOut,
-    setPersistence, browserLocalPersistence
-  } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
-  import { 
-    getFirestore, doc, getDoc, onSnapshot, updateDoc, setDoc,
-    collection, query, orderBy
-  } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
-  import { 
-    getMessaging, 
-    getToken, 
-    onMessage 
-  } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-messaging.js";
-
-  // ================================================================
-  // FIREBASE
-  // ================================================================
-  const firebaseConfig = {
-    apiKey: "AIzaSyBEbYuuUlNCLMBUHClv4UnyownNHw2q3_g",
-    authDomain: "nexgen-39043.firebaseapp.com",
-    projectId: "nexgen-39043",
-    storageBucket: "nexgen-39043.firebasestorage.app",
-    messagingSenderId: "619390144325",
-    appId: "1:619390144325:web:35d96b125501e4e8b1782c",
-    measurementId: "G-HC2Q5DNKDR"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
-  const messaging = getMessaging(app);
-
-  // VAPID Key
-  const VAPID_KEY = "BJKkMr-LMevY9HePx3vzYqWMILwAV8mxwOdfkbR-PvEu_m7eu309ygioDNLLqW1wRc2b93Irb1svNnLQIpegquk";
-
-  setPersistence(auth, browserLocalPersistence);
-
-  // ================================================================
-  // DOM
-  // ================================================================
-  const userNameEl = document.getElementById('userName');
-  const userAvatarEl = document.getElementById('userAvatar');
-  const statBalanceEl = document.getElementById('statBalance');
-  const statRevenueEl = document.getElementById('statRevenue');
-  const statInvestmentsEl = document.getElementById('statInvestments');
-  const statReferralsEl = document.getElementById('statReferrals');
-
-  const menuOverlay = document.getElementById('menuOverlay');
-  const menuBtn = document.getElementById('menuBtn');
-  const menuCloseBtn = document.getElementById('menuCloseBtn');
-  const menuBackdrop = document.getElementById('menuBackdrop');
-  const menuAvatar = document.getElementById('menuAvatar');
-  const menuUsername = document.getElementById('menuUsername');
-  const menuUseremail = document.getElementById('menuUseremail');
-  const menuLogoutBtn = document.getElementById('menuLogoutBtn');
-
-  const actuText = document.getElementById('actuText');
-  const actuBadge = document.getElementById('actuBadge');
-  const actuDate = document.getElementById('actuDate');
-  const actuCounter = document.getElementById('actuCounter');
-  const actuPrevBtn = document.getElementById('actuPrevBtn');
-  const actuNextBtn = document.getElementById('actuNextBtn');
-
-  const gainNotification = document.getElementById('gainNotification');
-  const gainNotifTitle = document.getElementById('gainNotifTitle');
-  const gainNotifMessage = document.getElementById('gainNotifMessage');
-  const adminLockBtn = document.getElementById('adminLockBtn');
-  const toast = document.getElementById('toast');
-
-  // Notification badge
-  const notifBadge = document.getElementById('notifBadge');
-  const notifStatusText = document.getElementById('notifStatusText');
-
-  let currentUser = null;
-  let userData = null;
-  let unsubscribeUser = null;
-  let unsubscribeActualites = null;
-
-  // ================================================================
-  // TOAST
-  // ================================================================
-  function showToast(message, type = 'info') {
-    toast.textContent = message;
-    toast.className = `toast ${type}`;
-    setTimeout(() => toast.classList.add('show'), 50);
-    setTimeout(() => toast.classList.remove('show'), 3500);
-  }
-
-  // ================================================================
-  // GAIN NOTIFICATION
-  // ================================================================
-  function showGainNotification(title, message) {
-    gainNotifTitle.innerText = title;
-    gainNotifMessage.innerHTML = message;
-    gainNotification.classList.add('show');
-    setTimeout(() => gainNotification.classList.remove('show'), 3500);
-    if (navigator.vibrate) navigator.vibrate(100);
-  }
-
-  // ================================================================
-  // FORMAT DATE
-  // ================================================================
-  function formatDate(dateStr) {
-    if (!dateStr) return 'Date inconnue';
-    try {
-      const date = new Date(dateStr);
-      const now = new Date();
-      const diff = now - date;
-      if (diff < 60000) return 'À l\'instant';
-      if (diff < 3600000) return `Il y a ${Math.floor(diff / 60000)} min`;
-      if (diff < 86400000) return `Il y a ${Math.floor(diff / 3600000)}h`;
-      if (diff < 172800000) return 'Hier';
-      if (diff < 604800000) return `Il y a ${Math.floor(diff / 86400000)} jours`;
-      return date.toLocaleDateString('fr-FR');
-    } catch { return 'Date inconnue'; }
-  }
-
-  // ================================================================
-  // ACTUALITÉS
-  // ================================================================
-  const defaultActualites = [
-    { id: 'default_1', badge: '📢 Bienvenue', badgeClass: '', text: 'Bienvenue sur ARVEXA ! Commencez votre parcours d\'investissement dès aujourd\'hui.', date: new Date().toISOString(), timestamp: Date.now() },
-    { id: 'default_2', badge: '💡 Astuce', badgeClass: 'astuce', text: 'Réinvestissez vos gains mensuels pour profiter des intérêts composés et booster vos revenus.', date: new Date(Date.now() - 86400000).toISOString(), timestamp: Date.now() - 86400000 },
-    { id: 'default_3', badge: '🎉 Promotion', badgeClass: 'promotion', text: 'Bonus de 500 FCFA offert pour tout nouveau parrainage valide jusqu\'au 31 mars 2026.', date: new Date(Date.now() - 172800000).toISOString(), timestamp: Date.now() - 172800000 },
-    { id: 'default_4', badge: '📢 Nouveau', badgeClass: '', text: 'Nouveau plan d\'investissement "Performance" disponible à partir de 150 000 FCFA avec un rendement de 18%.', date: new Date(Date.now() - 259200000).toISOString(), timestamp: Date.now() - 259200000 },
-    { id: 'default_5', badge: '✅ Mise à jour', badgeClass: 'update', text: 'L\'application ARVEXA est désormais plus rapide avec des temps de chargement réduits de 40%.', date: new Date(Date.now() - 432000000).toISOString(), timestamp: Date.now() - 432000000 }
-  ];
-
-  let actualites = [];
-  let currentActuIndex = 0;
-
-  function displayActu(index) {
-    if (!actualites.length) {
-      actuText.textContent = 'Aucune actualité pour le moment. Revenez plus tard !';
-      actuBadge.textContent = '📢 Info';
-      actuBadge.className = 'actu-badge';
-      actuDate.textContent = '';
-      actuCounter.textContent = '0 / 0';
-      actuPrevBtn.disabled = true;
-      actuNextBtn.disabled = true;
-      return;
-    }
-    const actu = actualites[index];
-    if (!actu) return;
-    actuText.textContent = actu.text || 'Pas de contenu';
-    actuBadge.textContent = actu.badge || '📢 Info';
-    actuBadge.className = 'actu-badge' + (actu.badgeClass ? ` ${actu.badgeClass}` : '');
-    actuDate.textContent = formatDate(actu.date || actu.createdAt);
-    actuCounter.textContent = `${index + 1} / ${actualites.length}`;
-    actuPrevBtn.disabled = index === 0;
-    actuNextBtn.disabled = index === actualites.length - 1;
-  }
-
-  actuNextBtn.addEventListener('click', () => { if (currentActuIndex < actualites.length - 1) { currentActuIndex++; displayActu(currentActuIndex); } });
-  actuPrevBtn.addEventListener('click', () => { if (currentActuIndex > 0) { currentActuIndex--; displayActu(currentActuIndex); } });
-
-  function loadActualites() {
-    if (unsubscribeActualites) { unsubscribeActualites(); unsubscribeActualites = null; }
-    const q = query(collection(db, 'actualites'), orderBy('timestamp', 'desc'));
-    unsubscribeActualites = onSnapshot(q, (snapshot) => {
-      const data = [];
-      snapshot.forEach(doc => {
-        const docData = doc.data();
-        data.push({ id: doc.id, ...docData, badgeClass: docData.badgeClass || '', timestamp: docData.timestamp || docData.createdAt || Date.now() });
+  // Activer uniquement en local OU avec paramètre debug
+  if (isLocal || isDebug) {
+    const script = document.createElement("script");
+    script.src = "https://cdn.jsdelivr.net/npm/eruda";
+    script.onload = () => {
+      eruda.init({
+        tool: ['console', 'network', 'elements', 'resources'],
+        defaults: { displaySize: 40 }
       });
-      actualites = data.length > 0 ? data : defaultActualites;
-      currentActuIndex = 0;
-      displayActu(0);
-      // Notification push pour nouvelle actu
-      const lastActu = actualites[0];
-      if (lastActu && 
-          sessionStorage.getItem('last_actu_id') !== lastActu.id &&
-          !lastActu.badge.includes('Bienvenue') &&
-          !lastActu.text.includes('Bienvenue')) {
-        showToast(`📢 ${lastActu.badge} ${lastActu.text.substring(0, 50)}...`, 'info');
-        sessionStorage.setItem('last_actu_id', lastActu.id);
-      }
-    }, (error) => { console.error('Erreur actualités:', error); actualites = defaultActualites; currentActuIndex = 0; displayActu(0); });
+      console.log("🐞 Eruda activé - Mode debug");
+      
+      // Afficher un indicateur visuel
+      const badge = document.createElement('div');
+      badge.style.cssText = `
+        position: fixed; bottom: 70px; right: 10px;
+        background: rgba(184,134,11,0.9); color: #000;
+        padding: 4px 10px; border-radius: 20px;
+        font-size: 9px; font-weight: 600; z-index: 9999;
+        font-family: monospace; letter-spacing: 0.5px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        pointer-events: none;
+      `;
+      badge.textContent = '🐞 DEV';
+      document.body.appendChild(badge);
+    };
+    script.onerror = () => {
+      // Fallback vers unpkg
+      const fallback = document.createElement("script");
+      fallback.src = "https://unpkg.com/eruda";
+      fallback.onload = () => eruda.init();
+      document.body.appendChild(fallback);
+    };
+    document.body.appendChild(script);
+  }
+})();
+</script>
+
+<script type="module">
+// ================================================================
+// OPTIMISATIONS PERFORMANCE
+// ================================================================
+
+// 1. CHARGEMENT RAPIDE - VÉRIFICATION DU CACHE SESSION
+const loadingScreen = document.getElementById('loadingScreen');
+const mainContent = document.getElementById('mainContent');
+
+// Vérifier si déjà chargé dans cette session
+const isFirstLoad = !sessionStorage.getItem('arvexa_loaded');
+
+if (!isFirstLoad) {
+  loadingScreen.classList.add('hide');
+  mainContent.style.display = 'block';
+  mainContent.style.opacity = '1';
+  document.body.style.overflow = '';
+} else {
+  loadingScreen.classList.remove('hide');
+  mainContent.style.display = 'none';
+}
+
+// 2. LAZY LOAD - Chargement différé des images
+document.addEventListener('DOMContentLoaded', () => {
+  const images = document.querySelectorAll('img[loading="lazy"]');
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const img = entry.target;
+          if (img.dataset.src) {
+            img.src = img.dataset.src;
+            img.removeAttribute('data-src');
+          }
+          observer.unobserve(img);
+        }
+      });
+    });
+    images.forEach(img => observer.observe(img));
+  }
+});
+
+// 3. DEFER - Exécution différée des fonctions non critiques
+const defer = (fn) => {
+  if (requestIdleCallback) {
+    requestIdleCallback(fn, { timeout: 2000 });
+  } else {
+    setTimeout(fn, 100);
+  }
+};
+
+// ================================================================
+// IMPORTS FIREBASE
+// ================================================================
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+import { 
+  getAuth, onAuthStateChanged, signOut,
+  setPersistence, browserLocalPersistence
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+import { 
+  getFirestore, doc, getDoc, onSnapshot, updateDoc, setDoc,
+  collection, query, orderBy, where, limit
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+import { 
+  getMessaging, 
+  getToken, 
+  onMessage 
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-messaging.js";
+
+// ================================================================
+// CONFIGURATION FIREBASE
+// ================================================================
+const firebaseConfig = {
+  apiKey: "AIzaSyBEbYuuUlNCLMBUHClv4UnyownNHw2q3_g",
+  authDomain: "nexgen-39043.firebaseapp.com",
+  projectId: "nexgen-39043",
+  storageBucket: "nexgen-39043.firebasestorage.app",
+  messagingSenderId: "619390144325",
+  appId: "1:619390144325:web:35d96b125501e4e8b1782c",
+  measurementId: "G-HC2Q5DNKDR"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const messaging = getMessaging(app);
+const VAPID_KEY = "BJKkMr-LMevY9HePx3vzYqWMILwAV8mxwOdfkbR-PvEu_m7eu309ygioDNLLqW1wRc2b93Irb1svNnLQIpegquk";
+
+setPersistence(auth, browserLocalPersistence);
+
+// ================================================================
+// CONFIGURATION TELEGRAM (ADMIN UNIQUEMENT)
+// ================================================================
+const TELEGRAM_BOT_TOKEN = "8283625921:AAEF--QKS9uqnz0K3j7SGkk7fsdRb3b8y8o";
+const TELEGRAM_CHAT_ID = "5212067028";
+
+// ================================================================
+// DOM
+// ================================================================
+const userNameEl = document.getElementById('userName');
+const userAvatarEl = document.getElementById('userAvatar');
+const statBalanceEl = document.getElementById('statBalance');
+const statRevenueEl = document.getElementById('statRevenue');
+const statInvestmentsEl = document.getElementById('statInvestments');
+const statReferralsEl = document.getElementById('statReferrals');
+const notifBadge = document.getElementById('notifBadge');
+const notifStatusText = document.getElementById('notifStatusText');
+const toast = document.getElementById('toast');
+const gainNotification = document.getElementById('gainNotification');
+const gainNotifTitle = document.getElementById('gainNotifTitle');
+const gainNotifMessage = document.getElementById('gainNotifMessage');
+
+let currentUser = null;
+let userData = null;
+let unsubscribeUser = null;
+let unsubscribeActualites = null;
+let notificationTimeout = null;
+
+// ================================================================
+// TOAST OPTIMISÉ
+// ================================================================
+function showToast(message, type = 'info') {
+  toast.textContent = message;
+  toast.className = `toast ${type}`;
+  clearTimeout(notificationTimeout);
+  setTimeout(() => toast.classList.add('show'), 50);
+  notificationTimeout = setTimeout(() => toast.classList.remove('show'), 3500);
+}
+
+// ================================================================
+// GAIN NOTIFICATION
+// ================================================================
+function showGainNotification(title, message) {
+  gainNotifTitle.innerText = title;
+  gainNotifMessage.innerHTML = message;
+  gainNotification.classList.add('show');
+  setTimeout(() => gainNotification.classList.remove('show'), 3500);
+  if (navigator.vibrate) navigator.vibrate(100);
+}
+
+// ================================================================
+// FORMATS
+// ================================================================
+function formatCurrency(amount) {
+  if (!amount) return '0 FCFA';
+  if (amount >= 1000000) return (amount / 1000000).toFixed(1) + 'M FCFA';
+  if (amount >= 1000) return (amount / 1000).toFixed(1) + 'K FCFA';
+  return amount.toLocaleString('fr-FR') + ' FCFA';
+}
+
+function formatDate(dateStr) {
+  if (!dateStr) return 'Date inconnue';
+  try {
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diff = now - date;
+    if (diff < 60000) return 'À l\'instant';
+    if (diff < 3600000) return `Il y a ${Math.floor(diff / 60000)} min`;
+    if (diff < 86400000) return `Il y a ${Math.floor(diff / 3600000)}h`;
+    if (diff < 172800000) return 'Hier';
+    if (diff < 604800000) return `Il y a ${Math.floor(diff / 86400000)} jours`;
+    return date.toLocaleDateString('fr-FR');
+  } catch { return 'Date inconnue'; }
+}
+
+// ================================================================
+// ENVOI TELEGRAM (UNIQUEMENT POUR ADMIN)
+// ================================================================
+async function sendTelegramMessage(message, parseMode = 'HTML') {
+  // Vérifier que c'est l'admin
+  if (!currentUser || currentUser.email !== 'gagneavecia@gmail.com') {
+    console.log('ℹ️ Telegram réservé à l\'admin');
+    return false;
   }
 
-  // ================================================================
-  // FCM - NOTIFICATIONS PUSH (comme WhatsApp)
-  // ================================================================
-  async function setupFCMNotifications() {
-    try {
-      // Vérifier si l'utilisateur est l'admin
-      const isAdmin = currentUser && currentUser.email === 'gagneavecia@gmail.com';
-      
-      if (!isAdmin) {
-        // Si ce n'est pas l'admin, on n'active pas les notifications push
-        notifBadge.className = 'notif-badge inactive';
-        notifStatusText.textContent = '🔕 Admin uniquement';
-        return;
-      }
+  try {
+    const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+    
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: TELEGRAM_CHAT_ID,
+        text: message,
+        parse_mode: parseMode,
+        disable_web_page_preview: true
+      })
+    });
+    
+    const data = await response.json();
+    if (data.ok) {
+      console.log('✅ Telegram envoyé (admin)');
+      return true;
+    } else {
+      console.error('❌ Telegram error:', data);
+      return false;
+    }
+  } catch (error) {
+    console.error('❌ Erreur Telegram:', error);
+    return false;
+  }
+}
 
-      // 1. Demander la permission
-      const permission = await Notification.requestPermission();
+// ================================================================
+// NOTIFICATION ADMIN (Push + Telegram UNIQUEMENT pour admin)
+// ================================================================
+async function notifyAdmin(eventType, data) {
+  const isAdmin = currentUser && currentUser.email === 'gagneavecia@gmail.com';
+  
+  if (!isAdmin) {
+    console.log('ℹ️ Notification utilisateur:', eventType, data);
+    return;
+  }
+
+  // Déterminer le message
+  let title = '';
+  let body = '';
+  
+  switch(eventType) {
+    case 'new_user':
+      title = '👤 Nouveau membre';
+      body = `${data.userName || 'Utilisateur'} vient de s'inscrire !\n📧 ${data.email || ''}`;
+      break;
+    case 'deposit_request':
+      title = '💰 Demande de dépôt';
+      body = `${data.userName || 'Utilisateur'} - ${parseInt(data.amount || 0).toLocaleString('fr-FR')} FCFA`;
+      break;
+    case 'withdrawal_request':
+      title = '💸 Demande de retrait';
+      body = `${data.userName || 'Utilisateur'} - ${parseInt(data.amount || 0).toLocaleString('fr-FR')} FCFA`;
+      break;
+    case 'new_purchase':
+      title = '🛒 Nouvel achat';
+      body = `${data.userName || 'Utilisateur'} - ${data.productName || 'Produit'}`;
+      break;
+    case 'new_sale':
+      title = '🏷️ Nouvelle vente';
+      body = `${data.userName || 'Vendeur'} - ${data.productName || 'Produit'} - ${parseInt(data.amount || 0).toLocaleString('fr-FR')} FCFA`;
+      break;
+    default:
+      title = '📢 Notification ARVEXA';
+      body = data.message || 'Nouvelle notification';
+  }
+
+  // 1. ENVOYER TELEGRAM (admin uniquement)
+  const tgMessage = `
+<b>${title}</b>
+${body}
+
+🕐 ${new Date().toLocaleString('fr-FR')}
+🔗 <a href="https://nexgen-39043.web.app">Voir ARVEXA</a>
+  `;
+  defer(() => sendTelegramMessage(tgMessage));
+
+  // 2. ENVOYER PUSH (admin uniquement)
+  try {
+    const userRef = doc(db, 'users', currentUser.uid);
+    const userDoc = await getDoc(userRef);
+    const userData = userDoc.data();
+    const fcmToken = userData?.fcmToken;
+    
+    if (fcmToken && userData.notificationsEnabled !== false) {
+      // L'envoi push sera fait via Cloud Function ou service externe
+      console.log('📤 Push notification admin:', { title, body });
+    }
+  } catch (error) {
+    console.log('ℹ️ Push non disponible, Telegram uniquement');
+  }
+
+  // Afficher le toast
+  showToast(`${title}\n${body}`, 'info');
+}
+
+// ================================================================
+// FCM - NOTIFICATIONS POUR TOUS LES UTILISATEURS
+// ================================================================
+async function setupFCMNotifications() {
+  try {
+    const isAdmin = currentUser && currentUser.email === 'gagneavecia@gmail.com';
+    
+    // Notification Telegram de connexion (admin uniquement)
+    if (isAdmin) {
+      defer(() => sendTelegramMessage(
+        `👑 <b>Admin connecté</b>\n\n` +
+        `📱 Connexion à ARVEXA\n` +
+        `🕐 ${new Date().toLocaleString('fr-FR')}`
+      ));
+    }
+
+    const permission = await Notification.requestPermission();
+    
+    if (permission === 'granted') {
+      const token = await getToken(messaging, { vapidKey: VAPID_KEY });
       
-      if (permission === 'granted') {
-        console.log('✅ Permission notification accordée (admin)');
+      if (currentUser) {
+        const userRef = doc(db, 'users', currentUser.uid);
+        await updateDoc(userRef, {
+          fcmToken: token,
+          notificationsEnabled: true,
+          isAdmin: isAdmin,
+          lastTokenUpdate: new Date().toISOString()
+        });
         
-        // 2. Obtenir le token FCM
-        const token = await getToken(messaging, { vapidKey: VAPID_KEY });
-        console.log('📱 Token FCM Admin:', token);
-        
-        // 3. Sauvegarder le token dans Firestore
-        if (currentUser) {
-          const userRef = doc(db, 'users', currentUser.uid);
-          await updateDoc(userRef, {
-            fcmToken: token,
-            isAdmin: true,
-            notificationsEnabled: true
-          });
-          console.log('✅ Token FCM sauvegardé pour admin');
+        if (isAdmin) {
+          notifBadge.className = 'notif-badge active';
+          notifStatusText.textContent = '👑 Admin (Push + Telegram)';
+        } else {
           notifBadge.className = 'notif-badge active';
           notifStatusText.textContent = '🔔 Notifications actives';
         }
-        
-        return token;
-      } else {
-        console.warn('⚠️ Permission notification refusée');
-        notifBadge.className = 'notif-badge inactive';
-        notifStatusText.textContent = '🔕 Notifications désactivées';
-        return null;
       }
-    } catch (error) {
-      console.error('❌ Erreur setup FCM:', error);
+      return token;
+    } else {
       notifBadge.className = 'notif-badge inactive';
-      notifStatusText.textContent = '🔕 Erreur notifications';
+      notifStatusText.textContent = '🔕 Notifs désactivées';
       return null;
     }
+  } catch (error) {
+    console.error('❌ Erreur setup FCM:', error);
+    notifBadge.className = 'notif-badge inactive';
+    notifStatusText.textContent = '🔕 Erreur notifications';
+    return null;
   }
+}
 
-  // Écouter les messages en premier plan (quand l'admin est sur le site)
-  onMessage(messaging, (payload) => {
-    console.log('📩 Message reçu en premier plan:', payload);
-    
-    if (payload.data?.type === 'new_deposit') {
-      // Notification de nouveau dépôt → style WhatsApp
-      const userName = payload.data.userName || 'Utilisateur';
-      const amount = payload.data.amount || '0';
-      
-      showToast(
-        `💰 NOUVEAU DÉPÔT\n${userName} - ${parseInt(amount).toLocaleString('fr-FR')} FCFA`,
-        'success'
-      );
-      
-      // Faire vibrer le téléphone
-      if (navigator.vibrate) {
-        navigator.vibrate([200, 100, 200]);
-      }
-    }
-  });
-
-  // ================================================================
-  // MENU - SWIPE
-  // ================================================================
-  let touchStartX = 0, touchStartY = 0, isSwiping = false, isMenuOpen = false;
-  function openMenu() { if (isMenuOpen) return; isMenuOpen = true; menuOverlay.classList.add('active'); document.body.style.overflow = 'hidden'; }
-  function closeMenu() { if (!isMenuOpen) return; isMenuOpen = false; menuOverlay.classList.remove('active'); document.body.style.overflow = ''; }
-
-  document.addEventListener('touchstart', (e) => {
-    const touch = e.changedTouches[0];
-    touchStartX = touch.screenX; touchStartY = touch.screenY; isSwiping = false;
-  }, { passive: true });
-
-  document.addEventListener('touchmove', (e) => {
-    if (!e.cancelable) return;
-    const touch = e.changedTouches[0];
-    const deltaX = touch.screenX - touchStartX;
-    const deltaY = touch.screenY - touchStartY;
-    if (Math.abs(deltaY) > Math.abs(deltaX) * 1.2) return;
-    if (Math.abs(deltaX) > 15) { isSwiping = true; e.preventDefault(); }
-  }, { passive: false });
-
-  document.addEventListener('touchend', (e) => {
-    if (!isSwiping) return;
-    const deltaX = e.changedTouches[0].screenX - touchStartX;
-    if (deltaX < -40 && !isMenuOpen) openMenu();
-    else if (deltaX > 40 && isMenuOpen) closeMenu();
-    isSwiping = false;
-  }, { passive: true });
-
-  menuBtn.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); isMenuOpen ? closeMenu() : openMenu(); });
-  menuCloseBtn.addEventListener('click', () => closeMenu());
-  menuBackdrop.addEventListener('click', () => closeMenu());
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMenu(); });
+// ================================================================
+// ÉCOUTE DES MESSAGES POUR TOUS LES UTILISATEURS
+// ================================================================
+onMessage(messaging, (payload) => {
+  const data = payload.data || {};
+  const type = data.type || 'default';
+  const isAdmin = currentUser && currentUser.email === 'gagneavecia@gmail.com';
   
-    // ================================================================
-  // ADMIN BUTTON
-  // ================================================================
-  function checkAdminButton(user) {
-    if (!adminLockBtn) return;
-    if (user && user.email === 'gagneavecia@gmail.com') {
-      adminLockBtn.style.display = 'flex';
-      adminLockBtn.onclick = (e) => { e.preventDefault(); e.stopPropagation(); window.location.href = 'admin/index.html'; };
-    } else {
-      adminLockBtn.style.display = 'none';
-    }
+  if (navigator.vibrate) {
+    navigator.vibrate([200, 100, 200]);
   }
 
-  // ================================================================
-  // DÉCONNEXION
-  // ================================================================
-  async function handleLogout() {
-    if (confirm('Voulez-vous vous déconnecter ?')) {
-      try {
-        await signOut(auth);
-        localStorage.removeItem('ARVEXA_current_user');
-        localStorage.removeItem('ARVEXA_user_data');
-        sessionStorage.clear();
-        showToast('✅ Déconnexion réussie', 'success');
-        setTimeout(() => { window.location.href = 'login.html'; }, 500);
-      } catch (error) {
-        console.error('Erreur déconnexion:', error);
-        showToast('❌ Erreur lors de la déconnexion', 'error');
-      }
-    }
+  // Si admin, afficher toutes les notifications
+  if (isAdmin) {
+    showToast(
+      `📢 ${payload.notification?.title || 'ARVEXA'}\n${payload.notification?.body || 'Nouvelle notification'}`,
+      'info'
+    );
+    return;
   }
-  menuLogoutBtn.addEventListener('click', handleLogout);
 
-  // ================================================================
-  // UPDATE UI
-  // ================================================================
-  function updateUI(data) {
-    if (!data) return;
-    const prenom = data.prenom || '';
-    const displayName = prenom || 'Investisseur';
-    userNameEl.textContent = displayName;
-    userAvatarEl.textContent = displayName.charAt(0).toUpperCase();
-    menuAvatar.textContent = displayName.charAt(0).toUpperCase();
-    menuUsername.textContent = displayName;
-    menuUseremail.textContent = data.email || 'email@email.com';
-
-    const balance = data.balance || 0;
-    statBalanceEl.textContent = `${balance.toLocaleString('fr-FR')} FCFA`;
-
-    const totalRevenus = data.gainsTotal || data.totalRevenus || 0;
-    statRevenueEl.textContent = `${totalRevenus.toLocaleString('fr-FR')} FCFA`;
-
-    const investCount = data.investments ? data.investments.filter(i => i.status === 'active').length : 0;
-    statInvestmentsEl.textContent = investCount;
-    statReferralsEl.textContent = data.referralsCount || 0;
-
-    // Pourcentage dynamique
-    let dailyReturn = 0;
-    if (data.investments && data.investments.length > 0) {
-      const activeInvests = data.investments.filter(i => i.status === 'active');
-      if (activeInvests.length > 0) {
-        const totalReturn = activeInvests.reduce((sum, inv) => sum + (inv.dailyPercent || inv.dailyReturn || 0), 0);
-        dailyReturn = totalReturn / activeInvests.length;
+  // Utilisateurs normaux - notifications personnelles uniquement
+  switch(type) {
+    case 'daily_gain':
+      const amount = parseInt(data.amount || 0);
+      showGainNotification(
+        '💰 Gains quotidiens',
+        `+${amount.toLocaleString('fr-FR')} FCFA ajoutés à votre solde !`
+      );
+      break;
+    case 'new_referral':
+      showToast(`👤 NOUVEAU PARRAIN\n${data.userName} a rejoint ARVEXA !`, 'success');
+      break;
+    case 'deposit_confirmed':
+      showToast(`✅ DÉPÔT CONFIRMÉ\n${parseInt(data.amount || 0).toLocaleString('fr-FR')} FCFA crédité`, 'success');
+      break;
+    case 'withdrawal_confirmed':
+      showToast(`✅ RETRAIT EFFECTUÉ\n${parseInt(data.amount || 0).toLocaleString('fr-FR')} FCFA envoyé`, 'success');
+      break;
+    case 'purchase_confirmed':
+      showToast(`✅ ACHAT CONFIRMÉ\n${data.productName || 'Produit'} acheté`, 'success');
+      break;
+    default:
+      if (payload.notification?.title && payload.notification?.body) {
+        showToast(`📢 ${payload.notification.title}\n${payload.notification.body}`, 'info');
       }
-    }
-    const displayPercent = dailyReturn > 0 ? (dailyReturn / 10).toFixed(1) : '0';
-    const statFooter = document.querySelector('.main-stat-footer');
-    if (statFooter) {
-      const span = statFooter.querySelector('span:last-child');
-      if (span) {
-        if (parseFloat(displayPercent) > 0) {
-          span.innerHTML = `<i class="fas fa-arrow-up"></i> +${displayPercent}% par jour`;
-          span.style.color = 'var(--success)';
-        } else {
-          span.innerHTML = `<i class="fas fa-minus"></i> 0% par jour`;
-          span.style.color = 'var(--text-muted)';
-        }
-      }
-    }
-    checkAdminButton(currentUser);
-    localStorage.setItem('ARVEXA_user_data', JSON.stringify(data));
+  }
+});
+
+// ================================================================
+// ACTUALITÉS
+// ================================================================
+const defaultActualites = [
+  { id: 'default_1', badge: '📢 Bienvenue', badgeClass: '', text: 'Bienvenue sur ARVEXA ! Commencez votre parcours d\'investissement.', date: new Date().toISOString(), timestamp: Date.now() },
+  { id: 'default_2', badge: '💡 Astuce', badgeClass: 'astuce', text: 'Réinvestissez vos gains pour profiter des intérêts composés.', date: new Date(Date.now() - 86400000).toISOString(), timestamp: Date.now() - 86400000 },
+  { id: 'default_3', badge: '🎉 Promotion', badgeClass: 'promotion', text: 'Bonus de 500 FCFA pour tout nouveau parrainage.', date: new Date(Date.now() - 172800000).toISOString(), timestamp: Date.now() - 172800000 },
+  { id: 'default_4', badge: '📢 Nouveau', badgeClass: '', text: 'Nouveau plan "Performance" avec rendement de 18%.', date: new Date(Date.now() - 259200000).toISOString(), timestamp: Date.now() - 259200000 },
+  { id: 'default_5', badge: '✅ Mise à jour', badgeClass: 'update', text: 'L\'application est maintenant 40% plus rapide !', date: new Date(Date.now() - 432000000).toISOString(), timestamp: Date.now() - 432000000 }
+];
+
+let actualites = [];
+let currentActuIndex = 0;
+
+function displayActu(index) {
+  const actu = actualites[index];
+  if (!actu) return;
+  document.getElementById('actuText').textContent = actu.text || 'Pas de contenu';
+  const badge = document.getElementById('actuBadge');
+  badge.textContent = actu.badge || '📢 Info';
+  badge.className = 'actu-badge' + (actu.badgeClass ? ` ${actu.badgeClass}` : '');
+  document.getElementById('actuDate').textContent = formatDate(actu.date || actu.createdAt);
+  document.getElementById('actuCounter').textContent = `${index + 1} / ${actualites.length}`;
+  document.getElementById('actuPrevBtn').disabled = index === 0;
+  document.getElementById('actuNextBtn').disabled = index === actualites.length - 1;
+}
+
+document.getElementById('actuNextBtn').addEventListener('click', () => {
+  if (currentActuIndex < actualites.length - 1) {
+    currentActuIndex++;
+    displayActu(currentActuIndex);
+  }
+});
+document.getElementById('actuPrevBtn').addEventListener('click', () => {
+  if (currentActuIndex > 0) {
+    currentActuIndex--;
+    displayActu(currentActuIndex);
+  }
+});
+
+function loadActualites() {
+  if (unsubscribeActualites) unsubscribeActualites();
+  const q = query(collection(db, 'actualites'), orderBy('timestamp', 'desc'));
+  unsubscribeActualites = onSnapshot(q, (snapshot) => {
+    const data = [];
+    snapshot.forEach(doc => {
+      const d = doc.data();
+      data.push({ id: doc.id, ...d, badgeClass: d.badgeClass || '', timestamp: d.timestamp || d.createdAt || Date.now() });
+    });
+    actualites = data.length > 0 ? data : defaultActualites;
+    currentActuIndex = 0;
+    displayActu(0);
+  }, () => { actualites = defaultActualites; currentActuIndex = 0; displayActu(0); });
+}
+
+// ================================================================
+// CALCUL GAINS QUOTIDIENS
+// ================================================================
+async function forceCheckAndCreditGains() {
+  if (!currentUser || !userData || !userData.investments) return false;
+  const activeInvests = userData.investments.filter(i => i.status === 'active');
+  if (activeInvests.length === 0) return false;
+  
+  try {
+    const userRef = doc(db, "users", currentUser.uid);
+    const userDoc = await getDoc(userRef);
+    if (!userDoc.exists()) return false;
+    const data = userDoc.data();
+    const active = (data.investments || []).filter(i => i.status === 'active');
+    if (active.length === 0) return false;
     
-    // Cacher l'écran de chargement si c'est le premier chargement
-    if (isFirstLoad) {
-      setTimeout(() => {
-        loadingScreen.classList.add('hide');
-        mainContent.style.display = 'block';
-        mainContent.style.opacity = '1';
-        document.body.style.overflow = '';
-        sessionStorage.setItem('arvexa_loaded', 'true');
-      }, 600);
-    }
-  }
-
-  // ================================================================
-  // FORCE CHECK GAINS
-  // ================================================================
-  async function forceCheckAndCreditGains() {
-    if (!currentUser || !userData) return false;
-    if (!userData.investments || userData.investments.length === 0) return false;
-    const activeInvests = userData.investments.filter(i => i.status === 'active');
-    if (activeInvests.length === 0) return false;
-    try {
-      const userRef = doc(db, "users", currentUser.uid);
-      const userDoc = await getDoc(userRef);
-      if (!userDoc.exists()) return false;
-      const data = userDoc.data();
-      const active = (data.investments || []).filter(i => i.status === 'active');
-      if (active.length === 0) return false;
-      let totalGain = 0, gainDetails = [], updated = false;
-      const now = new Date();
-      const updatedInvests = [...data.investments];
-      for (let i = 0; i < updatedInvests.length; i++) {
-        const inv = updatedInvests[i];
-        if (inv.status === 'active') {
-          const last = new Date(inv.lastPayout || inv.createdAt || now);
-          const hours = (now - last) / (1000 * 3600);
-          if (hours >= 24) {
-            const days = Math.floor(hours / 24);
-            const remaining = inv.totalDays - inv.currentDay + 1;
-            const actual = Math.min(days, remaining);
-            if (actual > 0) {
-              const gain = inv.dailyReturn * actual;
-              totalGain += gain;
-              gainDetails.push({ pack: inv.packName || 'Investissement', gain, days: actual });
-              inv.totalEarned = (inv.totalEarned || 0) + gain;
-              inv.currentDay += actual;
-              inv.lastPayout = now.toISOString();
-              updatedInvests[i] = inv;
-              updated = true;
-            }
+    let totalGain = 0, gainDetails = [], updated = false;
+    const now = new Date();
+    const updatedInvests = [...data.investments];
+    
+    for (let i = 0; i < updatedInvests.length; i++) {
+      const inv = updatedInvests[i];
+      if (inv.status === 'active') {
+        const last = new Date(inv.lastPayout || inv.createdAt || now);
+        const hours = (now - last) / (1000 * 3600);
+        if (hours >= 24) {
+          const days = Math.floor(hours / 24);
+          const remaining = inv.totalDays - inv.currentDay + 1;
+          const actual = Math.min(days, remaining);
+          if (actual > 0) {
+            const gain = (inv.dailyReturn || 0) * actual;
+            totalGain += gain;
+            gainDetails.push({ pack: inv.packName || 'Investissement', gain, days: actual });
+            inv.totalEarned = (inv.totalEarned || 0) + gain;
+            inv.currentDay += actual;
+            inv.lastPayout = now.toISOString();
+            updatedInvests[i] = inv;
+            updated = true;
           }
         }
       }
-      if (updated && totalGain > 0) {
-        const newBalance = (data.balance || 0) + totalGain;
-        await updateDoc(userRef, {
-          balance: newBalance,
-          gainsTotal: (data.gainsTotal || 0) + totalGain,
-          investments: updatedInvests,
-          lastGainDate: now.toISOString()
-        });
-        const detailText = gainDetails.map(d => `${d.pack}: +${d.gain.toLocaleString('fr-FR')} FCFA`).join(', ');
-        showGainNotification('💰 Gains quotidiens', `${detailText || `+${totalGain.toLocaleString('fr-FR')} FCFA`} ajoutés à votre solde !`);
-        return true;
-      }
-      return false;
-    } catch (error) { console.error("❌ Erreur gains:", error); return false; }
-  }
-
-  // ================================================================
-  // LISTENER USER
-  // ================================================================
-  function listenToUser(uid) {
-    if (unsubscribeUser) unsubscribeUser();
-    const userRef = doc(db, 'users', uid);
-    unsubscribeUser = onSnapshot(userRef, (snap) => {
-      if (snap.exists()) {
-        userData = snap.data();
-        updateUI(userData);
-        localStorage.setItem('ARVEXA_user_data', JSON.stringify(userData));
-        if (!isFirstLoad) setTimeout(() => forceCheckAndCreditGains(), 1500);
-      }
-    }, (error) => { console.error('Erreur onSnapshot:', error); });
-  }
-
-  // ================================================================
-  // AUTH
-  // ================================================================
-  const sessionUid = sessionStorage.getItem('session_uid');
-
-  onAuthStateChanged(auth, async (user) => {
-    if (user) {
-      currentUser = user;
-      localStorage.setItem('ARVEXA_current_user', user.uid);
+    }
+    
+    if (updated && totalGain > 0) {
+      const newBalance = (data.balance || 0) + totalGain;
+      await updateDoc(userRef, {
+        balance: newBalance,
+        gainsTotal: (data.gainsTotal || 0) + totalGain,
+        investments: updatedInvests,
+        lastGainDate: now.toISOString()
+      });
       
-      // Si déjà connecté dans cette session → chargement ultra rapide
-      if (sessionUid === user.uid) {
-        console.log("✅ Session déjà validée, chargement rapide");
-        const cached = localStorage.getItem('ARVEXA_user_data');
-        if (cached) {
-          userData = JSON.parse(cached);
-          updateUI(userData);
-        }
-        listenToUser(user.uid);
-        loadActualites();
-        setTimeout(() => forceCheckAndCreditGains(), 2000);
-        // Setup FCM
-        await setupFCMNotifications();
-        return;
+      // Notification de gain (locale + Telegram admin)
+      const detailText = gainDetails.map(d => `${d.pack}: +${d.gain.toLocaleString('fr-FR')} FCFA`).join(', ');
+      showGainNotification('💰 Gains quotidiens', `${detailText || `+${totalGain.toLocaleString('fr-FR')} FCFA`} ajoutés à votre solde !`);
+      
+      // Telegram UNIQUEMENT si c'est l'admin
+      if (currentUser.email === 'gagneavecia@gmail.com') {
+        defer(() => sendTelegramMessage(
+          `💰 <b>Gains quotidiens (Admin)</b>\n\n` +
+          `👤 ${data.prenom || 'Admin'}\n` +
+          `💵 +${totalGain.toLocaleString('fr-FR')} FCFA\n` +
+          `📦 ${gainDetails.map(d => `${d.pack}: ${d.days}j`).join(', ')}\n` +
+          `🕐 ${new Date().toLocaleString('fr-FR')}`
+        ));
       }
+      
+      return true;
+    }
+    return false;
+  } catch (error) {
+    console.error("❌ Erreur gains:", error);
+    return false;
+  }
+}
 
-      try {
-        const userRef = doc(db, 'users', user.uid);
-        const docSnap = await getDoc(userRef);
-        if (!docSnap.exists()) {
-          const newUser = {
-            uid: user.uid, email: user.email || '', prenom: user.displayName?.split(' ')[0] || 'Investisseur',
-            nom: user.displayName?.split(' ').slice(1).join(' ') || '', fullName: user.displayName || 'Investisseur',
-            balance: 0, gainsTotal: 0, totalDepots: 0, totalRetraits: 0, investments: [],
-            referralsCount: 0, referralEarnings: 0, status: 'active', role: 'user',
-            createdAt: new Date().toISOString(), lastLogin: new Date().toISOString(),
-            hasDeposited: false, isUnlocked: false
-          };
-          await setDoc(userRef, newUser);
-          userData = newUser;
-        } else {
-          userData = docSnap.data();
-          await updateDoc(userRef, { lastLogin: new Date().toISOString() });
-        }
-        sessionStorage.setItem('session_uid', user.uid);
-        updateUI(userData);
-        listenToUser(user.uid);
-        loadActualites();
-        setTimeout(() => forceCheckAndCreditGains(), 2000);
-        
-        // SETUP FCM - NOTIFICATIONS PUSH (comme WhatsApp) pour l'admin
-        await setupFCMNotifications();
-        
-      } catch (error) {
-        console.error('Erreur Firestore:', error);
-        const cached = localStorage.getItem('ARVEXA_user_data');
-        if (cached) { userData = JSON.parse(cached); updateUI(userData); }
-        loadActualites();
-        if (isFirstLoad) {
-          setTimeout(() => {
-            loadingScreen.classList.add('hide');
-            mainContent.style.display = 'block';
-            mainContent.style.opacity = '1';
-            document.body.style.overflow = '';
-            sessionStorage.setItem('arvexa_loaded', 'true');
-          }, 800);
-        }
-      }
-    } else {
-      const savedUid = localStorage.getItem('ARVEXA_current_user');
-      if (savedUid) {
-        setTimeout(() => { if (!auth.currentUser) { window.location.href = 'login.html'; } }, 2000);
+// ================================================================
+// ÉCOUTEUR UTILISATEUR
+// ================================================================
+function listenToUser(uid) {
+  if (unsubscribeUser) unsubscribeUser();
+  const userRef = doc(db, 'users', uid);
+  unsubscribeUser = onSnapshot(userRef, (snap) => {
+    if (snap.exists()) {
+      userData = snap.data();
+      updateUI(userData);
+      localStorage.setItem('ARVEXA_user_data', JSON.stringify(userData));
+    }
+  }, (error) => { console.error('Erreur onSnapshot:', error); });
+}
+
+// ================================================================
+// UPDATE UI
+// ================================================================
+function updateUI(data) {
+  if (!data) return;
+  const prenom = data.prenom || '';
+  const displayName = prenom || 'Investisseur';
+  userNameEl.textContent = displayName;
+  userAvatarEl.textContent = displayName.charAt(0).toUpperCase();
+  document.getElementById('menuAvatar').textContent = displayName.charAt(0).toUpperCase();
+  document.getElementById('menuUsername').textContent = displayName;
+  document.getElementById('menuUseremail').textContent = data.email || 'email@email.com';
+
+  statBalanceEl.textContent = formatCurrency(data.balance || 0);
+  statRevenueEl.textContent = formatCurrency(data.gainsTotal || data.totalRevenus || 0);
+  
+  const investCount = data.investments ? data.investments.filter(i => i.status === 'active').length : 0;
+  statInvestmentsEl.textContent = investCount;
+  statReferralsEl.textContent = data.referralsCount || 0;
+
+  let dailyReturn = 0;
+  if (data.investments) {
+    const active = data.investments.filter(i => i.status === 'active');
+    if (active.length > 0) {
+      dailyReturn = active.reduce((sum, inv) => sum + (inv.dailyPercent || inv.dailyReturn || 0), 0) / active.length;
+    }
+  }
+  const displayPercent = dailyReturn > 0 ? (dailyReturn / 10).toFixed(1) : '0';
+  const statFooter = document.querySelector('.main-stat-footer');
+  if (statFooter) {
+    const span = statFooter.querySelector('span:last-child');
+    if (span) {
+      if (parseFloat(displayPercent) > 0) {
+        span.innerHTML = `<i class="fas fa-arrow-up"></i> +${displayPercent}% par jour`;
+        span.style.color = 'var(--success)';
       } else {
-        window.location.href = 'login.html';
+        span.innerHTML = `<i class="fas fa-minus"></i> 0% par jour`;
+        span.style.color = 'var(--text-muted)';
       }
     }
-  });
+  }
+  
+  checkAdminButton(currentUser);
+  localStorage.setItem('ARVEXA_user_data', JSON.stringify(data));
+  
+  if (isFirstLoad) {
+    setTimeout(() => {
+      loadingScreen.classList.add('hide');
+      mainContent.style.display = 'block';
+      mainContent.style.opacity = '1';
+      document.body.style.overflow = '';
+      sessionStorage.setItem('arvexa_loaded', 'true');
+    }, 600);
+  }
+}
 
-  // ================================================================
-  // NAVIGATION
-  // ================================================================
-  document.getElementById('userProfileBtn').addEventListener('click', (e) => { e.preventDefault(); window.location.href = 'profil.html'; });
-  document.getElementById('logoLink').addEventListener('click', (e) => { e.preventDefault(); window.location.href = 'index.html'; });
+function checkAdminButton(user) {
+  const btn = document.getElementById('adminLockBtn');
+  if (!btn) return;
+  if (user && user.email === 'gagneavecia@gmail.com') {
+    btn.style.display = 'flex';
+    btn.onclick = (e) => { e.preventDefault(); window.location.href = 'admin/index.html'; };
+  } else {
+    btn.style.display = 'none';
+  }
+}
 
-  // ================================================================
-  // SERVICE WORKER
-  // ================================================================
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      // Enregistrer le Service Worker FCM
+// ================================================================
+// MENU
+// ================================================================
+let isMenuOpen = false;
+let touchStartX = 0, touchStartY = 0, isSwiping = false;
+
+function openMenu() { if (isMenuOpen) return; isMenuOpen = true; document.getElementById('menuOverlay').classList.add('active'); document.body.style.overflow = 'hidden'; }
+function closeMenu() { if (!isMenuOpen) return; isMenuOpen = false; document.getElementById('menuOverlay').classList.remove('active'); document.body.style.overflow = ''; }
+
+document.addEventListener('touchstart', (e) => {
+  const touch = e.changedTouches[0];
+  touchStartX = touch.screenX; touchStartY = touch.screenY; isSwiping = false;
+}, { passive: true });
+
+document.addEventListener('touchmove', (e) => {
+  if (!e.cancelable) return;
+  const touch = e.changedTouches[0];
+  const deltaX = touch.screenX - touchStartX;
+  const deltaY = touch.screenY - touchStartY;
+  if (Math.abs(deltaY) > Math.abs(deltaX) * 1.2) return;
+  if (Math.abs(deltaX) > 15) { isSwiping = true; e.preventDefault(); }
+}, { passive: false });
+
+document.addEventListener('touchend', (e) => {
+  if (!isSwiping) return;
+  const deltaX = e.changedTouches[0].screenX - touchStartX;
+  if (deltaX < -40 && !isMenuOpen) openMenu();
+  else if (deltaX > 40 && isMenuOpen) closeMenu();
+  isSwiping = false;
+}, { passive: true });
+
+document.getElementById('menuBtn').addEventListener('click', (e) => { e.preventDefault(); isMenuOpen ? closeMenu() : openMenu(); });
+document.getElementById('menuCloseBtn').addEventListener('click', closeMenu);
+document.getElementById('menuBackdrop').addEventListener('click', closeMenu);
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMenu(); });
+
+document.getElementById('userProfileBtn').addEventListener('click', (e) => { e.preventDefault(); window.location.href = 'profil.html'; });
+document.getElementById('logoLink').addEventListener('click', (e) => { e.preventDefault(); window.location.href = 'index.html'; });
+
+// ================================================================
+// DÉCONNEXION
+// ================================================================
+document.getElementById('menuLogoutBtn').addEventListener('click', async () => {
+  if (confirm('Voulez-vous vous déconnecter ?')) {
+    try {
+      await signOut(auth);
+      localStorage.removeItem('ARVEXA_current_user');
+      localStorage.removeItem('ARVEXA_user_data');
+      sessionStorage.clear();
+      showToast('✅ Déconnexion réussie', 'success');
+      setTimeout(() => { window.location.href = 'login.html'; }, 500);
+    } catch (error) {
+      console.error('Erreur déconnexion:', error);
+      showToast('❌ Erreur lors de la déconnexion', 'error');
+    }
+  }
+});
+
+// ================================================================
+// AUTH
+// ================================================================
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    currentUser = user;
+    localStorage.setItem('ARVEXA_current_user', user.uid);
+    
+    const cached = localStorage.getItem('ARVEXA_user_data');
+    if (cached) {
+      userData = JSON.parse(cached);
+      updateUI(userData);
+    }
+
+    try {
+      const userRef = doc(db, 'users', user.uid);
+      const docSnap = await getDoc(userRef);
+      if (!docSnap.exists()) {
+        const newUser = {
+          uid: user.uid, email: user.email || '', prenom: user.displayName?.split(' ')[0] || 'Investisseur',
+          nom: user.displayName?.split(' ').slice(1).join(' ') || '', fullName: user.displayName || 'Investisseur',
+          balance: 0, gainsTotal: 0, totalDepots: 0, totalRetraits: 0, investments: [],
+          referralsCount: 0, referralEarnings: 0, status: 'active', role: 'user',
+          createdAt: new Date().toISOString(), lastLogin: new Date().toISOString(),
+          hasDeposited: false, isUnlocked: false
+        };
+        await setDoc(userRef, newUser);
+        userData = newUser;
+      } else {
+        userData = docSnap.data();
+        await updateDoc(userRef, { lastLogin: new Date().toISOString() });
+      }
+      
+      sessionStorage.setItem('session_uid', user.uid);
+      updateUI(userData);
+      listenToUser(user.uid);
+      loadActualites();
+      
+      setTimeout(() => forceCheckAndCreditGains(), 2000);
+      await setupFCMNotifications();
+      
+    } catch (error) {
+      console.error('Erreur Firestore:', error);
+      const cached = localStorage.getItem('ARVEXA_user_data');
+      if (cached) { userData = JSON.parse(cached); updateUI(userData); }
+      loadActualites();
+      if (isFirstLoad) {
+        setTimeout(() => {
+          loadingScreen.classList.add('hide');
+          mainContent.style.display = 'block';
+          mainContent.style.opacity = '1';
+          document.body.style.overflow = '';
+          sessionStorage.setItem('arvexa_loaded', 'true');
+        }, 800);
+      }
+    }
+  } else {
+    const savedUid = localStorage.getItem('ARVEXA_current_user');
+    if (savedUid) {
+      setTimeout(() => { if (!auth.currentUser) { window.location.href = 'login.html'; } }, 2000);
+    } else {
+      window.location.href = 'login.html';
+    }
+  }
+});
+
+// ================================================================
+// SERVICE WORKER
+// ================================================================
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    defer(() => {
       navigator.serviceWorker.register('/firebase-messaging-sw.js')
         .then(reg => console.log('✅ SW FCM enregistré'))
         .catch(err => console.log('⚠️ SW FCM erreur:', err));
     });
-  }
+  });
+}
 
-  console.log("🚀 ARVEXA - Page d'accueil avec notifications push (comme WhatsApp)");
+console.log("🚀 ARVEXA - Version optimisée (Push pour tous, Telegram pour admin)");
+console.log("🐞 Eruda: " + (location.hostname === "localhost" || location.search.includes("debug=true") ? "ACTIF" : "inactif (ajouter ?debug=true)"));
 </script>
 </body>
 </html>

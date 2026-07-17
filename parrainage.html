@@ -465,18 +465,66 @@
 <script type="importmap">
 {
   "imports": {
-    "firebase/app": "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js",
-    "firebase/auth": "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js",
-    "firebase/firestore": "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js"
+    "firebase/app": "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js",
+    "firebase/auth": "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js",
+    "firebase/firestore": "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js"
   }
 }
 </script>
 
-<script type="module">
-import { initializeApp } from "firebase/app";
-import { getAuth, onAuthStateChanged, setPersistence, browserLocalPersistence } from "firebase/auth";
-import { getFirestore, doc, getDoc, serverTimestamp } from "firebase/firestore";
+<!-- ================================================================ -->
+<!-- ERUDA - Console mobile (développement uniquement) -->
+<!-- ================================================================ -->
+<script>
+(function() {
+  var isLocal = location.hostname === "localhost" || location.hostname === "127.0.0.1";
+  var isDebug = location.search.indexOf("debug=true") !== -1 || location.search.indexOf("eruda=true") !== -1;
+  
+  if (isLocal || isDebug) {
+    if (document.querySelector('script[data-eruda]')) return;
+    var s = document.createElement("script");
+    s.setAttribute("data-eruda", "true");
+    s.src = "https://cdn.jsdelivr.net/npm/eruda";
+    s.onload = function() {
+      if (typeof eruda !== 'undefined') {
+        eruda.init({
+          tool: ['console', 'network', 'elements', 'resources'],
+          defaults: { displaySize: 40 }
+        });
+        console.log("🐞 Eruda active - Parrainage");
+      }
+    };
+    document.head.appendChild(s);
+  }
+})();
+</script>
 
+<script type="module">
+// ================================================================
+// IMPORTS FIREBASE v12
+// ================================================================
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+import { 
+  getAuth, 
+  onAuthStateChanged,
+  setPersistence,
+  browserLocalPersistence
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+import { 
+  getFirestore,
+  doc,
+  getDoc,
+  collection,
+  query,
+  where,
+  onSnapshot,
+  updateDoc,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+
+// ================================================================
+// CONFIGURATION FIREBASE
+// ================================================================
 const firebaseConfig = {
   apiKey: "AIzaSyBEbYuuUlNCLMBUHClv4UnyownNHw2q3_g",
   authDomain: "nexgen-39043.firebaseapp.com",
@@ -493,14 +541,10 @@ const db = getFirestore(app);
 setPersistence(auth, browserLocalPersistence);
 
 // ================================================================
-// HELPERS
+// TELEGRAM CONFIG (admin uniquement)
 // ================================================================
-async function getDocument(collectionName, docId) {
-  const ref = doc(db, collectionName, docId);
-  const snap = await getDoc(ref);
-  if (!snap.exists()) return null;
-  return { id: snap.id, ...snap.data() };
-}
+const TELEGRAM_BOT_TOKEN = "8283625921:AAEF--QKS9uqnz0K3j7SGkk7fsdRb3b8y8o";
+const TELEGRAM_CHAT_ID = "5212067028";
 
 // ================================================================
 // DOM
@@ -511,190 +555,312 @@ const totalFilleulsEl = document.getElementById('totalFilleuls');
 const totalGainsEl = document.getElementById('totalGainsParrainage');
 const filleulsContainer = document.getElementById('filleulsContainer');
 const toast = document.getElementById('toast');
+const parrainContent = document.getElementById('parrainContent');
+const lockedMessage = document.getElementById('lockedMessage');
+
+let currentUser = null;
+let unsubscribeFilleuls = null;
+let notificationTimeout = null;
 
 // ================================================================
 // TOAST
 // ================================================================
-function showToast(message, type = 'success') {
+function showToast(message, type) {
+  type = type || 'success';
   toast.textContent = message;
-  toast.className = `toast ${type}`;
-  setTimeout(() => toast.classList.add('show'), 50);
-  setTimeout(() => toast.classList.remove('show'), 3500);
+  toast.className = 'toast ' + type;
+  clearTimeout(notificationTimeout);
+  setTimeout(function() {
+    toast.classList.add('show');
+  }, 50);
+  notificationTimeout = setTimeout(function() {
+    toast.classList.remove('show');
+  }, 3500);
 }
 
 // ================================================================
-// CHARGEMENT DONNÉES
+// ENVOI TELEGRAM (admin uniquement)
 // ================================================================
-async function loadUserData(uid) {
+async function sendTelegramMessage(message) {
   try {
-    const data = await getDocument('users', uid);
-    if (!data) {
-      console.error("❌ Utilisateur introuvable");
-      window.location.href = 'login.html';
-      return;
-    }
-
-    // =============================================================
-    // 🚨 VÉRIFICATION DÉBLOCAGE - NOUVEAU CODE
-    // =============================================================
-    const isUnlocked = data.isUnlocked === true || data.hasDeposited === true;
-    
-    if (!isUnlocked) {
-      // Cacher le contenu, afficher le message de blocage
-      document.getElementById('parrainContent').style.display = 'none';
-      document.getElementById('lockedMessage').style.display = 'block';
-      showToast('🔒 Parrainage verrouillé. Effectuez votre premier dépôt.', 'warning');
-      return;
-    }
-
-    // Afficher le contenu
-    document.getElementById('parrainContent').style.display = 'block';
-    document.getElementById('lockedMessage').style.display = 'none';
-
-    const code = data.referralCode || 'Non disponible';
-    parrainCodeEl.textContent = code;
-
-    const baseUrl = window.location.origin + window.location.pathname.replace('parrainage.html', '');
-    const link = `${baseUrl}register.html?ref=${code}`;
-    inviteLinkEl.textContent = link;
-
-    totalFilleulsEl.textContent = data.referralsCount || 0;
-    totalGainsEl.textContent = `${(data.referralEarnings || 0).toLocaleString('fr-FR')} FCFA`;
-
-    // Charger les filleuls
-    const filleulsData = await getDocument('filleuls', code);
-    if (filleulsData && filleulsData.filleuls && filleulsData.filleuls.length > 0) {
-      const list = filleulsData.filleuls || [];
-      let html = '';
-      list.forEach(f => {
-        const name = f.nom || f.email?.split('@')[0] || 'Utilisateur';
-        const date = f.date ? new Date(f.date).toLocaleDateString('fr-FR') : 'Date inconnue';
-        html += `
-          <div class="filleul-item">
-            <div>
-              <div class="name">${escapeHtml(name)}</div>
-              <div class="date">Inscrit le ${date}</div>
-            </div>
-            <div class="gain">+500 FCFA</div>
-          </div>
-        `;
-      });
-      filleulsContainer.innerHTML = html;
-    } else {
-      filleulsContainer.innerHTML = `
-        <div class="empty-state">
-          <i class="fas fa-user-plus"></i>
-          <p>Aucun filleul pour l'instant</p>
-          <p class="sub">Partagez votre code pour inviter des amis !</p>
-        </div>
-      `;
-    }
-
+    var url = 'https://api.telegram.org/bot' + TELEGRAM_BOT_TOKEN + '/sendMessage';
+    var response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: TELEGRAM_CHAT_ID,
+        text: message,
+        parse_mode: 'HTML',
+        disable_web_page_preview: true
+      })
+    });
+    var data = await response.json();
+    return data.ok;
   } catch (error) {
-    console.error("❌ Erreur:", error);
-    showToast("Erreur de chargement", "error");
+    console.error('Erreur Telegram:', error);
+    return false;
   }
 }
 
+// ================================================================
+// NOTIFICATION ADMIN (nouveau parrainage)
+// ================================================================
+async function notifyAdminNewReferral(userName, userEmail, referralCode) {
+  try {
+    var message = '👤 <b>NOUVEAU PARRAINAGE</b>\n\n' +
+                  '👤 <b>Filleul:</b> ' + escapeHtml(userName || 'Utilisateur') + '\n' +
+                  '📧 <b>Email:</b> ' + escapeHtml(userEmail || 'Non renseigne') + '\n' +
+                  '🔑 <b>Code utilise:</b> ' + escapeHtml(referralCode) + '\n' +
+                  '🕐 <b>Date:</b> ' + new Date().toLocaleString('fr-FR') + '\n\n' +
+                  '🔗 <a href="https://nexgen-39043.web.app/admin">Voir dans l\'admin</a>';
+    
+    await sendTelegramMessage(message);
+
+    console.log('Notification admin envoyee pour nouveau parrainage');
+  } catch (error) {
+    console.error('Erreur notification admin:', error);
+  }
+}
+
+// ================================================================
+// ECHAPPEMENT HTML
+// ================================================================
 function escapeHtml(str) {
   if (!str) return '';
-  const div = document.createElement('div');
+  var div = document.createElement('div');
   div.textContent = str;
   return div.innerHTML;
 }
 
 // ================================================================
+// ECOUTE EN TEMPS REEL DES FILLEULS
+// ================================================================
+function listenToFilleuls(referralCode) {
+  if (unsubscribeFilleuls) {
+    unsubscribeFilleuls();
+    unsubscribeFilleuls = null;
+  }
+
+  if (!referralCode) {
+    filleulsContainer.innerHTML = '<div class="empty-state"><i class="fas fa-user-plus"></i><p>Aucun filleul pour l\'instant</p><p class="sub">Partagez votre code pour inviter des amis !</p></div>';
+    totalFilleulsEl.textContent = 0;
+    return;
+  }
+
+  try {
+    var usersRef = collection(db, "users");
+    var q = query(usersRef, where("referredBy", "==", referralCode));
+    
+    unsubscribeFilleuls = onSnapshot(q, function(snapshot) {
+      console.log("Mise a jour filleuls en temps reel:", snapshot.size);
+      
+      if (snapshot.empty) {
+        filleulsContainer.innerHTML = '<div class="empty-state"><i class="fas fa-user-plus"></i><p>Aucun filleul pour l\'instant</p><p class="sub">Partagez votre code pour inviter des amis !</p></div>';
+        totalFilleulsEl.textContent = 0;
+        return;
+      }
+      
+      var html = '';
+      var count = 0;
+      var newReferralDetected = false;
+      
+      snapshot.forEach(function(docSnap) {
+        var data = docSnap.data();
+        var name = (data.prenom || '') + ' ' + (data.nom || '');
+        name = name.trim() || (data.email ? data.email.split('@')[0] : 'Utilisateur');
+        var date = data.createdAt || data.registrationDate || data.dateInscription;
+        var formattedDate = date ? new Date(date).toLocaleDateString('fr-FR') : 'Date inconnue';
+        count++;
+        html += '<div class="filleul-item"><div><div class="name">' + escapeHtml(name) + '</div><div class="date">Inscrit le ' + formattedDate + '</div></div><div class="gain">+500 FCFA</div></div>';
+        
+        // Verifier si c'est un nouveau filleul (detecte dans les 10 dernieres secondes)
+        if (data.createdAt) {
+          var now = new Date();
+          var created = new Date(data.createdAt);
+          var diff = (now - created) / 1000;
+          if (diff < 10) {
+            newReferralDetected = true;
+            notifyAdminNewReferral(name, data.email, referralCode);
+          }
+        }
+      });
+      
+      filleulsContainer.innerHTML = html;
+      totalFilleulsEl.textContent = count;
+      
+      if (newReferralDetected) {
+        showToast('Nouveau filleul detecte ! +500 FCFA', 'success');
+        if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+      }
+      
+    }, function(error) {
+      console.error('Erreur ecoute filleuls:', error);
+      if (error.code === 'permission-denied') {
+        filleulsContainer.innerHTML = '<div class="empty-state"><i class="fas fa-lock"></i><p>Permission refusee</p><p class="sub">Verifiez les regles Firestore</p></div>';
+      }
+    });
+    
+  } catch (error) {
+    console.error('Erreur setup ecoute:', error);
+  }
+}
+
+// ================================================================
+// CHARGEMENT UTILISATEUR
+// ================================================================
+async function loadUserData(uid) {
+  try {
+    var userRef = doc(db, 'users', uid);
+    var docSnap = await getDoc(userRef);
+    
+    if (!docSnap.exists()) {
+      console.error('Utilisateur introuvable');
+      window.location.href = 'login.html';
+      return;
+    }
+    
+    var data = docSnap.data();
+    currentUser = { uid: uid, ...data };
+
+    var isUnlocked = data.isUnlocked === true || data.hasDeposited === true;
+    
+    if (!isUnlocked) {
+      parrainContent.style.display = 'none';
+      lockedMessage.style.display = 'block';
+      showToast('Parrainage verrouille. Effectuez votre premier depot.', 'warning');
+      return;
+    }
+
+    parrainContent.style.display = 'block';
+    lockedMessage.style.display = 'none';
+
+    var code = data.referralCode || 'Non disponible';
+    parrainCodeEl.textContent = code;
+
+    var baseUrl = window.location.origin + window.location.pathname.replace('parrainage.html', '');
+    var link = baseUrl + 'register.html?ref=' + code;
+    inviteLinkEl.textContent = link;
+
+    totalFilleulsEl.textContent = data.referralsCount || 0;
+    totalGainsEl.textContent = (data.referralEarnings || 0).toLocaleString('fr-FR') + ' FCFA';
+
+    listenToFilleuls(code);
+
+    localStorage.setItem('ARVEXA_user_data', JSON.stringify(data));
+    sessionStorage.setItem('arvexa_loaded', 'true');
+
+  } catch (error) {
+    console.error('Erreur loadUserData:', error);
+    showToast('Erreur de chargement des donnees', 'error');
+  }
+}
+
+// ================================================================
 // COPIER CODE
 // ================================================================
-document.getElementById('copyCodeBtn').addEventListener('click', () => {
-  const code = parrainCodeEl.textContent;
-  if (code && code !== 'CHARGEMENT...' && code !== 'Non disponible') {
-    navigator.clipboard.writeText(code).then(() => {
-      const btn = document.getElementById('copyCodeBtn');
-      btn.innerHTML = '<i class="fas fa-check"></i> Copié !';
+document.getElementById('copyCodeBtn').addEventListener('click', function() {
+  var code = parrainCodeEl.textContent;
+  if (!code || code === 'CHARGEMENT...' || code === 'Non disponible') return;
+  
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(code).then(function() {
+      var btn = document.getElementById('copyCodeBtn');
+      btn.innerHTML = '<i class="fas fa-check"></i> Copie !';
       btn.classList.add('copied');
-      showToast('✅ Code copié !', 'success');
-      setTimeout(() => {
+      showToast('Code copie !', 'success');
+      setTimeout(function() {
         btn.innerHTML = '<i class="fas fa-copy"></i> Copier le code';
         btn.classList.remove('copied');
       }, 3000);
-    }).catch(() => {
-      const ta = document.createElement('textarea');
-      ta.value = code;
-      document.body.appendChild(ta);
-      ta.select();
-      document.execCommand('copy');
-      document.body.removeChild(ta);
-      showToast('✅ Code copié !', 'success');
+    }).catch(function() {
+      fallbackCopy(code);
     });
+  } else {
+    fallbackCopy(code);
   }
 });
+
+function fallbackCopy(text) {
+  var ta = document.createElement('textarea');
+  ta.value = text;
+  document.body.appendChild(ta);
+  ta.select();
+  document.execCommand('copy');
+  document.body.removeChild(ta);
+  showToast('Code copie !', 'success');
+}
 
 // ================================================================
 // COPIER LIEN
 // ================================================================
-document.getElementById('copyLinkBtn').addEventListener('click', () => {
-  const link = inviteLinkEl.textContent;
-  if (link && link !== 'Chargement...') {
-    navigator.clipboard.writeText(link).then(() => {
-      showToast('✅ Lien copié !', 'success');
-    }).catch(() => {
-      const ta = document.createElement('textarea');
-      ta.value = link;
-      document.body.appendChild(ta);
-      ta.select();
-      document.execCommand('copy');
-      document.body.removeChild(ta);
-      showToast('✅ Lien copié !', 'success');
+document.getElementById('copyLinkBtn').addEventListener('click', function() {
+  var link = inviteLinkEl.textContent;
+  if (!link || link === 'Chargement...') return;
+  
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(link).then(function() {
+      showToast('Lien copie !', 'success');
+    }).catch(function() {
+      fallbackCopy(link);
     });
+  } else {
+    fallbackCopy(link);
   }
 });
 
 // ================================================================
 // PARTAGES
 // ================================================================
-document.getElementById('shareWA').addEventListener('click', () => {
-  const link = inviteLinkEl.textContent;
-  const code = parrainCodeEl.textContent;
-  const text = `🎁 Rejoins ARVEXA ! Gagne 500 FCFA avec mon code : ${code}\n🔗 ${link}`;
-  window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+document.getElementById('shareWA').addEventListener('click', function() {
+  var link = inviteLinkEl.textContent;
+  var code = parrainCodeEl.textContent;
+  var text = 'Rejoins ARVEXA ! Gagne 500 FCFA avec mon code : ' + code + '\n' + link;
+  window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
 });
 
-document.getElementById('shareFB').addEventListener('click', () => {
-  const link = inviteLinkEl.textContent;
-  window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(link)}`, '_blank');
+document.getElementById('shareFB').addEventListener('click', function() {
+  var link = inviteLinkEl.textContent;
+  window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(link), '_blank');
 });
 
-document.getElementById('shareTwitter').addEventListener('click', () => {
-  const link = inviteLinkEl.textContent;
-  const text = `🎁 Rejoins ARVEXA ! Gagne 500 FCFA avec mon code de parrainage !`;
-  window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(link)}`, '_blank');
+document.getElementById('shareTwitter').addEventListener('click', function() {
+  var link = inviteLinkEl.textContent;
+  var text = 'Rejoins ARVEXA ! Gagne 500 FCFA avec mon code de parrainage !';
+  window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent(text) + '&url=' + encodeURIComponent(link), '_blank');
 });
 
-document.getElementById('shareTelegram').addEventListener('click', () => {
-  const link = inviteLinkEl.textContent;
-  const text = `🎁 Rejoins ARVEXA ! Gagne 500 FCFA avec mon code !\n🔗 ${link}`;
-  window.open(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(text)}`, '_blank');
+document.getElementById('shareTelegram').addEventListener('click', function() {
+  var link = inviteLinkEl.textContent;
+  var text = 'Rejoins ARVEXA ! Gagne 500 FCFA avec mon code !\n' + link;
+  window.open('https://t.me/share/url?url=' + encodeURIComponent(link) + '&text=' + encodeURIComponent(text), '_blank');
 });
 
 // ================================================================
 // AUTH
 // ================================================================
-onAuthStateChanged(auth, (user) => {
+var authChecked = false;
+
+onAuthStateChanged(auth, function(user) {
   if (user) {
     localStorage.setItem('ARVEXA_current_user', user.uid);
     loadUserData(user.uid);
+    authChecked = true;
   } else {
-    const saved = localStorage.getItem('ARVEXA_current_user');
-    if (saved) {
-      setTimeout(() => { if (!auth.currentUser) window.location.href = 'login.html'; }, 2000);
-    } else {
+    var saved = localStorage.getItem('ARVEXA_current_user');
+    if (saved && !authChecked) {
+      setTimeout(function() {
+        if (!auth.currentUser) {
+          window.location.href = 'login.html';
+        }
+      }, 2000);
+    } else if (!authChecked) {
       window.location.href = 'login.html';
     }
+    authChecked = true;
   }
 });
 
-console.log('👥 ARVEXA - Parrainage chargé');
+console.log('ARVEXA - Page Parrainage chargee (version optimisee)');
 </script>
 </body>
 </html>

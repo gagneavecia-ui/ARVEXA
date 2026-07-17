@@ -777,39 +777,65 @@
     "imports": {
       "firebase/app": "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js",
       "firebase/auth": "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js",
-      "firebase/firestore": "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js",
-      "firebase/messaging": "https://www.gstatic.com/firebasejs/12.12.1/firebase-messaging.js"
+      "firebase/firestore": "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js"
     }
   }
 </script>
 
+<!-- ================================================================ -->
+<!-- ERUDA - Console mobile (développement uniquement) -->
+<!-- ================================================================ -->
+<script>
+(function() {
+  var isLocal = location.hostname === "localhost" || location.hostname === "127.0.0.1";
+  var isDebug = location.search.indexOf("debug=true") !== -1 || location.search.indexOf("eruda=true") !== -1;
+  
+  if (isLocal || isDebug) {
+    if (document.querySelector('script[data-eruda]')) return;
+    var s = document.createElement("script");
+    s.setAttribute("data-eruda", "true");
+    s.src = "https://cdn.jsdelivr.net/npm/eruda";
+    s.onload = function() {
+      if (typeof eruda !== 'undefined') {
+        eruda.init({
+          tool: ['console', 'network', 'elements', 'resources'],
+          defaults: { displaySize: 40 }
+        });
+        console.log("🐞 Eruda active - Recharger");
+      }
+    };
+    document.head.appendChild(s);
+  }
+})();
+</script>
+
 <script type="module">
 // ================================================================
-// IMPORTS
+// IMPORTS FIREBASE v12
 // ================================================================
-import { initializeApp } from "firebase/app";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
 import { 
   getAuth, 
   onAuthStateChanged,
   setPersistence,
   browserLocalPersistence
-} from "firebase/auth";
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
 import { 
   getFirestore,
   doc,
   getDoc,
-  getDocs,
   collection,
   query,
   where,
   orderBy,
   addDoc,
   updateDoc,
+  onSnapshot,
   serverTimestamp
-} from "firebase/firestore";
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
 // ================================================================
-// FIREBASE CONFIG
+// CONFIGURATION FIREBASE
 // ================================================================
 const firebaseConfig = {
   apiKey: "AIzaSyBEbYuuUlNCLMBUHClv4UnyownNHw2q3_g",
@@ -825,6 +851,12 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 setPersistence(auth, browserLocalPersistence);
+
+// ================================================================
+// TELEGRAM CONFIG (admin uniquement)
+// ================================================================
+const TELEGRAM_BOT_TOKEN = "8283625921:AAEF--QKS9uqnz0K3j7SGkk7fsdRb3b8y8o";
+const TELEGRAM_CHAT_ID = "5212067028";
 
 // ================================================================
 // CONSTANTES
@@ -849,30 +881,42 @@ const toast = document.getElementById('toast');
 let currentUserId = null;
 let currentAuthUser = null;
 let userData = null;
-let isUnlocked = false;
+let unsubscribeHistory = null;
+let notificationTimeout = null;
 
 // ================================================================
 // HELPERS
 // ================================================================
 async function getDocument(collectionName, docId) {
-  const ref = doc(db, collectionName, docId);
-  const snap = await getDoc(ref);
-  if (!snap.exists()) return null;
-  return { id: snap.id, ...snap.data() };
+  try {
+    const ref = doc(db, collectionName, docId);
+    const snap = await getDoc(ref);
+    if (!snap.exists()) return null;
+    return { id: snap.id, ...snap.data() };
+  } catch (error) {
+    console.error('Erreur getDocument:', error);
+    return null;
+  }
 }
 
-function showToast(message, type = 'success') {
+function showToast(message, type) {
+  type = type || 'success';
   toast.textContent = message;
-  toast.className = `toast ${type}`;
-  setTimeout(() => toast.classList.add('show'), 50);
-  setTimeout(() => toast.classList.remove('show'), 4000);
+  toast.className = 'toast ' + type;
+  clearTimeout(notificationTimeout);
+  setTimeout(function() {
+    toast.classList.add('show');
+  }, 50);
+  notificationTimeout = setTimeout(function() {
+    toast.classList.remove('show');
+  }, 4000);
 }
 
 function generateId() {
-  const prefix = 'ARV';
-  const timestamp = Date.now().toString(36).toUpperCase();
-  const random = Math.random().toString(36).substring(2, 7).toUpperCase();
-  return `${prefix}-${timestamp}-${random}`;
+  var prefix = 'ARV';
+  var timestamp = Date.now().toString(36).toUpperCase();
+  var random = Math.random().toString(36).substring(2, 7).toUpperCase();
+  return prefix + '-' + timestamp + '-' + random;
 }
 
 function formatCurrency(amount) {
@@ -880,67 +924,192 @@ function formatCurrency(amount) {
   return amount.toLocaleString('fr-FR') + ' FCFA';
 }
 
+function escapeHtml(str) {
+  if (!str) return '';
+  var div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
 // ================================================================
-// VALIDATION TÉLÉPHONE
+// ENVOI TELEGRAM (admin uniquement)
+// ================================================================
+async function sendTelegramMessage(message) {
+  try {
+    var url = 'https://api.telegram.org/bot' + TELEGRAM_BOT_TOKEN + '/sendMessage';
+    var response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: TELEGRAM_CHAT_ID,
+        text: message,
+        parse_mode: 'HTML',
+        disable_web_page_preview: true
+      })
+    });
+    var data = await response.json();
+    return data.ok;
+  } catch (error) {
+    console.error('Erreur Telegram:', error);
+    return false;
+  }
+}
+
+// ================================================================
+// NOTIFICATION ADMIN (nouvelle demande de dépôt)
+// ================================================================
+async function notifyAdminDeposit(userName, userId, amount, depositId) {
+  try {
+    var message = '💰 <b>NOUVELLE DEMANDE DE DEPOT</b>\n\n' +
+                  '👤 <b>Utilisateur:</b> ' + escapeHtml(userName) + '\n' +
+                  '🆔 <b>ID:</b> ' + escapeHtml(userId) + '\n' +
+                  '💵 <b>Montant:</b> ' + formatCurrency(amount) + '\n' +
+                  '🕐 <b>Date:</b> ' + new Date().toLocaleString('fr-FR') + '\n\n' +
+                  '🔗 <a href="https://nexgen-39043.web.app/admin">Voir dans l\'admin</a>';
+    
+    await sendTelegramMessage(message);
+
+    await addDoc(collection(db, 'notifications'), {
+      type: 'deposit_pending',
+      title: '💰 Nouveau depôt - ' + formatCurrency(amount),
+      body: userName + ' - ID: ' + userId,
+      userId: currentAuthUser ? currentAuthUser.uid : '',
+      userName: userName,
+      amount: amount,
+      depositId: depositId,
+      read: false,
+      createdAt: new Date().toISOString(),
+      target: 'admin'
+    });
+
+    console.log('Notification admin envoyee pour depot:', amount);
+  } catch (error) {
+    console.error('Erreur notification admin:', error);
+  }
+}
+
+// ================================================================
+// VALIDATION TELEPHONE
 // ================================================================
 function validatePhone(phone) {
   if (!phone) return false;
-  const clean = phone.replace(/\D/g, '');
+  var clean = phone.replace(/\D/g, '');
   return clean.length >= 7 && clean.length <= 9;
 }
 
 // ================================================================
-// VÉRIFIER LA LIMITE DE DEMANDES PAR JOUR
+// VERIFIER LA LIMITE DE DEMANDES PAR JOUR
 // ================================================================
 async function checkDailyLimit(uid) {
   if (!uid) return { allowed: false, count: 0 };
 
   try {
-    const today = new Date().toISOString().split('T')[0];
-    const q = query(
+    var today = new Date().toISOString().split('T')[0];
+    var q = query(
       collection(db, 'depots'),
       where('userId', '==', uid),
       where('date', '==', today),
       where('statut', 'in', ['en_attente', 'pending'])
     );
-    const snapshot = await getDocs(q);
+    var snapshot = await getDocs(q);
     
-    const count = snapshot.size;
-    const allowed = count < MAX_REQUESTS_PER_DAY;
+    var count = snapshot.size;
+    var allowed = count < MAX_REQUESTS_PER_DAY;
     
-    return { allowed, count };
+    return { allowed: allowed, count: count };
   } catch (error) {
-    console.error('❌ Erreur checkDailyLimit:', error);
+    console.error('Erreur checkDailyLimit:', error);
     return { allowed: true, count: 0 };
   }
 }
 
 // ================================================================
+// ECOUTE EN TEMPS REEL DE L'HISTORIQUE
+// ================================================================
+function listenToHistory(uid) {
+  if (unsubscribeHistory) {
+    unsubscribeHistory();
+    unsubscribeHistory = null;
+  }
+
+  if (!uid) return;
+
+  var q = query(
+    collection(db, 'depots'),
+    where('userId', '==', uid),
+    orderBy('timestamp', 'desc')
+  );
+
+  unsubscribeHistory = onSnapshot(q, function(snapshot) {
+    if (snapshot.empty) {
+      historyList.innerHTML = '<div class="empty-state"><i class="fas fa-clock"></i><p>Aucun depot effectue</p></div>';
+      return;
+    }
+
+    historyList.innerHTML = '';
+    snapshot.forEach(function(docSnap) {
+      var data = docSnap.data();
+      var item = document.createElement('div');
+      item.className = 'history-item';
+      
+      var statusClass = 'pending';
+      var statusLabel = '⏳ En attente';
+      
+      if (data.statut === 'valide' || data.statut === 'validé') {
+        statusClass = 'validated';
+        statusLabel = '✅ Valide';
+      } else if (data.statut === 'rejete' || data.statut === 'rejeté') {
+        statusClass = 'rejected';
+        statusLabel = '❌ Rejete';
+      }
+
+      item.innerHTML = '<div class="left"><span class="amount">' + formatCurrency(data.montant || 0) + '</span><span class="date">' + (data.date || 'Date inconnue') + '</span></div><div class="right"><span class="status-badge ' + statusClass + '">' + statusLabel + '</span></div>';
+      historyList.appendChild(item);
+    });
+  }, function(error) {
+    console.error('Erreur ecoute historique:', error);
+    historyList.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>Erreur de chargement</p></div>';
+  });
+}
+
+// ================================================================
 // AUTH
 // ================================================================
-onAuthStateChanged(auth, async (user) => {
+onAuthStateChanged(auth, function(user) {
   if (user) {
     currentAuthUser = user;
+    localStorage.setItem('ARVEXA_current_user', user.uid);
     
-    const data = await getDocument('users', user.uid);
-    if (data) {
-      userData = data;
-      isUnlocked = data.isUnlocked === true || data.hasDeposited === true;
-      currentUserId = data.id || data.customerId || generateId();
-      
-      if (!data.id && !data.customerId) {
-        const userRef = doc(db, 'users', user.uid);
-        await updateDoc(userRef, { id: currentUserId, customerId: currentUserId });
-      }
-      
-      userIdDisplay.textContent = currentUserId || 'ID indisponible';
-      loadHistory();
+    var cached = localStorage.getItem('ARVEXA_user_data');
+    if (cached) {
+      try {
+        userData = JSON.parse(cached);
+      } catch(e) {}
     }
+
+    getDocument('users', user.uid).then(function(data) {
+      if (data) {
+        userData = data;
+        currentUserId = data.id || data.customerId || generateId();
+        
+        if (!data.id && !data.customerId) {
+          var userRef = doc(db, 'users', user.uid);
+          updateDoc(userRef, { id: currentUserId, customerId: currentUserId });
+        }
+        
+        userIdDisplay.textContent = currentUserId || 'ID indisponible';
+        listenToHistory(user.uid);
+        localStorage.setItem('ARVEXA_user_data', JSON.stringify(data));
+        sessionStorage.setItem('arvexa_loaded', 'true');
+      }
+    }).catch(function(error) {
+      console.error('Erreur chargement:', error);
+    });
     
   } else {
-    const savedUid = localStorage.getItem('ARVEXA_current_user');
+    var savedUid = localStorage.getItem('ARVEXA_current_user');
     if (savedUid) {
-      setTimeout(() => {
+      setTimeout(function() {
         if (!auth.currentUser) {
           window.location.href = 'login.html';
         }
@@ -954,35 +1123,42 @@ onAuthStateChanged(auth, async (user) => {
 // ================================================================
 // COPIER L'ID
 // ================================================================
-copyIdBtn.addEventListener('click', async () => {
-  const id = userIdDisplay.textContent;
+copyIdBtn.addEventListener('click', function() {
+  var id = userIdDisplay.textContent;
   if (!id || id === 'CHARGEMENT...') return;
 
-  try {
-    await navigator.clipboard.writeText(id);
-    copyIdBtn.innerHTML = '<i class="fas fa-check"></i> ID copié !';
-    copyIdBtn.classList.add('copied');
-    showToast('✅ ID copié', 'success');
-    setTimeout(() => {
-      copyIdBtn.innerHTML = '<i class="fas fa-copy"></i> Copier mon ID';
-      copyIdBtn.classList.remove('copied');
-    }, 3000);
-  } catch {
-    const textarea = document.createElement('textarea');
-    textarea.value = id;
-    document.body.appendChild(textarea);
-    textarea.select();
-    document.execCommand('copy');
-    document.body.removeChild(textarea);
-    showToast('✅ ID copié !', 'success');
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(id).then(function() {
+      copyIdBtn.innerHTML = '<i class="fas fa-check"></i> ID copie !';
+      copyIdBtn.classList.add('copied');
+      showToast('ID copie', 'success');
+      setTimeout(function() {
+        copyIdBtn.innerHTML = '<i class="fas fa-copy"></i> Copier mon ID';
+        copyIdBtn.classList.remove('copied');
+      }, 3000);
+    }).catch(function() {
+      fallbackCopy(id);
+    });
+  } else {
+    fallbackCopy(id);
   }
 });
 
+function fallbackCopy(text) {
+  var textarea = document.createElement('textarea');
+  textarea.value = text;
+  document.body.appendChild(textarea);
+  textarea.select();
+  document.execCommand('copy');
+  document.body.removeChild(textarea);
+  showToast('ID copie !', 'success');
+}
+
 // ================================================================
-// METTRE À JOUR L'AFFICHAGE DU MONTANT
+// METTRE A JOUR L'AFFICHAGE DU MONTANT
 // ================================================================
 function updateAmountDisplay() {
-  const amount = parseInt(amountInput.value) || 0;
+  var amount = parseInt(amountInput.value) || 0;
   
   if (amount >= MIN_DEPOSIT) {
     displayAmount.textContent = formatCurrency(amount);
@@ -1002,100 +1178,92 @@ function updateAmountDisplay() {
 }
 
 // ================================================================
-// METTRE À JOUR LE LIEN WHATSAPP
+// METTRE A JOUR LE LIEN WHATSAPP
 // ================================================================
 function updateWhatsAppLink(amount) {
-  const amountValue = amount || parseInt(amountInput.value) || 0;
+  var amountValue = amount || parseInt(amountInput.value) || 0;
   
   if (amountValue < MIN_DEPOSIT) {
     whatsappBtn.disabled = true;
     whatsappBtn.style.opacity = '0.5';
-    whatsappBtn.innerHTML = `<i class="fab fa-whatsapp"></i> ⚠️ Minimum ${formatCurrency(MIN_DEPOSIT)}`;
+    whatsappBtn.innerHTML = '<i class="fab fa-whatsapp"></i> Minimum ' + formatCurrency(MIN_DEPOSIT);
     return;
   }
 
   if (amountValue > MAX_DEPOSIT) {
     whatsappBtn.disabled = true;
     whatsappBtn.style.opacity = '0.5';
-    whatsappBtn.innerHTML = `<i class="fab fa-whatsapp"></i> ⚠️ Maximum ${formatCurrency(MAX_DEPOSIT)}`;
+    whatsappBtn.innerHTML = '<i class="fab fa-whatsapp"></i> Maximum ' + formatCurrency(MAX_DEPOSIT);
     return;
   }
 
   whatsappBtn.disabled = false;
   whatsappBtn.style.opacity = '1';
-  whatsappBtn.innerHTML = `<i class="fab fa-whatsapp"></i> Envoyer la demande`;
+  whatsappBtn.innerHTML = '<i class="fab fa-whatsapp"></i> Envoyer la demande';
   
-  const phone = userData?.phone || '';
-  const indicatif = userData?.indicatif || '+227';
-  const userName = userData?.prenom || userData?.fullName || 'Utilisateur';
-  const cleanPhone = phone.replace(/\D/g, '');
+  var phone = userData ? userData.phone : '';
+  var indicatif = userData ? userData.indicatif : '+227';
+  var userName = userData ? (userData.prenom || userData.fullName || 'Utilisateur') : 'Utilisateur';
+  var cleanPhone = phone.replace(/\D/g, '');
   
-  const message = `💰 NOUVELLE DEMANDE DE RECHARGE\n\n` +
-                  `👤 Nom: ${userName}\n` +
-                  `🆔 ID: ${currentUserId}\n` +
-                  `📱 Téléphone: ${indicatif} ${cleanPhone}\n` +
-                  `💵 Montant: ${formatCurrency(amountValue)}\n` +
-                  `📅 Date: ${new Date().toLocaleDateString('fr-FR')}\n\n` +
-                  `🔗 Valider: https://arvexa.com/admin/index.html`;
+  var message = 'NOUVELLE DEMANDE DE RECHARGE\n\n' +
+                'Nom: ' + userName + '\n' +
+                'ID: ' + currentUserId + '\n' +
+                'Telephone: ' + indicatif + ' ' + cleanPhone + '\n' +
+                'Montant: ' + formatCurrency(amountValue) + '\n' +
+                'Date: ' + new Date().toLocaleDateString('fr-FR') + '\n\n' +
+                'Valider: https://nexgen-39043.web.app/admin/index.html';
   
-  whatsappBtn.href = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+  whatsappBtn.href = 'https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(message);
 }
 
 // ================================================================
 // ENVOI VIA WHATSAPP
 // ================================================================
-whatsappBtn.addEventListener('click', async (event) => {
+whatsappBtn.addEventListener('click', function(event) {
   event.preventDefault();
 
-  const amount = parseInt(amountInput.value, 10) || 0;
-  const phone = userData?.phone || '';
-  const indicatif = userData?.indicatif || '+227';
-  const cleanPhone = phone.replace(/\D/g, '');
+  var amount = parseInt(amountInput.value, 10) || 0;
+  var phone = userData ? userData.phone : '';
+  var indicatif = userData ? userData.indicatif : '+227';
+  var cleanPhone = phone.replace(/\D/g, '');
 
-  // Vérification 1: Utilisateur connecté
   if (!currentAuthUser || !currentUserId) {
-    showToast('⚠️ Veuillez vous reconnecter.', 'error');
+    showToast('Veuillez vous reconnecter.', 'error');
     return;
   }
 
-  // Vérification 2: Montant minimum
   if (amount < MIN_DEPOSIT) {
-    showToast(`⚠️ Le montant minimum est de ${formatCurrency(MIN_DEPOSIT)}.`, 'error');
+    showToast('Le montant minimum est de ' + formatCurrency(MIN_DEPOSIT) + '.', 'error');
     return;
   }
 
-  // Vérification 3: Montant maximum
   if (amount > MAX_DEPOSIT) {
-    showToast(`⚠️ Le montant maximum est de ${formatCurrency(MAX_DEPOSIT)}.`, 'error');
+    showToast('Le montant maximum est de ' + formatCurrency(MAX_DEPOSIT) + '.', 'error');
     return;
   }
 
-  // Vérification 4: Numéro de téléphone
   if (!phone || cleanPhone.length < 7) {
-    showToast('⚠️ Numéro de téléphone invalide. Mettez à jour votre profil.', 'error');
+    showToast('Numero de telephone invalide. Mettez a jour votre profil.', 'error');
     return;
   }
 
-  // Vérification 5: Limite de demandes par jour
-  const { allowed, count } = await checkDailyLimit(currentAuthUser.uid);
-  
-  if (!allowed) {
-    showToast(`⚠️ Vous avez déjà ${count} demande en attente aujourd'hui. Réessayez demain.`, 'warning');
-    return;
-  }
+  checkDailyLimit(currentAuthUser.uid).then(function(result) {
+    if (!result.allowed) {
+      showToast('Vous avez deja ' + result.count + ' demande en attente aujourd\'hui. Reessayez demain.', 'warning');
+      return;
+    }
 
-  try {
-    const userName = userData?.prenom || userData?.fullName || 'Utilisateur';
+    var userName = userData ? (userData.prenom || userData.fullName || 'Utilisateur') : 'Utilisateur';
 
-    // Enregistrer la demande
-    const depositData = {
+    var depositData = {
       userId: currentAuthUser.uid,
       displayId: currentUserId,
       userName: userName,
-      userEmail: userData?.email || currentAuthUser.email,
+      userEmail: userData ? (userData.email || currentAuthUser.email) : currentAuthUser.email,
       userPhone: cleanPhone,
       userIndicatif: indicatif,
-      fullPhone: `${indicatif} ${cleanPhone}`,
+      fullPhone: indicatif + ' ' + cleanPhone,
       montant: amount,
       date: new Date().toISOString().split('T')[0],
       timestamp: new Date().toISOString(),
@@ -1105,122 +1273,28 @@ whatsappBtn.addEventListener('click', async (event) => {
       paymentMethod: 'whatsapp'
     };
 
-    const docRef = await addDoc(collection(db, 'depots'), depositData);
-
-    // Notification à l'admin
-    await addDoc(collection(db, 'notifications'), {
-      type: 'deposit_pending',
-      title: `💰 Nouveau dépôt - ${formatCurrency(amount)}`,
-      body: `${userName} - ID: ${currentUserId}`,
-      userId: currentAuthUser.uid,
-      userName: userName,
-      amount: amount,
-      depositId: docRef.id,
-      read: false,
-      createdAt: new Date().toISOString(),
-      target: 'admin'
+    addDoc(collection(db, 'depots'), depositData).then(function(docRef) {
+      notifyAdminDeposit(userName, currentUserId, amount, docRef.id);
+      showToast('Demande de ' + formatCurrency(amount) + ' enregistree.', 'success');
+      window.open(whatsappBtn.href, '_blank', 'noopener,noreferrer');
+      amountInput.value = '';
+      updateAmountDisplay();
+    }).catch(function(error) {
+      console.error('Erreur:', error);
+      showToast('Erreur lors de l\'enregistrement.', 'error');
     });
-
-    // Message WhatsApp
-    const message = `💰 NOUVELLE DEMANDE DE RECHARGE\n\n` +
-                    `👤 Nom: ${userName}\n` +
-                    `🆔 ID: ${currentUserId}\n` +
-                    `📱 Téléphone: ${indicatif} ${cleanPhone}\n` +
-                    `💵 Montant: ${formatCurrency(amount)}\n` +
-                    `📅 Date: ${new Date().toLocaleDateString('fr-FR')}\n\n` +
-                    `🔗 Valider: https://arvexa.com/admin/index.html`;
-    
-    whatsappBtn.href = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
-
-    showToast(`✅ Demande de ${formatCurrency(amount)} enregistrée.`, 'success');
-    window.open(whatsappBtn.href, '_blank', 'noopener,noreferrer');
-    amountInput.value = '';
-    updateAmountDisplay();
-    loadHistory();
-    
-  } catch (error) {
-    console.error('❌ Erreur:', error);
-    showToast('❌ Erreur lors de l\'enregistrement.', 'error');
-  }
+  });
 });
 
 // ================================================================
-// CHARGER L'HISTORIQUE
-// ================================================================
-async function loadHistory() {
-  if (!currentAuthUser) return;
-
-  try {
-    const q = query(
-      collection(db, 'depots'),
-      where('userId', '==', currentAuthUser.uid)
-    );
-    
-    const snapshot = await getDocs(q);
-    
-    if (snapshot.empty) {
-      historyList.innerHTML = `
-        <div class="empty-state">
-          <i class="fas fa-clock"></i>
-          <p>Aucun dépôt effectué</p>
-        </div>
-      `;
-      return;
-    }
-
-    const deposits = [];
-    snapshot.forEach(doc => {
-      deposits.push({ id: doc.id, ...doc.data() });
-    });
-    
-    deposits.sort((a, b) => {
-      const dateA = a.timestamp || a.date || '';
-      const dateB = b.timestamp || b.date || '';
-      return dateB.localeCompare(dateA);
-    });
-
-    historyList.innerHTML = '';
-    deposits.forEach((data) => {
-      const item = document.createElement('div');
-      item.className = 'history-item';
-      
-      const statusMap = {
-        'en_attente': 'pending',
-        'validé': 'validated',
-        'rejeté': 'rejected'
-      };
-      const statusClass = statusMap[data.statut] || 'pending';
-      const statusLabel = data.statut === 'en_attente' ? '⏳ En attente' :
-                         data.statut === 'validé' ? '✅ Validé' : '❌ Rejeté';
-
-      item.innerHTML = `
-        <div class="left">
-          <span class="amount">${data.montant.toLocaleString('fr-FR')} FCFA</span>
-          <span class="date">${data.date || 'Date inconnue'}</span>
-        </div>
-        <div class="right">
-          <span class="status-badge ${statusClass}">${statusLabel}</span>
-        </div>
-      `;
-      historyList.appendChild(item);
-    });
-  } catch (error) {
-    console.error('Erreur historique:', error);
-    historyList.innerHTML = `
-      <div class="empty-state">
-        <i class="fas fa-exclamation-circle"></i>
-        <p>Erreur de chargement</p>
-      </div>
-    `;
-  }
-}
-
-// ================================================================
-// ÉVÉNEMENTS
+// EVENEMENTS
 // ================================================================
 amountInput.addEventListener('input', updateAmountDisplay);
 
-console.log('💰 ARVEXA - Page Recharger chargée');
+console.log('ARVEXA - Page Recharger chargee');
+</script>
+</body>
+</html>
 </script>
 </body>
 </html>
