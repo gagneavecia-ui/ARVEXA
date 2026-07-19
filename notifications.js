@@ -1,139 +1,257 @@
-// notifications.js - Gestion des notifications FCM
-// À placer dans le dossier racine
+// notifications.js
+import { messaging, getToken, onMessage, VAPID_KEY } from './firebase-config.js';
+import { getAuth } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+import { 
+  getFirestore, 
+  doc, 
+  getDoc,
+  updateDoc, 
+  setDoc, 
+  collection, 
+  query, 
+  where, 
+  getDocs,
+  orderBy,
+  serverTimestamp 
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
-import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-messaging.js";
-import { getFirestore, doc, getDoc, updateDoc, collection, addDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
-
-// VAPID Key
-const VAPID_KEY = "BJKkMr-LMevY9HePx3vzYqWMILwAV8mxwOdfkbR-PvEu_m7eu309ygioDNLLqW1wRc2b93Irb1svNnLQIpegquk";
+const auth = getAuth();
+const db = getFirestore();
 
 // ================================================================
-// DEMANDER LA PERMISSION ET ENREGISTRER LE TOKEN
+// SETUP - Initialisation des notifications pour l'admin
 // ================================================================
-export async function setupNotifications(user, db, messaging) {
-  if (!user) return null;
-  
+export async function setupNotifications() {
   try {
-    // 1. Vérifier si c'est l'admin
-    const isAdmin = user.email === 'gagneavecia@gmail.com';
-    
-    // 2. Demander la permission
-    const permission = await Notification.requestPermission();
-    
-    if (permission !== 'granted') {
-      console.warn('⚠️ Permission notification refusée');
+    if (!('Notification' in window)) {
+      console.warn('⚠️ Notifications non supportées');
       return null;
     }
-    
-    console.log('✅ Permission notification accordée');
-    
-    // 3. Obtenir le token FCM
+
+    const user = auth.currentUser;
+    if (!user) {
+      console.warn('⚠️ Utilisateur non connecté');
+      return null;
+    }
+
+    // Vérifier si c'est l'admin
+    const isAdmin = user.email === 'gagneavecia@gmail.com';
+    if (!isAdmin) {
+      console.log('🔕 Notifications réservées à l\'admin');
+      return null;
+    }
+
+    // Demander la permission
+    let permission = Notification.permission;
+    if (permission === 'default') {
+      permission = await Notification.requestPermission();
+    }
+
+    if (permission !== 'granted') {
+      console.warn('⚠️ Permission refusée');
+      return null;
+    }
+
+    // Obtenir le token FCM
+    console.log('📱 Obtention du token FCM...');
     const token = await getToken(messaging, { vapidKey: VAPID_KEY });
-    console.log('📱 Token FCM:', token);
-    
-    // 4. Sauvegarder dans Firestore
+    console.log('✅ Token FCM:', token);
+
+    // Sauvegarder dans Firestore
     const userRef = doc(db, 'users', user.uid);
     await updateDoc(userRef, {
       fcmToken: token,
+      isAdmin: true,
       notificationsEnabled: true,
-      isAdmin: isAdmin
+      lastNotifUpdate: serverTimestamp()
+    }).catch(async () => {
+      await setDoc(userRef, {
+        fcmToken: token,
+        isAdmin: true,
+        notificationsEnabled: true,
+        lastNotifUpdate: serverTimestamp()
+      }, { merge: true });
     });
-    
-    console.log('✅ Token FCM sauvegardé');
+
     return token;
-    
   } catch (error) {
-    console.error('❌ Erreur setup notifications:', error);
+    console.error('❌ Erreur setupNotifications:', error);
     return null;
   }
 }
 
 // ================================================================
-// ÉCOUTER LES MESSAGES EN PREMIER PLAN
+// ÉCOUTE - Messages en premier plan
 // ================================================================
-export function listenMessages(messaging, callback) {
-  onMessage(messaging, (payload) => {
+export function listenForMessages() {
+  return onMessage(messaging, (payload) => {
     console.log('📩 Message reçu en premier plan:', payload);
-    
-    if (callback) {
-      callback(payload);
+
+    const title = payload.notification?.title || payload.data?.title || 'ARVEXA';
+    const body = payload.notification?.body || payload.data?.body || '';
+    const type = payload.data?.type || 'info';
+    const url = payload.data?.url || '/index.html';
+
+    // Notification système
+    if (Notification.permission === 'granted') {
+      const options = {
+        body: body,
+        icon: '/favicon.ico',
+        data: { url: url },
+        requireInteraction: true,
+        vibrate: [200, 100, 200]
+      };
+      const notification = new Notification(title, options);
+      notification.onclick = () => {
+        notification.close();
+        window.location.href = url;
+      };
     }
-    
-    // Notification de nouveau dépôt
-    if (payload.data?.type === 'new_deposit') {
-      const userName = payload.data.userName || 'Utilisateur';
-      const amount = payload.data.amount || '0';
-      
-      // Vibration
-      if (navigator.vibrate) {
-        navigator.vibrate([200, 100, 200]);
-      }
-      
-      // Afficher une alerte
-      if (payload.notification) {
-        // La notification s'affiche déjà
-      }
-    }
+
+    // Toast dans l'application
+    showToastNotification(title, body, type);
+
+    // Traitement des types spécifiques
+    handleNotificationType(type, payload.data);
   });
 }
 
 // ================================================================
-// ENVOYER UNE NOTIFICATION À L'ADMIN (depuis la page utilisateur)
+// TYPES DE NOTIFICATIONS
 // ================================================================
-export async function sendAdminNotification(db, depositData) {
+function handleNotificationType(type, data) {
+  switch (type) {
+    case 'new_deposit':
+      const amount = data?.amount || '0';
+      const userName = data?.userName || 'Utilisateur';
+      showToastNotification(
+        '💰 Nouveau dépôt',
+        `${userName} - ${parseInt(amount).toLocaleString('fr-FR')} FCFA`,
+        'success'
+      );
+      if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+      break;
+
+    case 'investment_gain':
+      showToastNotification(
+        '📈 Gain reçu',
+        `${data?.amount || 0} FCFA ajoutés à votre solde`,
+        'success'
+      );
+      break;
+
+    case 'new_referral':
+      showToastNotification(
+        '👥 Nouveau filleul',
+        `${data?.userName || 'Quelqu\'un'} s'est inscrit avec votre code !`,
+        'success'
+      );
+      break;
+
+    default:
+      break;
+  }
+}
+
+// ================================================================
+// TOAST DANS L'APPLICATION
+// ================================================================
+function showToastNotification(title, message, type = 'info') {
+  let toast = document.getElementById('toast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'toast';
+    toast.className = 'toast';
+    document.body.appendChild(toast);
+  }
+
+  toast.textContent = message || title;
+  toast.className = `toast ${type}`;
+  setTimeout(() => toast.classList.add('show'), 50);
+  setTimeout(() => toast.classList.remove('show'), 4000);
+}
+
+// ================================================================
+// ENVOI DE NOTIFICATIONS (Admin)
+// ================================================================
+export async function sendNotificationToUser(userId, title, body, data = {}) {
   try {
-    // Récupérer les tokens des admins
-    const adminQuery = query(
-      collection(db, 'users'),
-      where('isAdmin', '==', true),
-      where('notificationsEnabled', '==', true)
-    );
-    
-    const adminSnapshot = await getDocs(adminQuery);
-    
-    if (adminSnapshot.empty) {
-      console.log('⚠️ Aucun admin avec notifications activées');
-      return;
+    const userRef = doc(db, 'users', userId);
+    const userDoc = await getDoc(userRef);
+    if (!userDoc.exists()) {
+      console.error('❌ Utilisateur introuvable');
+      return false;
     }
-    
-    // Enregistrer la notification dans Firestore
-    await addDoc(collection(db, 'notifications'), {
-      type: 'deposit_pending',
-      title: `💰 Nouveau dépôt - ${depositData.montant.toLocaleString('fr-FR')} FCFA`,
-      body: `${depositData.userName} - ID: ${depositData.displayId}`,
-      userId: depositData.userId,
-      userName: depositData.userName,
-      amount: depositData.montant,
-      depositId: depositData.id,
+
+    const notifRef = doc(db, 'notifications', `${userId}_${Date.now()}`);
+    await setDoc(notifRef, {
+      userId: userId,
+      title: title,
+      body: body,
+      data: data,
       read: false,
-      createdAt: new Date().toISOString(),
-      target: 'admin'
+      createdAt: serverTimestamp(),
+      type: data.type || 'info',
+      sent: true
     });
-    
-    console.log('✅ Notification admin enregistrée dans Firestore');
-    
-    // Pour les tokens FCM, ils seront utilisés par les Cloud Functions
-    // ou par le panel admin qui écoute les notifications
-    
+
     return true;
-    
   } catch (error) {
-    console.error('❌ Erreur envoi notification admin:', error);
+    console.error('❌ Erreur:', error);
+    return false;
+  }
+}
+
+export async function sendNotificationToAll(title, body, data = {}) {
+  try {
+    const notifRef = doc(db, 'notifications', `global_${Date.now()}`);
+    await setDoc(notifRef, {
+      title: title,
+      body: body,
+      data: data,
+      read: false,
+      createdAt: serverTimestamp(),
+      type: data.type || 'info',
+      sent: true,
+      target: 'all'
+    });
+    return true;
+  } catch (error) {
+    console.error('❌ Erreur:', error);
     return false;
   }
 }
 
 // ================================================================
-// METTRE À JOUR LE STATUT DES NOTIFICATIONS
+// LECTURE DES NOTIFICATIONS
 // ================================================================
-export function updateNotificationStatus(enabled, notifBadge, notifStatusText) {
-  if (!notifBadge || !notifStatusText) return;
-  
-  if (enabled) {
-    notifBadge.className = 'notif-badge active';
-    notifStatusText.textContent = '🔔 Notifications actives';
-  } else {
-    notifBadge.className = 'notif-badge inactive';
-    notifStatusText.textContent = '🔕 Notifications désactivées';
+export async function getUnreadNotifications(userId) {
+  try {
+    const q = query(
+      collection(db, 'notifications'),
+      where('userId', '==', userId),
+      where('read', '==', false),
+      orderBy('createdAt', 'desc')
+    );
+    const snapshot = await getDocs(q);
+    const notifications = [];
+    snapshot.forEach(doc => {
+      notifications.push({ id: doc.id, ...doc.data() });
+    });
+    return notifications;
+  } catch (error) {
+    console.error('❌ Erreur:', error);
+    return [];
   }
+}
+
+export async function markNotificationRead(notificationId) {
+  try {
+    const notifRef = doc(db, 'notifications', notificationId);
+    await updateDoc(notifRef, { read: true });
+    return true;
+  } catch (error) {
+    console.error('❌ Erreur:', error);
+    return false;
   }
+}

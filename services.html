@@ -80,7 +80,7 @@
     }
     .glow-1 { width: 350px; height: 350px; background: rgba(26, 58, 42, 0.15); top: -80px; right: -80px; }
     .glow-2 { width: 200px; height: 200px; background: rgba(184, 134, 11, 0.03); bottom: 0; left: 0; animation-delay: -4s; }
-    .glow-3 { width: 250px; height: 250px; background: rgba(26, 58, 42, 0.08); top: 40%; left: 50%; transform: translate(-50%, -50%); animation-delay: -8s; }
+    .glow-3 { width: 250px; height: 250px; background: rgba(26, 58, 42, 0.08); top: 40%; left: 50%; transform: translate(-50%,-50%); animation-delay: -8s; }
     @keyframes glowMove {
       0% { transform: translate(0, 0) scale(1); }
       100% { transform: translate(30px, -20px) scale(1.1); }
@@ -132,9 +132,21 @@
     }
     .back-btn i { font-size: clamp(14px, 1.8vw, 18px); }
 
-    .header-placeholder {
-      width: clamp(32px, 4vw, 40px);
-      flex-shrink: 0;
+    .notif-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 30px;
+      font-size: 10px;
+      font-weight: 500;
+      transition: var(--transition);
+      background: rgba(45, 125, 90, 0.08);
+      color: var(--success);
+      border: 1px solid rgba(45, 125, 90, 0.10);
+    }
+    .notif-badge i {
+      font-size: 12px;
     }
 
     .container {
@@ -306,6 +318,11 @@
       color: var(--accent);
       border: 1px solid rgba(184, 134, 11, 0.15);
     }
+    .service-card .badge.free {
+      background: rgba(45, 125, 90, 0.10);
+      color: var(--success);
+      border: 1px solid rgba(45, 125, 90, 0.15);
+    }
     .service-card .badge.coming {
       background: rgba(138, 58, 58, 0.08);
       color: #8A3A3A;
@@ -321,6 +338,51 @@
       opacity: 0.5;
     }
 
+    /* ===== NOTIFICATION BANNER ===== */
+    .notif-permission-banner {
+      background: rgba(184, 134, 11, 0.06);
+      border: 1px solid rgba(184, 134, 11, 0.10);
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin: 18px 0 10px;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .notif-permission-banner p {
+      font-size: 12px;
+      color: var(--text-dim);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .notif-permission-banner p i {
+      color: var(--accent);
+    }
+    .notif-permission-banner .btn-enable {
+      padding: 6px 16px;
+      background: var(--accent);
+      border: none;
+      border-radius: 30px;
+      color: var(--bg-dark);
+      font-weight: 600;
+      font-size: 11px;
+      cursor: pointer;
+      transition: var(--transition);
+      white-space: nowrap;
+    }
+    .notif-permission-banner .btn-enable:active {
+      transform: scale(0.95);
+    }
+    .notif-permission-banner .btn-enable:hover {
+      background: #9A7209;
+    }
+
+    /* ============================================================
+       TOAST
+       ============================================================ */
     .toast {
       position: fixed;
       bottom: 20px;
@@ -344,6 +406,52 @@
     .toast.warning { background: #2A1A0D; border: 1px solid #B8860B; color: #B8860B; }
     .toast.info { background: #0D1A2A; border: 1px solid #4A7A8A; color: #4A7A8A; }
 
+    /* ============================================================
+       SKELETON LOADING
+       ============================================================ */
+    .skeleton-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+    .skeleton-card {
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: var(--radius);
+      padding: 20px 14px;
+      height: 140px;
+      border: 1px solid rgba(255, 255, 255, 0.02);
+      animation: skeletonPulse 1.5s ease-in-out infinite;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .skeleton-card .skeleton-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.04);
+    }
+    .skeleton-card .skeleton-line {
+      height: 12px;
+      width: 60%;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.04);
+    }
+    .skeleton-card .skeleton-line.short {
+      width: 40%;
+      height: 10px;
+    }
+
+    @keyframes skeletonPulse {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 0.6; }
+    }
+
+    /* ============================================================
+       RESPONSIVE
+       ============================================================ */
     @media (max-width: 480px) {
       .services-grid {
         grid-template-columns: repeat(2, 1fr);
@@ -360,6 +468,10 @@
       .service-card .name { font-size: 12px; }
       .service-card .desc { font-size: 10px; }
       .container { padding: 12px 4% 30px; }
+      .skeleton-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+      .skeleton-card { height: 100px; padding: 14px 10px; }
+      .skeleton-card .skeleton-icon { width: 32px; height: 32px; }
+      .skeleton-card .skeleton-line { height: 10px; }
     }
 
     @media (min-width: 601px) and (max-width: 768px) {
@@ -367,6 +479,7 @@
         grid-template-columns: repeat(3, 1fr);
         gap: 14px;
       }
+      .skeleton-grid { grid-template-columns: repeat(3, 1fr); gap: 16px; }
     }
 
     @media (min-width: 769px) {
@@ -378,6 +491,7 @@
         grid-template-columns: repeat(3, 1fr);
         gap: 16px;
       }
+      .skeleton-grid { grid-template-columns: repeat(3, 1fr); gap: 16px; }
     }
 
     @media (min-width: 1024px) {
@@ -389,61 +503,8 @@
         grid-template-columns: repeat(4, 1fr);
         gap: 18px;
       }
+      .skeleton-grid { grid-template-columns: repeat(4, 1fr); gap: 18px; }
     }
-    
-    /* ===== SKELETON LOADING ===== */
-.skeleton-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-}
-.skeleton-card {
-  background: rgba(255, 255, 255, 0.02);
-  border-radius: var(--radius);
-  padding: 20px 14px;
-  height: 140px;
-  border: 1px solid rgba(255, 255, 255, 0.02);
-  animation: skeletonPulse 1.5s ease-in-out infinite;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-.skeleton-card .skeleton-icon {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.04);
-}
-.skeleton-card .skeleton-line {
-  height: 12px;
-  width: 60%;
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.04);
-}
-.skeleton-card .skeleton-line.short {
-  width: 40%;
-  height: 10px;
-}
-
-@keyframes skeletonPulse {
-  0%, 100% { opacity: 0.3; }
-  50% { opacity: 0.6; }
-}
-
-@media (max-width: 480px) {
-  .skeleton-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
-  .skeleton-card { height: 100px; padding: 14px 10px; }
-  .skeleton-card .skeleton-icon { width: 32px; height: 32px; }
-  .skeleton-card .skeleton-line { height: 10px; }
-}
-@media (min-width: 769px) {
-  .skeleton-grid { grid-template-columns: repeat(3, 1fr); gap: 16px; }
-}
-@media (min-width: 1024px) {
-  .skeleton-grid { grid-template-columns: repeat(4, 1fr); gap: 18px; }
-}
   </style>
 </head>
 <body>
@@ -456,7 +517,9 @@
 <header class="header">
   <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i></a>
   <a href="index.html" class="logo">ARVE<span>XA</span></a>
-  <div class="header-placeholder"></div>
+  <span class="notif-badge" id="notifBadge">
+    <i class="fas fa-circle"></i> <span id="notifStatusText">🔔</span>
+  </span>
 </header>
 
 <main class="container">
@@ -478,23 +541,33 @@
   </div>
 
   <div class="services-grid skeleton-grid" id="servicesGrid">
-  <div class="skeleton-card"><div class="skeleton-icon"></div><div class="skeleton-line"></div><div class="skeleton-line short"></div></div>
-  <div class="skeleton-card"><div class="skeleton-icon"></div><div class="skeleton-line"></div><div class="skeleton-line short"></div></div>
-  <div class="skeleton-card"><div class="skeleton-icon"></div><div class="skeleton-line"></div><div class="skeleton-line short"></div></div>
-  <div class="skeleton-card"><div class="skeleton-icon"></div><div class="skeleton-line"></div><div class="skeleton-line short"></div></div>
-  <div class="skeleton-card"><div class="skeleton-icon"></div><div class="skeleton-line"></div><div class="skeleton-line short"></div></div>
-  <div class="skeleton-card"><div class="skeleton-icon"></div><div class="skeleton-line"></div><div class="skeleton-line short"></div></div>
-</div>
+    <div class="skeleton-card"><div class="skeleton-icon"></div><div class="skeleton-line"></div><div class="skeleton-line short"></div></div>
+    <div class="skeleton-card"><div class="skeleton-icon"></div><div class="skeleton-line"></div><div class="skeleton-line short"></div></div>
+    <div class="skeleton-card"><div class="skeleton-icon"></div><div class="skeleton-line"></div><div class="skeleton-line short"></div></div>
+    <div class="skeleton-card"><div class="skeleton-icon"></div><div class="skeleton-line"></div><div class="skeleton-line short"></div></div>
+    <div class="skeleton-card"><div class="skeleton-icon"></div><div class="skeleton-line"></div><div class="skeleton-line short"></div></div>
+    <div class="skeleton-card"><div class="skeleton-icon"></div><div class="skeleton-line"></div><div class="skeleton-line short"></div></div>
+    <div class="skeleton-card"><div class="skeleton-icon"></div><div class="skeleton-line"></div><div class="skeleton-line short"></div></div>
+    <div class="skeleton-card"><div class="skeleton-icon"></div><div class="skeleton-line"></div><div class="skeleton-line short"></div></div>
+    <div class="skeleton-card"><div class="skeleton-icon"></div><div class="skeleton-line"></div><div class="skeleton-line short"></div></div>
+    <div class="skeleton-card"><div class="skeleton-icon"></div><div class="skeleton-line"></div><div class="skeleton-line short"></div></div>
+    <div class="skeleton-card"><div class="skeleton-icon"></div><div class="skeleton-line"></div><div class="skeleton-line short"></div></div>
+    <div class="skeleton-card"><div class="skeleton-icon"></div><div class="skeleton-line"></div><div class="skeleton-line short"></div></div>
+  </div>
 
-  <div class="section-header" id="comingSoonHeader">
+  <div class="section-header" id="comingSoonHeader" style="display:none;">
     <div class="section-header-left">
       <div class="section-subtitle">Bientôt disponibles</div>
       <h2 class="section-title">Nouveautés <span>à venir</span></h2>
     </div>
   </div>
 
-  <div class="services-grid" id="comingSoonGrid">
-    <!-- Rempli par JavaScript -->
+  <div class="services-grid" id="comingSoonGrid"></div>
+
+  <!-- NOTIFICATION PERMISSION BANNER -->
+  <div class="notif-permission-banner" id="notifPermissionBanner">
+    <p><i class="fas fa-bell"></i> Activez les notifications pour ne rien manquer !</p>
+    <button class="btn-enable" id="enableNotifBtn"><i class="fas fa-check"></i> Activer</button>
   </div>
 
   <footer style="text-align:center;padding:20px;border-top:1px solid rgba(184,134,11,0.03);margin-top:20px;color:var(--text-muted);font-size:10px;opacity:0.4;">
@@ -505,24 +578,13 @@
 
 <div class="toast" id="toast"></div>
 
-<script type="importmap">
-{
-  "imports": {
-    "firebase/app": "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js",
-    "firebase/auth": "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js",
-    "firebase/firestore": "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js"
-  }
-}
-</script>
-
 <!-- ================================================================ -->
-<!-- ERUDA - Console mobile (développement uniquement) -->
+<!-- ERUDA -->
 <!-- ================================================================ -->
 <script>
 (function() {
   var isLocal = location.hostname === "localhost" || location.hostname === "127.0.0.1";
   var isDebug = location.search.indexOf("debug=true") !== -1 || location.search.indexOf("eruda=true") !== -1;
-  
   if (isLocal || isDebug) {
     if (document.querySelector('script[data-eruda]')) return;
     var s = document.createElement("script");
@@ -530,16 +592,27 @@
     s.src = "https://cdn.jsdelivr.net/npm/eruda";
     s.onload = function() {
       if (typeof eruda !== 'undefined') {
-        eruda.init({
-          tool: ['console', 'network', 'elements', 'resources'],
-          defaults: { displaySize: 40 }
-        });
+        eruda.init({ tool: ['console', 'network', 'elements'], defaults: { displaySize: 40 } });
         console.log("🐞 Eruda active - Services");
       }
     };
     document.head.appendChild(s);
   }
 })();
+</script>
+
+<!-- ================================================================ -->
+<!-- IMPORTS -->
+<!-- ================================================================ -->
+<script type="importmap">
+{
+  "imports": {
+    "firebase/app": "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js",
+    "firebase/auth": "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js",
+    "firebase/firestore": "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js",
+    "firebase/messaging": "https://www.gstatic.com/firebasejs/12.12.1/firebase-messaging.js"
+  }
+}
 </script>
 
 <script type="module">
@@ -565,6 +638,10 @@ import {
   setDoc,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+import { 
+  getMessaging,
+  getToken
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-messaging.js";
 
 // ================================================================
 // CONFIGURATION FIREBASE
@@ -582,6 +659,10 @@ var firebaseConfig = {
 var app = initializeApp(firebaseConfig);
 var auth = getAuth(app);
 var db = getFirestore(app);
+var messaging = getMessaging(app);
+
+var VAPID_KEY = "BJKkMr-LMevY9HePx3vzYqWMILwAV8mxwOdfkbR-PvEu_m7eu309ygioDNLLqW1wRc2b93Irb1svNnLQIpegquk";
+
 setPersistence(auth, browserLocalPersistence);
 
 // ================================================================
@@ -591,6 +672,10 @@ var servicesGrid = document.getElementById('servicesGrid');
 var comingSoonGrid = document.getElementById('comingSoonGrid');
 var comingSoonHeader = document.getElementById('comingSoonHeader');
 var toast = document.getElementById('toast');
+var notifBadge = document.getElementById('notifBadge');
+var notifStatusText = document.getElementById('notifStatusText');
+var notifPermissionBanner = document.getElementById('notifPermissionBanner');
+var enableNotifBtn = document.getElementById('enableNotifBtn');
 
 var isUnlocked = false;
 var notificationTimeout = null;
@@ -655,16 +740,18 @@ function setDocument(collectionName, docId, data) {
 // DONNEES PAR DEFAUT - SERVICES
 // ================================================================
 var DEFAULT_SERVICES = [
-  { id: 'service_001', name: 'E-books', icon: 'fa-book', iconClass: 'blue', description: 'Lisez et apprenez a votre rythme', page: 'ebooks.html', isPremium: true, isComing: false, order: 1, createdAt: new Date().toISOString() },
-  { id: 'service_002', name: 'Formations', icon: 'fa-graduation-cap', iconClass: 'purple', description: 'Cours video pour maitriser la finance', page: 'formations.html', isPremium: true, isComing: false, order: 2, createdAt: new Date().toISOString() },
+  { id: 'service_001', name: 'E-books', icon: 'fa-book', iconClass: 'blue', description: 'Lisez et apprenez à votre rythme', page: 'ebooks.html', isPremium: true, isComing: false, order: 1, createdAt: new Date().toISOString() },
+  { id: 'service_002', name: 'Formations', icon: 'fa-graduation-cap', iconClass: 'purple', description: 'Cours vidéo pour maîtriser la finance', page: 'formations.html', isPremium: true, isComing: false, order: 2, createdAt: new Date().toISOString() },
   { id: 'service_003', name: 'Achat', icon: 'fa-shopping-cart', iconClass: 'gold', description: 'E-books, formations et services', page: 'boutique.html', isPremium: true, isComing: false, order: 3, createdAt: new Date().toISOString() },
-  { id: 'service_004', name: 'Investir', icon: 'fa-chart-line', iconClass: 'gold', description: 'Packs d\'investissement avec rendements', page: 'investir.html', isPremium: true, isComing: false, order: 4, createdAt: new Date().toISOString() },
-  { id: 'service_005', name: 'Vendre', icon: 'fa-store', iconClass: 'green', description: 'Monetisez vos competences', page: 'vendre.html', isPremium: true, isComing: false, order: 5, createdAt: new Date().toISOString() },
-  { id: 'service_006', name: 'Parrainage', icon: 'fa-users', iconClass: 'gold', description: 'Gagnez jusqu\'a 500 FCFA par filleul', page: 'parrainage.html', isPremium: true, isComing: false, order: 6, createdAt: new Date().toISOString() },
+  { id: 'service_004', name: 'Épargne', icon: 'fa-piggy-bank', iconClass: 'gold', description: 'Épargnez pour vos projets et objectifs', page: 'epargne.html', isPremium: true, isComing: false, order: 4, createdAt: new Date().toISOString() },
+  { id: 'service_005', name: 'Vendre', icon: 'fa-store', iconClass: 'green', description: 'Monétisez vos compétences', page: 'vendre.html', isPremium: true, isComing: false, order: 5, createdAt: new Date().toISOString() },
+  { id: 'service_006', name: 'Parrainage', icon: 'fa-users', iconClass: 'gold', description: 'Gagnez jusqu\'à 500 FCFA après le 1er dépôt', page: 'parrainage.html', isPremium: true, isComing: false, order: 6, createdAt: new Date().toISOString() },
   { id: 'service_007', name: 'Recharger', icon: 'fa-plus-circle', iconClass: 'green', description: 'Alimentez votre compte ARVEXA', page: 'recharger.html', isPremium: false, isComing: false, order: 7, createdAt: new Date().toISOString() },
-  { id: 'service_008', name: 'Retrait', icon: 'fa-arrow-down', iconClass: 'red', description: 'Retirez vos gains en toute securite', page: 'retrait.html', isPremium: true, isComing: false, order: 8, createdAt: new Date().toISOString() },
-  { id: 'service_009', name: 'Forum', icon: 'fa-comments', iconClass: 'blue', description: 'Echangez avec la communaute', page: 'forum.html', isPremium: true, isComing: false, order: 9, createdAt: new Date().toISOString() },
-  { id: 'service_010', name: 'Mon Activite', icon: 'fa-chart-pie', iconClass: 'purple', description: 'Suivez vos performances en temps reel', page: 'activite.html', isPremium: false, isComing: false, order: 10, createdAt: new Date().toISOString() }
+  { id: 'service_008', name: 'Retrait', icon: 'fa-arrow-down', iconClass: 'red', description: 'Retirez vos gains en toute sécurité', page: 'retrait.html', isPremium: true, isComing: false, order: 8, createdAt: new Date().toISOString() },
+  { id: 'service_009', name: 'Forum', icon: 'fa-comments', iconClass: 'blue', description: 'Échangez avec la communauté', page: 'forum.html', isPremium: true, isComing: false, order: 9, createdAt: new Date().toISOString() },
+  { id: 'service_010', name: 'Mon Activité', icon: 'fa-chart-pie', iconClass: 'purple', description: 'Suivez vos performances en temps réel', page: 'activite.html', isPremium: false, isComing: false, order: 10, createdAt: new Date().toISOString() },
+  { id: 'service_011', name: 'Avis', icon: 'fa-star', iconClass: 'gold', description: 'Donnez votre avis sur ARVEXA', page: 'avis.html', isPremium: true, isComing: false, order: 11, createdAt: new Date().toISOString() },
+  { id: 'service_012', name: 'Assistant ARVEXA', icon: 'fa-robot', iconClass: 'teal', description: 'Votre conseiller financier virtuel', page: 'chat.html', isPremium: false, isComing: false, order: 12, createdAt: new Date().toISOString() }
 ];
 
 // ================================================================
@@ -704,11 +791,14 @@ function renderServiceCard(service, unlocked) {
   var badgeClass = '';
   
   if (isComing) {
-    badgeText = '🔜 A venir';
+    badgeText = '🔜 À venir';
     badgeClass = 'coming';
   } else if (isPremium && !unlocked) {
     badgeText = '🔒 Premium';
     badgeClass = 'premium';
+  } else {
+    badgeText = '🆓 Gratuit';
+    badgeClass = 'free';
   }
 
   var showLock = isPremium && !unlocked && !isComing;
@@ -793,15 +883,73 @@ function loadUser(uid) {
 }
 
 // ================================================================
+// NOTIFICATIONS FCM
+// ================================================================
+async function setupFCMNotifications() {
+  try {
+    if (Notification.permission === 'granted') {
+      var token = await getToken(messaging, { vapidKey: VAPID_KEY });
+      if (currentUser) {
+        var userRef = doc(db, 'users', currentUser.uid);
+        await updateDoc(userRef, { fcmToken: token, notificationsEnabled: true });
+      }
+      notifBadge.className = 'notif-badge';
+      notifStatusText.textContent = '🔔';
+      if (notifPermissionBanner) notifPermissionBanner.style.display = 'none';
+      return token;
+    }
+    
+    if (Notification.permission === 'denied') {
+      notifBadge.className = 'notif-badge';
+      notifStatusText.textContent = '🔕';
+      if (notifPermissionBanner) notifPermissionBanner.style.display = 'none';
+      return null;
+    }
+    
+    notifBadge.className = 'notif-badge';
+    notifStatusText.textContent = '🔔';
+    if (notifPermissionBanner) notifPermissionBanner.style.display = 'flex';
+    return null;
+  } catch (error) {
+    console.error('❌ Erreur FCM:', error);
+    return null;
+  }
+}
+
+if (enableNotifBtn) {
+  enableNotifBtn.addEventListener('click', async function() {
+    try {
+      var permission = await Notification.requestPermission();
+      if (permission === 'granted') {
+        var token = await getToken(messaging, { vapidKey: VAPID_KEY });
+        if (currentUser) {
+          var userRef = doc(db, 'users', currentUser.uid);
+          await updateDoc(userRef, { fcmToken: token, notificationsEnabled: true });
+        }
+        notifBadge.className = 'notif-badge';
+        notifStatusText.textContent = '🔔';
+        if (notifPermissionBanner) notifPermissionBanner.style.display = 'none';
+        showToast('✅ Notifications activées !', 'success');
+      } else {
+        showToast('⚠️ Notifications désactivées.', 'warning');
+      }
+    } catch (error) {
+      console.error('❌ Erreur permission:', error);
+    }
+  });
+}
+
+// ================================================================
 // AUTH
 // ================================================================
 var authChecked = false;
+var currentUser = null;
 
 onAuthStateChanged(auth, function(user) {
   if (user) {
+    currentUser = user;
     localStorage.setItem('ARVEXA_current_user', user.uid);
     
-    // Chargement rapide depuis cache
     var cached = localStorage.getItem('ARVEXA_user_data');
     if (cached) {
       try {
@@ -814,6 +962,7 @@ onAuthStateChanged(auth, function(user) {
       return initializeServices();
     }).then(function() {
       loadServices();
+      setupFCMNotifications();
     });
     
     authChecked = true;
@@ -832,7 +981,7 @@ onAuthStateChanged(auth, function(user) {
   }
 });
 
-console.log('🛠️ ARVEXA - Page des services chargee (version optimisee)');
+console.log('🛠️ ARVEXA - Page des services chargée (version optimisée)');
 </script>
 </body>
 </html>

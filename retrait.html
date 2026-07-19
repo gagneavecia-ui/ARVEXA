@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
   <meta name="theme-color" content="#0A0A0A">
-  <meta name="description" content="ARVEXA - Retrait">
+  <meta name="description" content="ARVEXA - Retirer votre argent">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="manifest" href="manifest.json">
@@ -31,8 +31,8 @@
       --card-border: rgba(184, 134, 11, 0.06);
       --glass-bg: rgba(26, 58, 42, 0.15);
       --glass-border: rgba(184, 134, 11, 0.04);
-      --transition: all 0.25s ease;
-      --shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+      --transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+      --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
       --radius: 16px;
     }
 
@@ -43,23 +43,18 @@
       -webkit-tap-highlight-color: transparent;
     }
 
-    html {
-      overflow-x: hidden;
-      scroll-behavior: smooth;
-    }
-
     body {
       font-family: 'Inter', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
-      background: #0A0A0A;
-      color: #F5F0E8;
+      background: var(--bg-dark);
+      color: var(--text-light);
       font-size: 14px;
       line-height: 1.6;
       min-height: 100vh;
       overflow-x: hidden;
-      padding-bottom: 40px;
-      -webkit-overflow-scrolling: touch;
+      padding-bottom: 80px;
       opacity: 0;
       animation: pageFadeIn 0.5s ease forwards;
+      -webkit-overflow-scrolling: touch;
     }
 
     @keyframes pageFadeIn {
@@ -67,7 +62,6 @@
       100% { opacity: 1; }
     }
 
-    /* ===== BACKGROUND ===== */
     .gradient-bg {
       position: fixed;
       top: 0;
@@ -80,7 +74,6 @@
       pointer-events: none;
     }
 
-    /* ===== HEADER ===== */
     .header {
       display: flex;
       justify-content: space-between;
@@ -100,14 +93,14 @@
       display: flex;
       align-items: center;
       text-decoration: none;
-      color: #F5F0E8;
+      color: var(--text-light);
       font-size: clamp(16px, 2.5vw, 22px);
       font-weight: 700;
       font-family: 'Playfair Display', 'Georgia', serif;
       letter-spacing: 2px;
     }
     .logo span {
-      color: #B8860B;
+      color: var(--accent);
       font-style: italic;
     }
 
@@ -120,7 +113,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #F5F0E8;
+      color: var(--text-light);
       cursor: pointer;
       text-decoration: none;
       transition: background 0.2s, border-color 0.2s;
@@ -134,12 +127,28 @@
       font-size: clamp(14px, 1.8vw, 18px);
     }
 
+    .notif-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 30px;
+      font-size: 10px;
+      font-weight: 500;
+      transition: var(--transition);
+      background: rgba(45, 125, 90, 0.08);
+      color: var(--success);
+      border: 1px solid rgba(45, 125, 90, 0.10);
+    }
+    .notif-badge i {
+      font-size: 12px;
+    }
+
     .header-placeholder {
       width: clamp(32px, 4vw, 40px);
       flex-shrink: 0;
     }
 
-    /* ===== CONTAINER ===== */
     .container {
       max-width: 600px;
       margin: 0 auto;
@@ -149,46 +158,17 @@
       -webkit-overflow-scrolling: touch;
     }
 
-    /* ===== PAGE HEADER ===== */
-    .page-header {
-      margin-bottom: 20px;
-    }
-    .page-header .subtitle {
-      font-size: 10px;
-      font-weight: 500;
-      color: #B8860B;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-    }
-    .page-header h1 {
-      font-family: 'Playfair Display', 'Georgia', serif;
-      font-size: clamp(24px, 4vw, 32px);
-      font-weight: 700;
-      margin-top: 2px;
-      color: #F5F0E8;
-    }
-    .page-header h1 span {
-      color: #B8860B;
-      font-style: italic;
-    }
-    .page-header p {
-      color: #8A8A7A;
-      font-size: clamp(12px, 1.2vw, 14px);
-      margin-top: 4px;
-    }
-
-    /* ===== CARD ===== */
     .card {
       background: rgba(20, 20, 20, 0.7);
       backdrop-filter: blur(8px);
       border: 1px solid rgba(184, 134, 11, 0.06);
       border-radius: var(--radius);
       padding: clamp(16px, 3vw, 24px);
+      margin-bottom: 18px;
       box-shadow: var(--shadow);
       transition: border-color 0.2s;
       width: 100%;
       overflow: hidden;
-      margin-bottom: 18px;
     }
     .card:hover {
       border-color: rgba(184, 134, 11, 0.08);
@@ -197,542 +177,388 @@
     /* ===== BALANCE ===== */
     .balance-card {
       text-align: center;
-      padding: clamp(18px, 3vw, 24px);
+      padding: clamp(16px, 2.5vw, 24px);
+      border-color: rgba(184, 134, 11, 0.08);
+      background: linear-gradient(135deg, rgba(20,20,20,0.8), rgba(10,10,10,0.9));
     }
-    .balance-card .balance-label {
-      font-size: 11px;
+    .balance-card .label {
+      font-size: clamp(10px, 1.2vw, 12px);
       font-weight: 500;
-      color: #5A5A4A;
+      color: var(--text-muted);
       text-transform: uppercase;
       letter-spacing: 1.5px;
     }
-    .balance-card .balance-amount {
+    .balance-card .label i {
+      color: var(--accent);
+      margin-right: 6px;
+    }
+    .balance-card .amount {
       font-family: 'Playfair Display', 'Georgia', serif;
-      font-size: clamp(28px, 5vw, 42px);
+      font-size: clamp(32px, 6vw, 48px);
       font-weight: 700;
-      color: #B8860B;
-      margin-top: 4px;
+      color: var(--text-light);
+      margin: 6px 0 4px;
+    }
+    .balance-card .status {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+    .balance-card .status i {
+      color: var(--success);
+    }
+
+    /* ===== INSTRUCTIONS ===== */
+    .instructions-card h3 {
+      font-size: clamp(15px, 2vw, 18px);
+      font-family: 'Playfair Display', 'Georgia', serif;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-light);
+    }
+    .instructions-card h3 i {
+      color: var(--accent);
+    }
+    .step-list {
+      list-style: none;
+      padding: 0;
+    }
+    .step-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: clamp(10px, 1.5vw, 14px);
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+      font-size: clamp(12px, 1.2vw, 14px);
+      color: #8A8A7A;
+      line-height: 1.5;
+    }
+    .step-list li:last-child {
+      border-bottom: none;
+    }
+    .step-number {
+      width: clamp(24px, 3vw, 28px);
+      height: clamp(24px, 3vw, 28px);
+      min-width: clamp(24px, 3vw, 28px);
+      background: rgba(184, 134, 11, 0.06);
+      border: 1px solid rgba(184, 134, 11, 0.1);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: clamp(10px, 1.2vw, 12px);
+      font-weight: 600;
+      color: var(--accent);
+      font-family: 'Playfair Display', serif;
+      flex-shrink: 0;
+    }
+    .step-highlight {
+      color: var(--accent);
+      font-weight: 600;
     }
 
     /* ===== FORM ===== */
-    .form-group {
-      margin-bottom: 16px;
-    }
-    .form-group label {
-      display: block;
-      font-size: 11px;
+    .form-label {
+      font-size: clamp(12px, 1.2vw, 14px);
       font-weight: 500;
-      color: #5A5A4A;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 4px;
+      color: var(--text-light);
+      display: block;
+      margin-bottom: 6px;
+    }
+    .form-label i {
+      color: var(--accent);
+      margin-right: 6px;
     }
 
-    /* ===== OPERATOR SELECTOR ===== */
-    .operator-selector {
+    .input-group {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      padding: 12px 14px;
       background: rgba(10, 10, 10, 0.5);
       border: 1px solid rgba(184, 134, 11, 0.06);
       border-radius: 12px;
-      cursor: pointer;
-      transition: border-color 0.2s, background 0.2s;
+      padding: 0 clamp(10px, 1.5vw, 16px);
+      transition: border-color 0.2s, box-shadow 0.2s;
+      width: 100%;
     }
-    .operator-selector:active {
-      transform: scale(0.98);
-    }
-    .operator-selector:focus-within {
-      border-color: #B8860B;
+    .input-group:focus-within {
+      border-color: var(--accent);
       box-shadow: 0 0 0 3px rgba(184, 134, 11, 0.06);
     }
-    .operator-selector-display {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex: 1;
-    }
-    .operator-selector-display .op-logo {
-      width: 32px;
-      height: 32px;
-      object-fit: contain;
-      border-radius: 6px;
-      background: rgba(255, 255, 255, 0.05);
-      padding: 2px;
+    .input-group .currency {
+      color: var(--accent);
+      font-weight: 700;
+      font-size: clamp(16px, 2vw, 20px);
+      margin-right: 8px;
       flex-shrink: 0;
     }
-    .operator-selector-display .name {
-      font-size: 14px;
-      font-weight: 500;
-      color: #F5F0E8;
-    }
-    .operator-selector .arrow {
-      color: #5A5A4A;
-      font-size: 12px;
-      transition: transform 0.2s;
-    }
-
-    /* ===== INPUT ===== */
-    .input-wrapper {
-      position: relative;
-      display: flex;
-      align-items: center;
-      background: rgba(10, 10, 10, 0.5);
-      border: 1px solid rgba(184, 134, 11, 0.06);
-      border-radius: 12px;
-      transition: border-color 0.2s;
-    }
-    .input-wrapper:focus-within {
-      border-color: #B8860B;
-      box-shadow: 0 0 0 3px rgba(184, 134, 11, 0.06);
-    }
-    .input-wrapper .icon-left {
-      position: absolute;
-      left: 14px;
-      color: #5A5A4A;
-      font-size: 14px;
-      pointer-events: none;
-      z-index: 2;
-    }
-    .input-wrapper input {
+    .input-group input {
       width: 100%;
-      padding: 12px 14px 12px 44px;
+      min-width: 0;
+      padding: clamp(12px, 1.8vw, 16px) 0;
       background: transparent;
       border: none;
       outline: none;
-      color: #F5F0E8;
-      font-size: 14px;
+      color: var(--text-light);
+      font-size: clamp(18px, 3vw, 24px);
+      font-weight: 600;
+      font-family: 'Playfair Display', 'Georgia', serif;
+    }
+    .input-group input::placeholder {
+      color: #5A5A4A;
+      font-weight: 400;
+      font-size: clamp(14px, 1.8vw, 18px);
       font-family: 'Inter', sans-serif;
     }
-    .input-wrapper input::placeholder {
-      color: #5A5A4A;
-      opacity: 0.6;
-    }
-    .input-wrapper input::-webkit-outer-spin-button,
-    .input-wrapper input::-webkit-inner-spin-button {
+    .input-group input::-webkit-outer-spin-button,
+    .input-group input::-webkit-inner-spin-button {
       -webkit-appearance: none;
       margin: 0;
     }
-    .input-wrapper input[type=number] {
+    .input-group input[type=number] {
       -moz-appearance: textfield;
     }
 
-    .input-hint {
-      font-size: 10px;
-      color: #5A5A4A;
-      margin-top: 4px;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-    .input-hint i {
-      font-size: 10px;
-    }
-
-    /* ===== FRAIS INFO ===== */
-    .frais-info {
-      background: rgba(184, 134, 11, 0.02);
-      border: 1px solid rgba(184, 134, 11, 0.04);
-      border-radius: 12px;
-      padding: 12px 16px;
+    .amount-display {
       margin-top: 14px;
-    }
-    .frais-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 4px 0;
-      font-size: clamp(12px, 1.1vw, 14px);
-    }
-    .frais-row .label {
-      color: #8A8A7A;
-    }
-    .frais-row .value {
-      font-weight: 600;
-    }
-    .frais-row .value.frais {
-      color: #B8860B;
-    }
-    .frais-row .value.net {
-      color: #2D7D5A;
-    }
-
-    /* ===== SUBMIT ===== */
-    .submit-btn {
-      width: 100%;
-      padding: 14px;
-      background: #B8860B;
-      border: none;
+      padding: clamp(12px, 1.5vw, 16px);
+      background: rgba(184, 134, 11, 0.03);
+      border: 1px solid rgba(184, 134, 11, 0.06);
       border-radius: 12px;
-      color: #0A0A0A;
+      text-align: center;
+      transition: all 0.3s;
+    }
+    .amount-display.has-value {
+      border-color: rgba(184, 134, 11, 0.15);
+      background: rgba(184, 134, 11, 0.05);
+    }
+    .amount-display .label {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .amount-display .value {
+      font-size: clamp(28px, 5vw, 40px);
       font-weight: 700;
-      font-size: clamp(14px, 1.4vw, 16px);
-      cursor: pointer;
+      font-family: 'Playfair Display', 'Georgia', serif;
+      color: var(--danger);
+      margin-top: 2px;
+    }
+    .amount-display .value.zero {
+      color: var(--text-muted);
+      opacity: 0.4;
+    }
+
+    .min-amount-hint {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-align: center;
+      margin-top: 8px;
+      font-weight: 300;
+    }
+    .min-amount-hint strong {
+      color: var(--accent);
+    }
+
+    .balance-info {
+      font-size: 12px;
+      color: var(--text-dim);
+      text-align: center;
+      margin-top: 6px;
+      padding: 8px 12px;
+      background: rgba(10, 10, 10, 0.3);
+      border-radius: 8px;
+    }
+    .balance-info i {
+      margin-right: 4px;
+    }
+    .balance-info.insufficient {
+      color: var(--danger);
+      border: 1px solid rgba(138, 58, 58, 0.15);
+    }
+    .balance-info.sufficient {
+      color: var(--success);
+      border: 1px solid rgba(45, 125, 90, 0.15);
+    }
+
+    /* ===== DELAI ===== */
+    .delai-info {
+      text-align: center;
+      padding: 10px 14px;
+      background: rgba(184, 134, 11, 0.04);
+      border: 1px solid rgba(184, 134, 11, 0.06);
+      border-radius: 10px;
+      font-size: 12px;
+      color: var(--text-dim);
+      margin-bottom: 10px;
+    }
+    .delai-info i {
+      color: var(--accent);
+      margin-right: 6px;
+    }
+
+    /* ===== WHATSAPP BUTTON ===== */
+    .btn-whatsapp {
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 10px;
-      transition: background 0.2s, transform 0.15s;
-      font-family: 'Inter', sans-serif;
-      margin-top: 4px;
-    }
-    .submit-btn:active {
-      transform: scale(0.97);
-    }
-    .submit-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-    .submit-btn .loader {
-      display: none;
-    }
-    .submit-btn.loading .loader {
-      display: inline-block;
-    }
-    .submit-btn.loading .btn-text {
-      display: none;
-    }
-    .submit-btn.loading .btn-icon {
-      display: none;
-    }
-
-    /* ===== WHATSAPP ===== */
-    .btn-whatsapp {
-      display: none;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
       width: 100%;
-      padding: 14px;
+      padding: clamp(12px, 1.8vw, 16px);
       background: #25D366;
       color: #FFF;
       border: none;
       border-radius: 12px;
-      font-size: clamp(14px, 1.4vw, 16px);
+      font-size: clamp(14px, 1.6vw, 17px);
       font-weight: 600;
       cursor: pointer;
       transition: background 0.2s, transform 0.15s;
       text-decoration: none;
       font-family: 'Inter', sans-serif;
-      margin-top: 10px;
     }
     .btn-whatsapp:active {
       transform: scale(0.97);
     }
-    .btn-whatsapp:hover {
-      background: #1DA851;
+    .btn-whatsapp:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      transform: none;
     }
     .btn-whatsapp i {
-      font-size: 20px;
+      font-size: clamp(18px, 2vw, 24px);
+    }
+
+    /* ===== NOTIFICATION BANNER ===== */
+    .notif-permission-banner {
+      background: rgba(184, 134, 11, 0.06);
+      border: 1px solid rgba(184, 134, 11, 0.10);
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin: 18px 0 10px;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .notif-permission-banner p {
+      font-size: 12px;
+      color: var(--text-dim);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .notif-permission-banner p i {
+      color: var(--accent);
+    }
+    .notif-permission-banner .btn-enable {
+      padding: 6px 16px;
+      background: var(--accent);
+      border: none;
+      border-radius: 30px;
+      color: var(--bg-dark);
+      font-weight: 600;
+      font-size: 11px;
+      cursor: pointer;
+      transition: var(--transition);
+      white-space: nowrap;
+    }
+    .notif-permission-banner .btn-enable:active {
+      transform: scale(0.95);
+    }
+    .notif-permission-banner .btn-enable:hover {
+      background: #9A7209;
+    }
+
+    /* ===== ADMIN NOTE ===== */
+    .admin-note {
+      background: rgba(45, 125, 90, 0.04);
+      border: 1px solid rgba(45, 125, 90, 0.08);
+      border-radius: 12px;
+      padding: clamp(10px, 1.5vw, 14px) clamp(14px, 2vw, 20px);
+      font-size: clamp(11px, 1vw, 13px);
+      color: #8A8A7A;
+      text-align: center;
+      line-height: 1.6;
+      width: 100%;
+    }
+    .admin-note i {
+      color: var(--success);
+      margin-right: 6px;
     }
 
     /* ===== HISTORIQUE ===== */
-    .history-title {
-      font-size: clamp(16px, 1.8vw, 19px);
-      font-weight: 700;
-      font-family: 'Playfair Display', 'Georgia', serif;
-      margin-bottom: 14px;
-      color: #F5F0E8;
+    .history-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 10px;
     }
-    .history-title span {
-      color: #B8860B;
-      font-style: italic;
-    }
-
     .history-item {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 10px 0;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-    }
-    .history-item:last-child {
-      border-bottom: none;
-    }
-    .history-item .h-left {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-    .history-item .h-left .h-date {
-      font-size: 11px;
-      color: #5A5A4A;
-    }
-    .history-item .h-left .h-amount {
-      font-size: 14px;
-      font-weight: 600;
-      color: #F5F0E8;
-    }
-    .history-item .h-right {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 2px;
-    }
-    .history-item .h-right .h-status {
-      font-size: 10px;
-      padding: 2px 12px;
-      border-radius: 20px;
-      font-weight: 600;
-    }
-    .history-item .h-right .h-status.validé {
-      background: rgba(45, 125, 90, 0.15);
-      color: #2D7D5A;
-    }
-    .history-item .h-right .h-status.en_attente {
-      background: rgba(184, 134, 11, 0.15);
-      color: #B8860B;
-    }
-    .history-item .h-right .h-status.rejeté {
-      background: rgba(138, 58, 58, 0.15);
-      color: #8A3A3A;
-    }
-    .history-item .h-right .h-detail {
-      font-size: 10px;
-      color: #5A5A4A;
-    }
-
-    .history-empty {
-      text-align: center;
-      padding: 30px 0;
-      color: #5A5A4A;
-    }
-    .history-empty i {
-      font-size: 32px;
-      opacity: 0.3;
-      margin-bottom: 10px;
-      display: block;
-    }
-
-    /* ===== MODAL ===== */
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(3, 3, 5, 0.96);
-      backdrop-filter: blur(8px);
-      z-index: 2000;
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity 0.3s, visibility 0.3s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-    .modal-overlay.show {
-      opacity: 1;
-      visibility: visible;
-    }
-    .modal {
-      background: rgba(20, 20, 20, 0.95);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(184, 134, 11, 0.1);
-      border-radius: var(--radius);
-      width: 100%;
-      max-width: 380px;
-      max-height: 80vh;
-      overflow: hidden;
-      transform: scale(0.9);
-      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-    .modal-overlay.show .modal {
-      transform: scale(1);
-    }
-    .modal-header {
-      padding: 16px 20px;
-      border-bottom: 1px solid rgba(184, 134, 11, 0.06);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .modal-header h3 {
-      font-size: 18px;
-      font-weight: 700;
-      font-family: 'Playfair Display', 'Georgia', serif;
-      color: #F5F0E8;
-    }
-    .modal-header h3 span {
-      color: #B8860B;
-      font-style: italic;
-    }
-    .modal-close {
-      width: 34px;
-      height: 34px;
-      background: rgba(184, 134, 11, 0.04);
-      border: 1px solid rgba(184, 134, 11, 0.04);
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: background 0.2s;
-      color: #8A8A7A;
-    }
-    .modal-close:active {
-      background: rgba(184, 134, 11, 0.08);
-      transform: scale(0.94);
-    }
-    .modal-list {
-      padding: 8px 8px 16px;
-      max-height: 400px;
-      overflow-y: auto;
-    }
-    .modal-list::-webkit-scrollbar {
-      width: 3px;
-    }
-    .modal-list::-webkit-scrollbar-track {
-      background: rgba(255, 255, 255, 0.02);
-      border-radius: 10px;
-    }
-    .modal-list::-webkit-scrollbar-thumb {
-      background: #B8860B;
-      border-radius: 10px;
-      opacity: 0.3;
-    }
-    .operator-option {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 10px 16px;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: background 0.2s;
-      margin-bottom: 2px;
-    }
-    .operator-option:active {
-      background: rgba(184, 134, 11, 0.06);
-      transform: scale(0.98);
-    }
-    .operator-option.selected {
-      background: rgba(184, 134, 11, 0.08);
-      border: 1px solid rgba(184, 134, 11, 0.1);
-    }
-    .operator-option .op-logo {
-      width: 34px;
-      height: 34px;
-      object-fit: contain;
-      border-radius: 8px;
-      background: rgba(255, 255, 255, 0.05);
-      padding: 2px;
-      flex-shrink: 0;
-    }
-    .operator-option .op-name {
-      font-size: 14px;
-      font-weight: 500;
-      color: #F5F0E8;
-    }
-    .operator-option .op-check {
-      margin-left: auto;
-      color: #B8860B;
-      font-size: 16px;
-    }
-
-    /* ===== CONFIRMATION MODAL ===== */
-    .confirm-modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.7);
-      backdrop-filter: blur(4px);
-      z-index: 3000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity 0.3s, visibility 0.3s;
-    }
-    .confirm-modal-overlay.show {
-      opacity: 1;
-      visibility: visible;
-    }
-    .confirm-modal {
-      background: rgba(20, 20, 20, 0.95);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(184, 134, 11, 0.1);
-      border-radius: var(--radius);
-      max-width: 400px;
-      width: 100%;
-      padding: 24px 28px;
-      transform: scale(0.9);
-      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-    .confirm-modal-overlay.show .confirm-modal {
-      transform: scale(1);
-    }
-    .confirm-modal h3 {
-      font-family: 'Playfair Display', 'Georgia', serif;
-      font-size: 20px;
-      color: #F5F0E8;
-      margin-bottom: 12px;
-      text-align: center;
-    }
-    .confirm-modal h3 span {
-      color: #B8860B;
-      font-style: italic;
-    }
-    .confirm-modal .confirm-details {
+      padding: 10px 14px;
       background: rgba(10, 10, 10, 0.3);
-      border-radius: 12px;
-      padding: 14px 16px;
-      margin: 12px 0 20px;
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      transition: border-color 0.2s;
     }
-    .confirm-modal .confirm-details .detail-row {
+    .history-item:hover {
+      border-color: rgba(184, 134, 11, 0.06);
+    }
+    .history-item .left {
       display: flex;
-      justify-content: space-between;
-      padding: 4px 0;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .history-item .left .amount {
       font-size: 13px;
-      color: #8A8A7A;
-    }
-    .confirm-modal .confirm-details .detail-row .value {
-      color: #F5F0E8;
       font-weight: 600;
+      color: var(--text-light);
     }
-    .confirm-modal .confirm-details .detail-row .value.accent {
-      color: #B8860B;
+    .history-item .left .date {
+      font-size: 10px;
+      color: var(--text-muted);
     }
-    .confirm-modal .confirm-details .detail-row .value.success {
-      color: #2D7D5A;
+    .history-item .right {
+      text-align: right;
     }
-    .confirm-btn-group {
-      display: flex;
-      gap: 10px;
-    }
-    .confirm-btn-group button {
-      flex: 1;
-      padding: 12px;
-      border: none;
-      border-radius: 12px;
-      font-size: 14px;
+    .status-badge {
+      font-size: 9px;
       font-weight: 600;
-      cursor: pointer;
-      transition: transform 0.15s, background 0.2s;
-      font-family: 'Inter', sans-serif;
+      padding: 2px 10px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
-    .confirm-btn-group button:active {
-      transform: scale(0.96);
+    .status-badge.pending {
+      background: rgba(212, 160, 23, 0.12);
+      color: #D4A017;
+      border: 1px solid rgba(212, 160, 23, 0.15);
     }
-    .confirm-btn-cancel {
-      background: rgba(255, 255, 255, 0.06);
-      color: #8A8A7A;
-      border: 1px solid rgba(255, 255, 255, 0.06);
+    .status-badge.validated {
+      background: rgba(45, 125, 90, 0.12);
+      color: var(--success);
+      border: 1px solid rgba(45, 125, 90, 0.15);
     }
-    .confirm-btn-cancel:hover {
-      background: rgba(255, 255, 255, 0.10);
+    .status-badge.rejected {
+      background: rgba(138, 58, 58, 0.12);
+      color: var(--danger);
+      border: 1px solid rgba(138, 58, 58, 0.15);
     }
-    .confirm-btn-confirm {
-      background: #B8860B;
-      color: #0A0A0A;
+
+    .empty-state {
+      text-align: center;
+      padding: 20px;
+      color: var(--text-dim);
     }
-    .confirm-btn-confirm:hover {
-      background: #9A7209;
+    .empty-state i {
+      font-size: 24px;
+      opacity: 0.2;
+      display: block;
+      margin-bottom: 6px;
     }
 
     /* ===== TOAST ===== */
@@ -748,7 +574,7 @@
       font-size: clamp(12px, 1.2vw, 14px);
       font-weight: 500;
       transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-      z-index: 9999;
+      z-index: 999;
       text-align: center;
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
       pointer-events: none;
@@ -771,32 +597,29 @@
       border: 1px solid #B8860B;
       color: #B8860B;
     }
-    .toast.info {
-      background: #0D1A2A;
-      border: 1px solid #4A7A8A;
-      color: #4A7A8A;
-    }
 
-    
     /* ============================================================
        RESPONSIVE
        ============================================================ */
     @media (max-width: 400px) {
       .container { padding: 12px 4%; }
       .card { padding: 14px; border-radius: 14px; }
-      .balance-card .balance-amount { font-size: 24px; }
+      .balance-card .amount { font-size: 28px; }
+      .btn-whatsapp { font-size: 13px; padding: 12px; }
     }
 
     @media (min-width: 601px) and (max-width: 900px) {
       .container { max-width: 700px; padding: 24px 5%; }
       .card { padding: 24px 28px; border-radius: 18px; }
-      .balance-card .balance-amount { font-size: 36px; }
+      .balance-card .amount { font-size: 40px; }
     }
 
     @media (min-width: 901px) {
       .container { max-width: 800px; padding: 32px 5%; }
-      .card { padding: 28px 32px; border-radius: 20px; }
-      .balance-card .balance-amount { font-size: 42px; }
+      .card { padding: 30px 36px; border-radius: 20px; margin-bottom: 24px; }
+      .balance-card .amount { font-size: 48px; }
+      .btn-whatsapp { padding: 18px; font-size: 18px; border-radius: 14px; }
+      .btn-whatsapp i { font-size: 24px; }
     }
   </style>
 </head>
@@ -809,637 +632,804 @@
 <header class="header">
   <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i></a>
   <a href="index.html" class="logo">ARVE<span>XA</span></a>
-  <div class="header-placeholder"></div>
+  <span class="notif-badge" id="notifBadge">
+    <i class="fas fa-circle"></i> <span id="notifStatusText">🔔</span>
+  </span>
 </header>
 
 <!-- ===== MAIN ===== -->
 <main class="container">
 
-  <!-- PAGE HEADER -->
-  <div class="page-header">
-    <div class="subtitle"><i class="fas fa-arrow-up"></i> Retrait</div>
-    <h1>💸 Retirer vos <span>gains</span></h1>
-    <p>Retirez votre argent vers votre compte Mobile Money</p>
-  </div>
-
-  <!-- SOLDE -->
+  <!-- BALANCE -->
   <div class="card balance-card">
-    <div class="balance-label">💰 Solde disponible</div>
-    <div class="balance-amount" id="balanceDisplay">0 FCFA</div>
+    <div class="label"><i class="fas fa-wallet"></i> Solde disponible</div>
+    <div class="amount" id="balanceDisplay">0 FCFA</div>
+    <div class="status"><i class="fas fa-check-circle"></i> Compte actif</div>
   </div>
 
-  <!-- FORMULAIRE -->
+  <!-- INSTRUCTIONS -->
+  <div class="card instructions-card">
+    <h3><i class="fas fa-info-circle"></i> Retrait en 3 étapes</h3>
+    <ol class="step-list">
+      <li>
+        <span class="step-number">1</span>
+        <span>Saisissez le montant que vous souhaitez retirer (<span class="step-highlight">5 000 à 50 000 FCFA</span>)</span>
+      </li>
+      <li>
+        <span class="step-number">2</span>
+        <span>Envoyez la demande via WhatsApp</span>
+      </li>
+      <li>
+        <span class="step-number">3</span>
+        <span>Votre retrait sera traité sous <span class="step-highlight">24-48h</span></span>
+      </li>
+    </ol>
+  </div>
+
+  <!-- MONTANT -->
   <div class="card">
-    <form id="retraitForm" novalidate>
+    <label class="form-label"><i class="fas fa-coins"></i> Montant à retirer</label>
+    <div class="input-group">
+      <span class="currency">F</span>
+      <input type="number" id="amountInput" placeholder="Ex: 5000" min="5000" max="50000" step="100">
+    </div>
 
-      <!-- Opérateur -->
-      <div class="form-group">
-        <label>📱 Opérateur</label>
-        <div class="operator-selector" id="operatorSelector">
-          <div class="operator-selector-display">
-            <img src="images.png" alt="Wave" class="op-logo" id="selectedOperatorLogo" loading="lazy">
-            <span class="name" id="selectedOperatorName">Wave</span>
-          </div>
-          <i class="fas fa-chevron-down arrow"></i>
-        </div>
-        <input type="hidden" id="operator" value="Wave">
-      </div>
+    <div class="amount-display" id="amountDisplay">
+      <div class="label">💸 Montant qui sera retiré</div>
+      <div class="value zero" id="displayAmount">0 FCFA</div>
+    </div>
 
-      <!-- Montant -->
-      <div class="form-group">
-        <label>💰 Montant à retirer</label>
-        <div class="input-wrapper">
-          <i class="fas fa-coins icon-left"></i>
-          <input type="number" id="montant" placeholder="25 000 - 50 000 FCFA" min="25000" max="50000">
-        </div>
-        <div class="input-hint">
-          <i class="fas fa-info-circle"></i>
-          Minimum : 25 000 FCFA • Maximum : 50 000 FCFA • Frais : 15%
-        </div>
-      </div>
+    <div class="min-amount-hint">
+      ⚠️ Minimum : <strong>5 000 FCFA</strong> | Maximum : <strong>50 000 FCFA</strong>
+    </div>
 
-      <!-- Téléphone -->
-      <div class="form-group">
-        <label>📱 Numéro de téléphone</label>
-        <div class="input-wrapper">
-          <i class="fas fa-phone icon-left"></i>
-          <input type="tel" id="phone" placeholder="90 12 34 56">
-        </div>
-      </div>
+    <div class="balance-info" id="balanceInfo">
+      <i class="fas fa-info-circle"></i> Solde disponible : <span id="balanceInfoAmount">0 FCFA</span>
+    </div>
+  </div>
 
-      <!-- Frais -->
-      <div class="frais-info">
-        <div class="frais-row">
-          <span class="label">📊 Frais de retrait (15%)</span>
-          <span class="value frais" id="fraisDisplay">0 FCFA</span>
-        </div>
-        <div class="frais-row">
-          <span class="label">💰 Total à recevoir</span>
-          <span class="value net" id="netDisplay">0 FCFA</span>
-        </div>
-      </div>
+  <!-- DELAI -->
+  <div class="delai-info">
+    <i class="fas fa-clock"></i> Délai de traitement : <strong>24-48h</strong> après validation
+  </div>
 
-      <!-- Submit -->
-      <button type="submit" class="submit-btn" id="submitBtn">
-        <span class="btn-icon"><i class="fas fa-arrow-up"></i></span>
-        <span class="btn-text">Demander le retrait</span>
-        <span class="loader"><i class="fas fa-spinner fa-spin"></i></span>
-      </button>
+  <!-- WHATSAPP BUTTON -->
+  <a href="#" class="btn-whatsapp" id="whatsappBtn" target="_blank">
+    <i class="fab fa-whatsapp"></i>
+    Envoyer la demande de retrait
+  </a>
 
-      <!-- WhatsApp -->
-      <a href="#" class="btn-whatsapp" id="whatsappBtn" target="_blank">
-        <i class="fab fa-whatsapp"></i>
-        Prévenir ARVEXA sur WhatsApp
-      </a>
-
-    </form>
+  <!-- NOTIFICATION PERMISSION BANNER -->
+  <div class="notif-permission-banner" id="notifPermissionBanner">
+    <p><i class="fas fa-bell"></i> Activez les notifications pour suivre vos retraits !</p>
+    <button class="btn-enable" id="enableNotifBtn"><i class="fas fa-check"></i> Activer</button>
   </div>
 
   <!-- HISTORIQUE -->
-  <div class="card">
-    <div class="history-title">📋 Historique des <span>retraits</span></div>
-    <div id="historyList">
-      <div class="history-empty">
+  <div class="card" style="margin-top:18px;padding-bottom:8px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <span style="font-size:13px;font-weight:600;color:var(--text-light);">📋 Historique des retraits</span>
+    </div>
+    <div class="history-list" id="historyList">
+      <div class="empty-state">
         <i class="fas fa-clock"></i>
         <p>Aucun retrait effectué</p>
       </div>
     </div>
   </div>
 
+  <!-- NOTE -->
+  <div class="admin-note">
+    <i class="fas fa-shield-alt"></i>
+    Toute demande est traitée manuellement par l'administrateur.
+    <strong>Conservez votre reçu de paiement</strong>.
+  </div>
+
 </main>
-
-<!-- ===== MODAL OPERATEURS ===== -->
-<div class="modal-overlay" id="operatorModal">
-  <div class="modal">
-    <div class="modal-header">
-      <h3>📱 Sélectionnez votre <span>opérateur</span></h3>
-      <button class="modal-close" id="closeOperatorModal">
-        <i class="fas fa-times"></i>
-      </button>
-    </div>
-    <div class="modal-list" id="operatorList"></div>
-  </div>
-</div>
-
-<!-- ===== MODAL DE CONFIRMATION ===== -->
-<div class="confirm-modal-overlay" id="confirmModal">
-  <div class="confirm-modal">
-    <h3>Confirmer le <span>retrait</span></h3>
-    <div class="confirm-details" id="confirmDetails">
-      <div class="detail-row">
-        <span>Montant</span>
-        <span class="value accent" id="confirmMontant">0 FCFA</span>
-      </div>
-      <div class="detail-row">
-        <span>Frais (15%)</span>
-        <span class="value" id="confirmFrais">0 FCFA</span>
-      </div>
-      <div class="detail-row">
-        <span>Net à recevoir</span>
-        <span class="value success" id="confirmNet">0 FCFA</span>
-      </div>
-      <div class="detail-row">
-        <span>Opérateur</span>
-        <span class="value" id="confirmOperateur">Wave</span>
-      </div>
-      <div class="detail-row">
-        <span>Téléphone</span>
-        <span class="value" id="confirmPhone">-</span>
-      </div>
-    </div>
-    <div class="confirm-btn-group">
-      <button class="confirm-btn-cancel" id="confirmCancel">Annuler</button>
-      <button class="confirm-btn-confirm" id="confirmOk">Confirmer</button>
-    </div>
-  </div>
-</div>
 
 <!-- ===== TOAST ===== -->
 <div class="toast" id="toast"></div>
 
-<!-- ============================================================ -->
-<!-- ===== IMPORTS ===== -->
-<script type="importmap">
-  {
-    "imports": {
-      "firebase/app": "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js",
-      "firebase/auth": "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js",
-      "firebase/firestore": "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js"
-    }
+<!-- ================================================================ -->
+<!-- ERUDA -->
+<!-- ================================================================ -->
+<script>
+(function() {
+  var isLocal = location.hostname === "localhost" || location.hostname === "127.0.0.1";
+  var isDebug = location.search.indexOf("debug=true") !== -1 || location.search.indexOf("eruda=true") !== -1;
+  if (isLocal || isDebug) {
+    if (document.querySelector('script[data-eruda]')) return;
+    var s = document.createElement("script");
+    s.setAttribute("data-eruda", "true");
+    s.src = "https://cdn.jsdelivr.net/npm/eruda";
+    s.onload = function() {
+      if (typeof eruda !== 'undefined') {
+        eruda.init({ tool: ['console', 'network', 'elements'], defaults: { displaySize: 40 } });
+        console.log("🐞 Eruda active - Retrait");
+      }
+    };
+    document.head.appendChild(s);
   }
+})();
+</script>
+
+<!-- ================================================================ -->
+<!-- IMPORTS -->
+<!-- ================================================================ -->
+<script type="importmap">
+{
+  "imports": {
+    "firebase/app": "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js",
+    "firebase/auth": "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js",
+    "firebase/firestore": "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js",
+    "firebase/messaging": "https://www.gstatic.com/firebasejs/12.12.1/firebase-messaging.js"
+  }
+}
 </script>
 
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
-  import { 
-    getAuth, 
-    onAuthStateChanged, 
-    setPersistence, 
-    browserLocalPersistence 
-  } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
-  import { 
-    getFirestore, 
-    doc, 
-    getDoc, 
-    updateDoc, 
-    addDoc, 
-    collection, 
-    query, 
-    where, 
-    onSnapshot,
-    enableIndexedDbPersistence
-  } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+// ================================================================
+// IMPORTS
+// ================================================================
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+import { 
+  getAuth, 
+  onAuthStateChanged,
+  setPersistence,
+  browserLocalPersistence
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+import { 
+  getFirestore,
+  doc,
+  getDoc,
+  getDocs,
+  collection,
+  query,
+  where,
+  orderBy,
+  addDoc,
+  updateDoc,
+  onSnapshot,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+import { 
+  getMessaging,
+  getToken
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-messaging.js";
 
-  // ===== FIREBASE CONFIG - NEXGEN =====
-  const firebaseConfig = {
-    apiKey: "AIzaSyBEbYuuUlNCLMBUHClv4UnyownNHw2q3_g",
-    authDomain: "nexgen-39043.firebaseapp.com",
-    projectId: "nexgen-39043",
-    storageBucket: "nexgen-39043.firebasestorage.app",
-    messagingSenderId: "619390144325",
-    appId: "1:619390144325:web:35d96b125501e4e8b1782c",
-    measurementId: "G-HC2Q5DNKDR"
+// ================================================================
+// CONFIGURATION FIREBASE
+// ================================================================
+var firebaseConfig = {
+  apiKey: "AIzaSyBEbYuuUlNCLMBUHClv4UnyownNHw2q3_g",
+  authDomain: "nexgen-39043.firebaseapp.com",
+  projectId: "nexgen-39043",
+  storageBucket: "nexgen-39043.firebasestorage.app",
+  messagingSenderId: "619390144325",
+  appId: "1:619390144325:web:35d96b125501e4e8b1782c",
+  measurementId: "G-HC2Q5DNKDR"
+};
+
+var app = initializeApp(firebaseConfig);
+var auth = getAuth(app);
+var db = getFirestore(app);
+var messaging = getMessaging(app);
+
+var VAPID_KEY = "BJKkMr-LMevY9HePx3vzYqWMILwAV8mxwOdfkbR-PvEu_m7eu309ygioDNLLqW1wRc2b93Irb1svNnLQIpegquk";
+
+setPersistence(auth, browserLocalPersistence);
+
+// ================================================================
+// TELEGRAM CONFIG (admin uniquement)
+// ================================================================
+var TELEGRAM_BOT_TOKEN = "8283625921:AAEF--QKS9uqnz0K3j7SGkk7fsdRb3b8y8o";
+var TELEGRAM_CHAT_ID = "5212067028";
+
+// ================================================================
+// CONSTANTES
+// ================================================================
+var WHATSAPP_NUMBER = "22798064667";
+var MIN_WITHDRAWAL = 5000;
+var MAX_WITHDRAWAL = 50000;
+
+// ================================================================
+// DOM
+// ================================================================
+var balanceDisplay = document.getElementById('balanceDisplay');
+var balanceInfoAmount = document.getElementById('balanceInfoAmount');
+var balanceInfo = document.getElementById('balanceInfo');
+var amountInput = document.getElementById('amountInput');
+var displayAmount = document.getElementById('displayAmount');
+var amountDisplay = document.getElementById('amountDisplay');
+var whatsappBtn = document.getElementById('whatsappBtn');
+var historyList = document.getElementById('historyList');
+var toast = document.getElementById('toast');
+var notifBadge = document.getElementById('notifBadge');
+var notifStatusText = document.getElementById('notifStatusText');
+var notifPermissionBanner = document.getElementById('notifPermissionBanner');
+var enableNotifBtn = document.getElementById('enableNotifBtn');
+
+var currentUserId = null;
+var currentAuthUser = null;
+var userData = null;
+var userBalance = 0;
+var unsubscribeHistory = null;
+var notificationTimeout = null;
+
+// ================================================================
+// HELPERS
+// ================================================================
+function getDocument(collectionName, docId) {
+  var ref = doc(db, collectionName, docId);
+  return getDoc(ref).then(function(snap) {
+    if (!snap.exists()) return null;
+    return { id: snap.id, ...snap.data() };
+  }).catch(function(error) {
+    console.error('Erreur getDocument:', error);
+    return null;
+  });
+}
+
+function showToast(message, type) {
+  type = type || 'success';
+  toast.textContent = message;
+  toast.className = 'toast ' + type;
+  clearTimeout(notificationTimeout);
+  setTimeout(function() {
+    toast.classList.add('show');
+  }, 50);
+  notificationTimeout = setTimeout(function() {
+    toast.classList.remove('show');
+  }, 4000);
+}
+
+function formatCurrency(amount) {
+  if (!amount) return '0 FCFA';
+  return amount.toLocaleString('fr-FR') + ' FCFA';
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  var div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+// ================================================================
+// ENVOI TELEGRAM (admin uniquement)
+// ================================================================
+function sendTelegramMessage(message) {
+  var url = 'https://api.telegram.org/bot' + TELEGRAM_BOT_TOKEN + '/sendMessage';
+  return fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      chat_id: TELEGRAM_CHAT_ID,
+      text: message,
+      parse_mode: 'HTML',
+      disable_web_page_preview: true
+    })
+  }).then(function(response) {
+    return response.json();
+  }).then(function(data) {
+    console.log('Telegram envoye:', data.ok);
+    return data.ok;
+  }).catch(function(error) {
+    console.error('Erreur Telegram:', error);
+    return false;
+  });
+}
+
+// ================================================================
+// MOTIVATION MESSAGES
+// ================================================================
+function getMotivationMessage(type, userName, amount) {
+  var messages = {
+    withdrawal: [
+      '💸 Paiement effectué ! ' + userName + ' a reçu ' + formatCurrency(amount) + '. ✅',
+      '🏦 ' + userName + ' a retiré ' + formatCurrency(amount) + '. Transaction réussie ! 🙌',
+      '💳 Retrait validé ! ' + userName + ' a récupéré ' + formatCurrency(amount) + '. Bien joué ! 🎯',
+      '✅ ' + userName + ' a retiré ' + formatCurrency(amount) + '. La confiance s\'installe ! 🔥',
+      '💰 Retrait approuvé ! ' + userName + ' a reçu ' + formatCurrency(amount) + '. 🚀'
+    ]
+  };
+  var list = messages[type] || ['✅ Action effectuée avec succès ! 🚀'];
+  return list[Math.floor(Math.random() * list.length)];
+}
+
+// ================================================================
+// NOTIFICATION ADMIN
+// ================================================================
+function notifyAdminWithdrawal(userName, userId, amount, withdrawalId) {
+  var message = '💸 <b>DEMANDE DE RETRAIT !</b>\n\n' +
+                '👤 ' + escapeHtml(userName) + '\n' +
+                '💵 ' + formatCurrency(amount) + '\n' +
+                '🆔 ' + escapeHtml(userId) + '\n' +
+                '🕐 ' + new Date().toLocaleString('fr-FR') + '\n\n' +
+                '📲 Valider: <a href="https://nexgen-39043.web.app/admin">Voir dans l\'admin</a>';
+  
+  sendTelegramMessage(message);
+
+  var notifData = {
+    type: 'withdrawal_pending',
+    title: '💸 Nouveau retrait - ' + formatCurrency(amount),
+    body: userName + ' - ID: ' + userId,
+    userId: currentAuthUser ? currentAuthUser.uid : '',
+    userName: userName,
+    amount: amount,
+    withdrawalId: withdrawalId,
+    read: false,
+    createdAt: new Date().toISOString(),
+    target: 'admin'
+  };
+  
+  addDoc(collection(db, 'notifications'), notifData).catch(function(error) {
+    console.error('Erreur notification admin:', error);
+  });
+}
+
+// ================================================================
+// NOTIFICATION APRES VALIDATION D'UN RETRAIT
+// ================================================================
+async function notifyWithdrawalValidated(userId, userName, amount, withdrawalId) {
+  var message = getMotivationMessage('withdrawal', userName, amount);
+  
+  var fullMessage = '✅ <b>PAIEMENT EFFECTUE !</b>\n\n' +
+                    '💸 ' + message + '\n\n' +
+                    '👤 ' + userName + '\n' +
+                    '💵 ' + formatCurrency(amount) + '\n' +
+                    '🕐 ' + new Date().toLocaleString('fr-FR') + '\n\n' +
+                    '🔗 <a href="https://nexgen-39043.web.app/admin">Gérer les retraits</a>';
+  
+  await sendTelegramMessage(fullMessage);
+}
+
+// ================================================================
+// ECOUTE EN TEMPS REEL DE L'HISTORIQUE
+// ================================================================
+function listenToHistory(uid) {
+  if (unsubscribeHistory) {
+    unsubscribeHistory();
+    unsubscribeHistory = null;
+  }
+
+  if (!uid) {
+    historyList.innerHTML = '<div class="empty-state"><i class="fas fa-clock"></i><p>Aucun retrait effectue</p></div>';
+    return;
+  }
+
+  var q = query(
+    collection(db, 'retraits'),
+    where('userId', '==', uid)
+  );
+
+  unsubscribeHistory = onSnapshot(q, function(snapshot) {
+    if (snapshot.empty) {
+      historyList.innerHTML = '<div class="empty-state"><i class="fas fa-clock"></i><p>Aucun retrait effectue</p></div>';
+      return;
+    }
+
+    var items = [];
+    snapshot.forEach(function(docSnap) {
+      var data = docSnap.data();
+      items.push({
+        id: docSnap.id,
+        montant: data.montant || 0,
+        date: data.date || 'Date inconnue',
+        statut: data.statut || 'en_attente',
+        timestamp: data.timestamp || data.createdAt || data.date || ''
+      });
+    });
+
+    items.sort(function(a, b) {
+      var dateA = a.timestamp ? new Date(a.timestamp).getTime() : 0;
+      var dateB = b.timestamp ? new Date(b.timestamp).getTime() : 0;
+      return dateB - dateA;
+    });
+
+    var displayItems = items.slice(0, 20);
+    historyList.innerHTML = '';
+
+    displayItems.forEach(function(data) {
+      var item = document.createElement('div');
+      item.className = 'history-item';
+      
+      var statusClass = 'pending';
+      var statusLabel = '⏳ En attente';
+      
+      var statut = data.statut || 'en_attente';
+      if (statut === 'valide' || statut === 'validé' || statut === 'confirmed') {
+        statusClass = 'validated';
+        statusLabel = '✅ Valide';
+      } else if (statut === 'rejete' || statut === 'rejeté' || statut === 'rejected') {
+        statusClass = 'rejected';
+        statusLabel = '❌ Rejete';
+      }
+
+      item.innerHTML = '<div class="left"><span class="amount">' + formatCurrency(data.montant) + '</span><span class="date">' + (data.date || 'Date inconnue') + '</span></div><div class="right"><span class="status-badge ' + statusClass + '">' + statusLabel + '</span></div>';
+      historyList.appendChild(item);
+    });
+
+    // Détecter les nouveaux retraits validés
+    snapshot.docChanges().forEach(function(change) {
+      if (change.type === 'modified') {
+        var data = change.doc.data();
+        if (data.statut === 'valide' || data.statut === 'validé') {
+          var userName = userData ? (userData.prenom || 'Utilisateur') : 'Utilisateur';
+          notifyWithdrawalValidated(currentAuthUser.uid, userName, data.montant || 0, change.doc.id);
+        }
+      }
+    });
+
+  }, function(error) {
+    console.error('Erreur ecoute historique retraits:', error.code);
+    if (error.code === 'failed-precondition' || error.code === 'permission-denied') {
+      loadHistoryOnce(uid);
+    }
+  });
+}
+
+// ================================================================
+// CHARGEMENT UNIQUE (FALLBACK)
+// ================================================================
+function loadHistoryOnce(uid) {
+  var q = query(collection(db, 'retraits'), where('userId', '==', uid));
+  
+  getDocs(q).then(function(snapshot) {
+    if (snapshot.empty) {
+      historyList.innerHTML = '<div class="empty-state"><i class="fas fa-clock"></i><p>Aucun retrait effectue</p></div>';
+      return;
+    }
+
+    var items = [];
+    snapshot.forEach(function(docSnap) {
+      var data = docSnap.data();
+      items.push({
+        id: docSnap.id,
+        montant: data.montant || 0,
+        date: data.date || 'Date inconnue',
+        statut: data.statut || 'en_attente',
+        timestamp: data.timestamp || data.createdAt || data.date || ''
+      });
+    });
+
+    items.sort(function(a, b) {
+      var dateA = a.timestamp ? new Date(a.timestamp).getTime() : 0;
+      var dateB = b.timestamp ? new Date(b.timestamp).getTime() : 0;
+      return dateB - dateA;
+    });
+
+    var displayItems = items.slice(0, 20);
+    historyList.innerHTML = '';
+
+    displayItems.forEach(function(data) {
+      var item = document.createElement('div');
+      item.className = 'history-item';
+      
+      var statusClass = 'pending';
+      var statusLabel = '⏳ En attente';
+      
+      var statut = data.statut || 'en_attente';
+      if (statut === 'valide' || statut === 'validé' || statut === 'confirmed') {
+        statusClass = 'validated';
+        statusLabel = '✅ Valide';
+      } else if (statut === 'rejete' || statut === 'rejeté' || statut === 'rejected') {
+        statusClass = 'rejected';
+        statusLabel = '❌ Rejete';
+      }
+
+      item.innerHTML = '<div class="left"><span class="amount">' + formatCurrency(data.montant) + '</span><span class="date">' + (data.date || 'Date inconnue') + '</span></div><div class="right"><span class="status-badge ' + statusClass + '">' + statusLabel + '</span></div>';
+      historyList.appendChild(item);
+    });
+  }).catch(function(error) {
+    console.error('Erreur fallback retraits:', error);
+    historyList.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>Erreur de chargement</p></div>';
+  });
+}
+
+// ================================================================
+// CHARGEMENT UTILISATEUR
+// ================================================================
+function loadUserData(uid) {
+  var userRef = doc(db, 'users', uid);
+  
+  getDoc(userRef).then(function(docSnap) {
+    if (docSnap.exists()) {
+      userData = docSnap.data();
+      
+      if (!userData.indicatif) userData.indicatif = '+227';
+      if (!userData.phone) userData.phone = '';
+      if (!userData.prenom) userData.prenom = 'Utilisateur';
+      
+      currentUserId = userData.id || userData.customerId || generateId();
+      
+      if (!userData.id && !userData.customerId) {
+        var ref = doc(db, 'users', uid);
+        updateDoc(ref, { id: currentUserId, customerId: currentUserId });
+      }
+      
+      userBalance = userData.balance || 0;
+      balanceDisplay.textContent = formatCurrency(userBalance);
+      balanceInfoAmount.textContent = formatCurrency(userBalance);
+      
+      listenToHistory(uid);
+      
+      localStorage.setItem('ARVEXA_user_data', JSON.stringify(userData));
+      sessionStorage.setItem('arvexa_loaded', 'true');
+    }
+  }).catch(function(error) {
+    console.error('Erreur chargement user:', error);
+  });
+}
+
+function generateId() {
+  var prefix = 'ARV';
+  var timestamp = Date.now().toString(36).toUpperCase();
+  var random = Math.random().toString(36).substring(2, 7).toUpperCase();
+  return prefix + '-' + timestamp + '-' + random;
+}
+
+// ================================================================
+// METTRE A JOUR L'AFFICHAGE DU MONTANT
+// ================================================================
+function updateAmountDisplay() {
+  var amount = parseInt(amountInput.value) || 0;
+  
+  if (amount >= MIN_WITHDRAWAL && amount <= MAX_WITHDRAWAL) {
+    displayAmount.textContent = formatCurrency(amount);
+    displayAmount.className = 'value';
+    amountDisplay.classList.add('has-value');
+    
+    if (amount <= userBalance) {
+      balanceInfo.className = 'balance-info sufficient';
+      balanceInfo.innerHTML = '<i class="fas fa-check-circle"></i> Solde suffisant : ' + formatCurrency(userBalance);
+    } else {
+      balanceInfo.className = 'balance-info insufficient';
+      balanceInfo.innerHTML = '<i class="fas fa-exclamation-circle"></i> Solde insuffisant. Vous avez ' + formatCurrency(userBalance);
+    }
+  } else if (amount > 0) {
+    displayAmount.textContent = formatCurrency(amount) + ' (hors limite)';
+    displayAmount.className = 'value zero';
+    amountDisplay.classList.add('has-value');
+  } else {
+    displayAmount.textContent = '0 FCFA';
+    displayAmount.className = 'value zero';
+    amountDisplay.classList.remove('has-value');
+    balanceInfo.className = 'balance-info';
+    balanceInfo.innerHTML = '<i class="fas fa-info-circle"></i> Solde disponible : ' + formatCurrency(userBalance);
+  }
+  
+  updateWhatsAppLink(amount);
+}
+
+// ================================================================
+// METTRE A JOUR LE LIEN WHATSAPP
+// ================================================================
+function updateWhatsAppLink(amount) {
+  var amountValue = amount || parseInt(amountInput.value) || 0;
+  
+  if (amountValue < MIN_WITHDRAWAL) {
+    whatsappBtn.disabled = true;
+    whatsappBtn.style.opacity = '0.5';
+    whatsappBtn.innerHTML = '<i class="fab fa-whatsapp"></i> Minimum ' + formatCurrency(MIN_WITHDRAWAL);
+    return;
+  }
+
+  if (amountValue > MAX_WITHDRAWAL) {
+    whatsappBtn.disabled = true;
+    whatsappBtn.style.opacity = '0.5';
+    whatsappBtn.innerHTML = '<i class="fab fa-whatsapp"></i> Maximum ' + formatCurrency(MAX_WITHDRAWAL);
+    return;
+  }
+
+  if (amountValue > userBalance) {
+    whatsappBtn.disabled = true;
+    whatsappBtn.style.opacity = '0.5';
+    whatsappBtn.innerHTML = '<i class="fab fa-whatsapp"></i> Solde insuffisant';
+    return;
+  }
+
+  whatsappBtn.disabled = false;
+  whatsappBtn.style.opacity = '1';
+  whatsappBtn.innerHTML = '<i class="fab fa-whatsapp"></i> Envoyer la demande de retrait';
+  
+  var phone = (userData && userData.phone) || '';
+  var indicatif = (userData && userData.indicatif) || '+227';
+  var userName = (userData && (userData.prenom || userData.fullName)) || 'Utilisateur';
+  var cleanPhone = phone.replace(/\D/g, '');
+  
+  var message = 'NOUVELLE DEMANDE DE RETRAIT\n\n' +
+                'Nom: ' + userName + '\n' +
+                'ID: ' + currentUserId + '\n' +
+                'Telephone: ' + indicatif + ' ' + cleanPhone + '\n' +
+                'Montant: ' + formatCurrency(amountValue) + '\n' +
+                'Date: ' + new Date().toLocaleDateString('fr-FR') + '\n\n' +
+                'Valider: https://nexgen-39043.web.app/admin/index.html';
+  
+  whatsappBtn.href = 'https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(message);
+}
+
+// ================================================================
+// ENVOI VIA WHATSAPP
+// ================================================================
+whatsappBtn.addEventListener('click', function(event) {
+  event.preventDefault();
+
+  var amount = parseInt(amountInput.value, 10) || 0;
+  var phone = (userData && userData.phone) || '';
+  var indicatif = (userData && userData.indicatif) || '+227';
+  var cleanPhone = phone.replace(/\D/g, '');
+  var userName = (userData && (userData.prenom || userData.fullName)) || 'Utilisateur';
+  var userEmail = (userData && userData.email) || (currentAuthUser ? currentAuthUser.email : '');
+
+  if (!currentAuthUser || !currentUserId) {
+    showToast('Veuillez vous reconnecter.', 'error');
+    return;
+  }
+
+  if (amount < MIN_WITHDRAWAL) {
+    showToast('Le montant minimum est de ' + formatCurrency(MIN_WITHDRAWAL) + '.', 'error');
+    return;
+  }
+
+  if (amount > MAX_WITHDRAWAL) {
+    showToast('Le montant maximum est de ' + formatCurrency(MAX_WITHDRAWAL) + '.', 'error');
+    return;
+  }
+
+  if (amount > userBalance) {
+    showToast('Solde insuffisant. Votre solde est de ' + formatCurrency(userBalance) + '.', 'error');
+    return;
+  }
+
+  if (!phone || cleanPhone.length < 7) {
+    showToast('Numero de telephone invalide. Mettez a jour votre profil.', 'error');
+    return;
+  }
+
+  var withdrawalData = {
+    userId: currentAuthUser.uid,
+    displayId: currentUserId || 'ID_INCONNU',
+    userName: userName,
+    userEmail: userEmail,
+    userPhone: cleanPhone,
+    userIndicatif: indicatif || '+227',
+    fullPhone: (indicatif || '+227') + ' ' + cleanPhone,
+    montant: amount,
+    date: new Date().toISOString().split('T')[0],
+    timestamp: new Date().toISOString(),
+    statut: 'en_attente',
+    type: 'retrait',
+    source: 'whatsapp',
+    paymentMethod: 'whatsapp',
+    createdAt: new Date().toISOString()
   };
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
-  
-  // Activer la persistance
-  enableIndexedDbPersistence(db).catch(() => {});
-
-  setPersistence(auth, browserLocalPersistence);
-
-  // ================================================================
-  // ===== CONSTANTES =====
-  // ================================================================
-  const FRAIS_POURCENTAGE = 15; // 15%
-  const MIN_RETRAIT = 25000;    // ✅ Minimum 25 000 FCFA
-  const MAX_RETRAIT = 50000;    // ✅ Maximum 50 000 FCFA
-  const WHATSAPP_NUMBER = "22798064667";
-
-  // ================================================================
-  // ===== OPÉRATEURS (avec images) =====
-  // ================================================================
-  const operators = [
-    { name: "Wave", logo: "images.png" },
-    { name: "Orange Money", logo: "images2.png" },
-    { name: "Moov Money", logo: "images3.png" },
-    { name: "Airtel Money", logo: "images1.png" },
-    { name: "MyNita", logo: "images4.png" },
-    { name: "AmanaTa", logo: "images5.png" }
-  ];
-
-  let selectedOperator = "Wave";
-  let selectedOperatorLogo = "images.png";
-  let currentUser = null;
-  let userData = null;
-  let allRetraits = [];
-  let unsubscribeHistory = null;
-
-  // ================================================================
-  // ===== DOM =====
-  // ================================================================
-  const balanceDisplay = document.getElementById('balanceDisplay');
-  const operatorSelector = document.getElementById('operatorSelector');
-  const selectedOperatorName = document.getElementById('selectedOperatorName');
-  const selectedOperatorLogoEl = document.getElementById('selectedOperatorLogo');
-  const operatorInput = document.getElementById('operator');
-  const montantInput = document.getElementById('montant');
-  const phoneInput = document.getElementById('phone');
-  const fraisDisplay = document.getElementById('fraisDisplay');
-  const netDisplay = document.getElementById('netDisplay');
-  const submitBtn = document.getElementById('submitBtn');
-  const whatsappBtn = document.getElementById('whatsappBtn');
-  const operatorModal = document.getElementById('operatorModal');
-  const closeOperatorModal = document.getElementById('closeOperatorModal');
-  const operatorList = document.getElementById('operatorList');
-  const historyList = document.getElementById('historyList');
-  const toast = document.getElementById('toast');
-
-  // Confirmation modal
-  const confirmModal = document.getElementById('confirmModal');
-  const confirmCancel = document.getElementById('confirmCancel');
-  const confirmOk = document.getElementById('confirmOk');
-  const confirmMontant = document.getElementById('confirmMontant');
-  const confirmFrais = document.getElementById('confirmFrais');
-  const confirmNet = document.getElementById('confirmNet');
-  const confirmOperateur = document.getElementById('confirmOperateur');
-  const confirmPhone = document.getElementById('confirmPhone');
-
-  let pendingRetrait = null;
-
-  // ================================================================
-  // ===== TOAST =====
-  // ================================================================
-  function showToast(message, type = 'success') {
-    toast.textContent = message;
-    toast.className = `toast ${type}`;
-    setTimeout(() => toast.classList.add('show'), 50);
-    setTimeout(() => toast.classList.remove('show'), 4000);
-  }
-
-  // ================================================================
-  // ===== FORMAT =====
-  // ================================================================
-  function formatCurrency(amount) {
-    return amount.toLocaleString('fr-FR') + ' FCFA';
-  }
-
-  function formatDate(dateStr) {
-    if (!dateStr) return '-';
-    try {
-      const d = new Date(dateStr);
-      return d.toLocaleDateString('fr-FR') + ' ' + d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-    } catch {
-      return '-';
-    }
-  }
-
-  // ================================================================
-  // ===== OPÉRATEUR MODAL =====
-  // ================================================================
-  function openOperatorModal() {
-    renderOperatorList();
-    operatorModal.classList.add('show');
-  }
-
-  function closeOperatorModalFn() {
-    operatorModal.classList.remove('show');
-  }
-
-  function selectOperator(name, logo) {
-    selectedOperator = name;
-    selectedOperatorLogo = logo;
-    selectedOperatorName.textContent = name;
-    selectedOperatorLogoEl.src = logo;
-    selectedOperatorLogoEl.alt = name;
-    operatorInput.value = name;
-    closeOperatorModalFn();
-  }
-
-  function renderOperatorList() {
-    operatorList.innerHTML = operators.map(op => `
-      <div class="operator-option ${op.name === selectedOperator ? 'selected' : ''}"
-           data-name="${op.name}" data-logo="${op.logo}">
-        <img src="${op.logo}" alt="${op.name}" class="op-logo" loading="lazy">
-        <span class="op-name">${op.name}</span>
-        ${op.name === selectedOperator ? '<span class="op-check"><i class="fas fa-check-circle"></i></span>' : ''}
-      </div>
-    `).join('');
-
-    operatorList.querySelectorAll('.operator-option').forEach(opt => {
-      opt.addEventListener('click', () => {
-        const name = opt.dataset.name;
-        const logo = opt.dataset.logo;
-        selectOperator(name, logo);
-      });
-    });
-  }
-
-  operatorSelector.addEventListener('click', openOperatorModal);
-  closeOperatorModal.addEventListener('click', closeOperatorModalFn);
-  operatorModal.addEventListener('click', (e) => {
-    if (e.target === operatorModal) closeOperatorModalFn();
-  });
-
-  // ================================================================
-  // ===== CALCUL FRAIS =====
-  // ================================================================
-  function calculateFees() {
-    const montant = parseInt(montantInput.value) || 0;
-    const frais = Math.round(montant * FRAIS_POURCENTAGE / 100);
-    const net = montant - frais;
-
-    fraisDisplay.textContent = formatCurrency(frais);
-    netDisplay.textContent = formatCurrency(net);
+  addDoc(collection(db, 'retraits'), withdrawalData).then(function(docRef) {
+    notifyAdminWithdrawal(userName, currentUserId, amount, docRef.id);
+    showToast('Demande de ' + formatCurrency(amount) + ' enregistree.', 'success');
     
-    return { montant, frais, net };
-  }
-
-  montantInput.addEventListener('input', calculateFees);
-
-  // ================================================================
-  // ===== UPDATE UI =====
-  // ================================================================
-  function updateUI(data) {
-    if (!data) return;
-    const balance = data.balance || 0;
-    balanceDisplay.textContent = formatCurrency(balance);
-  }
-
-  // ================================================================
-  // ===== CHARGER HISTORIQUE =====
-  // ================================================================
-  function loadHistory(userId) {
-    if (unsubscribeHistory) {
-      unsubscribeHistory();
-      unsubscribeHistory = null;
-    }
-
-    const q = query(
-      collection(db, "retraits"),
-      where("userId", "==", userId)
-    );
-
-    unsubscribeHistory = onSnapshot(q, (snapshot) => {
-      allRetraits = [];
-      snapshot.forEach(doc => {
-        allRetraits.push({ id: doc.id, ...doc.data() });
-      });
-
-      // Trier par timestamp décroissant
-      allRetraits.sort((a, b) => {
-        const dateA = a.timestamp ? new Date(a.timestamp) : new Date(0);
-        const dateB = b.timestamp ? new Date(b.timestamp) : new Date(0);
-        return dateB - dateA;
-      });
-
-      if (allRetraits.length === 0) {
-        historyList.innerHTML = `
-          <div class="history-empty">
-            <i class="fas fa-clock"></i>
-            <p>Aucun retrait effectué</p>
-          </div>
-        `;
-        return;
-      }
-
-      let html = '';
-      allRetraits.slice(0, 10).forEach(r => {
-        const statusClass = r.statut === 'validé' ? 'validé' : (r.statut === 'rejeté' ? 'rejeté' : 'en_attente');
-        const statusText = r.statut === 'validé' ? '✅ Validé' : (r.statut === 'rejeté' ? '❌ Rejeté' : '⏳ En attente');
-        const net = (r.montant || 0) - (r.frais || 0);
-
-        html += `
-          <div class="history-item">
-            <div class="h-left">
-              <span class="h-date">${formatDate(r.timestamp || r.date)}</span>
-              <span class="h-amount">${formatCurrency(r.montant || 0)}</span>
-            </div>
-            <div class="h-right">
-              <span class="h-status ${statusClass}">${statusText}</span>
-              <span class="h-detail">Frais: ${formatCurrency(r.frais || 0)} • Net: ${formatCurrency(net)}</span>
-            </div>
-          </div>
-        `;
-      });
-      historyList.innerHTML = html;
-    }, (error) => {
-      console.warn('⚠️ Erreur historique:', error);
-      historyList.innerHTML = `
-        <div class="history-empty">
-          <i class="fas fa-exclamation-triangle"></i>
-          <p>Erreur de chargement de l'historique</p>
-        </div>
-      `;
-    });
-  }
-
-  // ================================================================
-  // ===== AFFICHER LA MODALE DE CONFIRMATION =====
-  // ================================================================
-  function showConfirmModal(montant, frais, net, operateur, phone) {
-    confirmMontant.textContent = formatCurrency(montant);
-    confirmFrais.textContent = formatCurrency(frais);
-    confirmNet.textContent = formatCurrency(net);
-    confirmOperateur.textContent = operateur;
-    confirmPhone.textContent = phone;
+    var message = 'NOUVELLE DEMANDE DE RETRAIT\n\n' +
+                  'Nom: ' + userName + '\n' +
+                  'ID: ' + currentUserId + '\n' +
+                  'Telephone: ' + (indicatif || '+227') + ' ' + cleanPhone + '\n' +
+                  'Montant: ' + formatCurrency(amount) + '\n' +
+                  'Date: ' + new Date().toLocaleDateString('fr-FR') + '\n\n' +
+                  'Valider: https://nexgen-39043.web.app/admin/index.html';
     
-    pendingRetrait = { montant, frais, net, operateur, phone };
-    confirmModal.classList.add('show');
-  }
-
-  function closeConfirmModalFn() {
-    confirmModal.classList.remove('show');
-    pendingRetrait = null;
-  }
-
-  confirmCancel.addEventListener('click', closeConfirmModalFn);
-  confirmModal.addEventListener('click', (e) => {
-    if (e.target === confirmModal) closeConfirmModalFn();
+    var waUrl = 'https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(message);
+    window.open(waUrl, '_blank', 'noopener,noreferrer');
+    
+    amountInput.value = '';
+    updateAmountDisplay();
+  }).catch(function(error) {
+    console.error('Erreur:', error);
+    showToast('Erreur lors de l\'enregistrement: ' + error.message, 'error');
   });
-  
-     // ================================================================
-  // ===== SOUMETTRE RETRAIT =====
-  // ================================================================
-  confirmOk.addEventListener('click', async () => {
-    if (!pendingRetrait || !currentUser) return;
+});
 
-    const { montant, frais, net, operateur, phone } = pendingRetrait;
-    closeConfirmModalFn();
+// ================================================================
+// NOTIFICATIONS FCM
+// ================================================================
+async function setupFCMNotifications() {
+  try {
+    if (Notification.permission === 'granted') {
+      var token = await getToken(messaging, { vapidKey: VAPID_KEY });
+      if (currentAuthUser) {
+        var userRef = doc(db, 'users', currentAuthUser.uid);
+        await updateDoc(userRef, { fcmToken: token, notificationsEnabled: true });
+      }
+      notifBadge.className = 'notif-badge';
+      notifStatusText.textContent = '🔔';
+      if (notifPermissionBanner) notifPermissionBanner.style.display = 'none';
+      return token;
+    }
+    
+    if (Notification.permission === 'denied') {
+      notifBadge.className = 'notif-badge';
+      notifStatusText.textContent = '🔕';
+      if (notifPermissionBanner) notifPermissionBanner.style.display = 'none';
+      return null;
+    }
+    
+    notifBadge.className = 'notif-badge';
+    notifStatusText.textContent = '🔔';
+    if (notifPermissionBanner) notifPermissionBanner.style.display = 'flex';
+    return null;
+  } catch (error) {
+    console.error('❌ Erreur FCM:', error);
+    return null;
+  }
+}
 
-    submitBtn.classList.add('loading');
-    submitBtn.disabled = true;
-
+if (enableNotifBtn) {
+  enableNotifBtn.addEventListener('click', async function() {
     try {
-      // 1. Vérifier à nouveau le solde
-      const userRef = doc(db, 'users', currentUser.uid);
-      const userSnap = await getDoc(userRef);
-      
-      if (!userSnap.exists()) {
-        showToast('❌ Utilisateur non trouvé', 'error');
-        submitBtn.classList.remove('loading');
-        submitBtn.disabled = false;
-        return;
-      }
-
-      const currentBalance = userSnap.data().balance || 0;
-      if (currentBalance < montant) {
-        showToast('❌ Solde insuffisant', 'error');
-        submitBtn.classList.remove('loading');
-        submitBtn.disabled = false;
-        return;
-      }
-
-      // 2. Créer la demande de retrait
-      await addDoc(collection(db, 'retraits'), {
-        userId: currentUser.uid,
-        userName: userData?.prenom || userData?.fullName || 'Utilisateur',
-        userEmail: userData?.email || currentUser.email,
-        montant: montant,
-        frais: frais,
-        net: net,
-        operateur: operateur,
-        phone: phone,
-        date: new Date().toISOString().split('T')[0],
-        timestamp: new Date().toISOString(),
-        statut: 'en_attente'
-      });
-
-      // 3. Déduire le solde immédiatement
-      await updateDoc(userRef, {
-        balance: currentBalance - montant,
-        totalRetraits: (userSnap.data().totalRetraits || 0) + montant,
-        lastRetrait: new Date().toISOString()
-      });
-
-      // 4. Mettre à jour les données locales
-      userData.balance = currentBalance - montant;
-      updateUI(userData);
-
-      // 5. Message WhatsApp
-      const waMessage = `Bonjour ARVEXA, je souhaite retirer ${montant.toLocaleString('fr-FR')} FCFA via ${operateur} sur le numéro ${phone}. Mon ID est : ${userData?.id || userData?.customerId || 'N/A'}`;
-      whatsappBtn.href = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(waMessage)}`;
-      whatsappBtn.style.display = 'flex';
-
-      showToast(`✅ Demande de retrait de ${formatCurrency(montant)} envoyée !`, 'success');
-
-      // Ouvrir WhatsApp
-      window.open(whatsappBtn.href, '_blank', 'noopener,noreferrer');
-
-      // Réinitialiser le formulaire
-      montantInput.value = '';
-      phoneInput.value = '';
-      fraisDisplay.textContent = '0 FCFA';
-      netDisplay.textContent = '0 FCFA';
-
-    } catch (error) {
-      console.error('❌ Erreur retrait:', error);
-      showToast('❌ Erreur lors de la demande de retrait', 'error');
-    }
-
-    submitBtn.classList.remove('loading');
-    submitBtn.disabled = false;
-  });
-
-  // ================================================================
-  // ===== FORMULAIRE =====
-  // ================================================================
-  document.getElementById('retraitForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    if (!currentUser) {
-      window.location.href = 'login.html';
-      return;
-    }
-
-    const montant = parseInt(montantInput.value) || 0;
-    const phone = phoneInput.value.trim().replace(/\s/g, '');
-    const operateur = selectedOperator;
-
-    // Validation
-    if (montant < MIN_RETRAIT) {
-      showToast(`❌ Le montant minimum est de ${MIN_RETRAIT.toLocaleString('fr-FR')} FCFA`, 'error');
-      return;
-    }
-
-    if (montant > MAX_RETRAIT) {
-      showToast(`❌ Le montant maximum est de ${MAX_RETRAIT.toLocaleString('fr-FR')} FCFA`, 'error');
-      return;
-    }
-
-    if (!phone || phone.length < 8) {
-      showToast('❌ Veuillez saisir un numéro de téléphone valide', 'error');
-      return;
-    }
-
-    // Vérifier le solde
-    const balance = userData?.balance || 0;
-    if (balance < montant) {
-      showToast(`❌ Solde insuffisant. Disponible : ${formatCurrency(balance)}`, 'error');
-      return;
-    }
-
-    // Calculer les frais
-    const frais = Math.round(montant * FRAIS_POURCENTAGE / 100);
-    const net = montant - frais;
-
-    // Afficher la modale de confirmation
-    showConfirmModal(montant, frais, net, operateur, phone);
-  });
-
-  // ================================================================
-  // ===== AUTH =====
-  // ================================================================
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      currentUser = user;
-      localStorage.setItem('ARVEXA_current_user', user.uid);
-
-      const userRef = doc(db, 'users', user.uid);
-
-      getDoc(userRef).then((docSnap) => {
-        if (docSnap.exists()) {
-          userData = docSnap.data();
-          updateUI(userData);
-          loadHistory(user.uid);
+      var permission = await Notification.requestPermission();
+      if (permission === 'granted') {
+        var token = await getToken(messaging, { vapidKey: VAPID_KEY });
+        if (currentAuthUser) {
+          var userRef = doc(db, 'users', currentAuthUser.uid);
+          await updateDoc(userRef, { fcmToken: token, notificationsEnabled: true });
         }
-      }).catch((error) => {
-        console.warn('⚠️ Erreur chargement:', error);
-        const cached = localStorage.getItem('ARVEXA_user_data');
-        if (cached) {
-          userData = JSON.parse(cached);
-          updateUI(userData);
-        }
-      });
-
-      // Écouter les changements
-      onSnapshot(userRef, (docSnap) => {
-        if (docSnap.exists()) {
-          userData = docSnap.data();
-          updateUI(userData);
-          localStorage.setItem('ARVEXA_user_data', JSON.stringify(userData));
-        }
-      }, (error) => {
-        console.warn('⚠️ Erreur snapshot:', error);
-      });
-
-    } else {
-      const savedUid = localStorage.getItem('ARVEXA_current_user');
-      if (savedUid) {
-        setTimeout(() => {
-          if (!auth.currentUser) {
-            window.location.href = 'login.html';
-          }
-        }, 2000);
+        notifBadge.className = 'notif-badge';
+        notifStatusText.textContent = '🔔';
+        if (notifPermissionBanner) notifPermissionBanner.style.display = 'none';
+        showToast('✅ Notifications activées !', 'success');
       } else {
-        window.location.href = 'login.html';
+        showToast('⚠️ Notifications désactivées.', 'warning');
       }
+    } catch (error) {
+      console.error('❌ Erreur permission:', error);
     }
   });
+}
 
-  console.log("💸 ARVEXA - Page Retrait (version corrigée)");
+// ================================================================
+// AUTH
+// ================================================================
+var authChecked = false;
+
+onAuthStateChanged(auth, function(user) {
+  if (user) {
+    currentAuthUser = user;
+    localStorage.setItem('ARVEXA_current_user', user.uid);
+    
+    var cached = localStorage.getItem('ARVEXA_user_data');
+    if (cached) {
+      try {
+        userData = JSON.parse(cached);
+        if (!userData.indicatif) userData.indicatif = '+227';
+        userBalance = userData.balance || 0;
+        balanceDisplay.textContent = formatCurrency(userBalance);
+        balanceInfoAmount.textContent = formatCurrency(userBalance);
+      } catch(e) {}
+    }
+
+    loadUserData(user.uid);
+    setupFCMNotifications();
+    authChecked = true;
+  } else {
+    var savedUid = localStorage.getItem('ARVEXA_current_user');
+    if (savedUid && !authChecked) {
+      setTimeout(function() {
+        if (!auth.currentUser) {
+          window.location.href = 'login.html';
+        }
+      }, 2000);
+    } else if (!authChecked) {
+      window.location.href = 'login.html';
+    }
+    authChecked = true;
+  }
+});
+
+// ================================================================
+// EVENEMENTS
+// ================================================================
+amountInput.addEventListener('input', updateAmountDisplay);
+
+console.log('💸 ARVEXA - Page Retrait chargee');
 </script>
 </body>
 </html>

@@ -4,11 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
   <meta name="theme-color" content="#0A0A0A">
-  <meta name="description" content="ARVEXA - Se connecter">
+  <meta name="description" content="ARVEXA - Connexion à votre compte">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3135/3135715.png">
+  
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔐</text></svg>">
+  
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
   
@@ -30,9 +33,10 @@
       --card-border: rgba(184, 134, 11, 0.06);
       --glass-bg: rgba(26, 58, 42, 0.15);
       --glass-border: rgba(184, 134, 11, 0.04);
-      --transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+      --transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
       --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
       --radius: 16px;
+      --danger: #8A3A3A;
     }
 
     * {
@@ -68,9 +72,9 @@
       top: 0; left: 0;
       width: 100%; height: 100%;
       z-index: -2;
-      background: radial-gradient(ellipse 40% 30% at 30% 20%, rgba(26, 58, 42, 0.10) 0%, transparent 70%),
+      background: radial-gradient(ellipse 40% 30% at 30% 20%, rgba(26, 58, 42, 0.12) 0%, transparent 70%),
+                  radial-gradient(ellipse 30% 20% at 70% 80%, rgba(184, 134, 11, 0.02) 0%, transparent 60%),
                   linear-gradient(180deg, #0A0A0A 0%, #060606 100%);
-      pointer-events: none;
     }
 
     .glow {
@@ -97,28 +101,49 @@
       align-items: center;
       padding: 12px 5%;
       background: rgba(10, 10, 10, 0.95);
-      backdrop-filter: blur(8px);
+      backdrop-filter: blur(12px);
       position: sticky;
       top: 0;
       z-index: 100;
       border-bottom: 1px solid var(--glass-border);
-      width: 100%;
-      max-width: 100%;
     }
 
-    .logo {
-      display: flex;
-      align-items: center;
-      text-decoration: none;
-      color: var(--text-light);
-      font-size: clamp(16px, 2.5vw, 22px);
+    .logo-text {
+      font-size: 18px;
       font-weight: 700;
       font-family: 'Playfair Display', 'Georgia', serif;
       letter-spacing: 2px;
+      color: var(--text-light);
+      text-decoration: none;
     }
-    .logo span {
+    .logo-text span {
       color: var(--accent);
       font-style: italic;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .register-link {
+      color: var(--text-dim);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 400;
+      padding: 6px 14px;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 30px;
+      transition: var(--transition);
+    }
+    .register-link:active {
+      transform: scale(0.96);
+    }
+    .register-link:hover {
+      border-color: rgba(184, 134, 11, 0.1);
+      color: var(--text-light);
     }
 
     .back-btn {
@@ -144,47 +169,58 @@
       font-size: clamp(14px, 1.8vw, 18px);
     }
 
-    .header-placeholder {
-      width: clamp(32px, 4vw, 40px);
-      flex-shrink: 0;
+    /* ===== BADGE NOTIFICATION ===== */
+    .notif-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 30px;
+      font-size: 10px;
+      font-weight: 500;
+      transition: var(--transition);
+      background: rgba(45, 125, 90, 0.08);
+      color: var(--success);
+      border: 1px solid rgba(45, 125, 90, 0.10);
+    }
+    .notif-badge i {
+      font-size: 12px;
     }
 
     /* ===== CONTAINER ===== */
     .container {
       max-width: 500px;
       margin: 0 auto;
-      padding: 30px 5% 40px;
+      padding: 20px 16px 40px;
       width: 100%;
       flex: 1;
       display: flex;
       align-items: center;
-      justify-content: center;
     }
 
     /* ===== CARD ===== */
     .login-card {
       background: var(--bg-card);
-      backdrop-filter: blur(8px);
+      backdrop-filter: blur(14px);
       border: 1px solid var(--card-border);
       border-radius: var(--radius);
-      padding: clamp(24px, 4vw, 36px);
-      width: 100%;
+      padding: 32px 24px;
+      animation: fadeInUp 0.6s ease-out;
       box-shadow: var(--shadow);
+      width: 100%;
     }
 
-    /* ===== HEADER ===== */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
     .login-header {
       text-align: center;
       margin-bottom: 28px;
     }
-    .login-header .icon-big {
-      font-size: 40px;
-      color: var(--accent);
-      margin-bottom: 6px;
-      display: block;
-    }
     .login-header h1 {
-      font-size: clamp(24px, 4vw, 32px);
+      font-size: 26px;
       font-weight: 700;
       font-family: 'Playfair Display', 'Georgia', serif;
       color: var(--text-light);
@@ -216,13 +252,13 @@
       to { opacity: 1; transform: translateY(0); }
     }
     .message-banner.error {
-      background: rgba(184, 134, 11, 0.10);
-      border: 1px solid rgba(184, 134, 11, 0.20);
+      background: rgba(184, 134, 11, 0.1);
+      border: 1px solid rgba(184, 134, 11, 0.2);
       color: var(--accent);
     }
     .message-banner.success {
-      background: rgba(45, 125, 90, 0.10);
-      border: 1px solid rgba(45, 125, 90, 0.20);
+      background: rgba(45, 125, 90, 0.1);
+      border: 1px solid rgba(45, 125, 90, 0.2);
       color: var(--success);
     }
     .message-banner.warning {
@@ -250,14 +286,14 @@
       position: relative;
       display: flex;
       align-items: center;
-      background: rgba(10, 10, 10, 0.5);
+      background: rgba(10, 10, 10, 0.6);
       border: 1px solid var(--card-border);
       border-radius: 12px;
-      transition: border-color 0.2s, box-shadow 0.2s;
+      transition: var(--transition);
     }
     .input-wrapper:focus-within {
       border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(184, 134, 11, 0.06);
+      box-shadow: 0 0 0 3px rgba(184, 134, 11, 0.08);
     }
     .input-wrapper .icon-left {
       position: absolute;
@@ -294,62 +330,21 @@
     }
 
     /* ===== FORGOT PASSWORD ===== */
-    .forgot-link {
+    .forgot-password {
       text-align: right;
-      margin-top: -8px;
       margin-bottom: 18px;
     }
-    .forgot-link a {
+    .forgot-password a {
       color: var(--text-muted);
       font-size: 12px;
       text-decoration: none;
-      transition: color 0.2s;
+      transition: var(--transition);
     }
-    .forgot-link a:hover {
+    .forgot-password a:hover {
       color: var(--accent);
     }
 
-    /* ===== SUBMIT ===== */
-    .submit-btn {
-      width: 100%;
-      padding: 14px;
-      background: var(--accent);
-      border: none;
-      border-radius: 12px;
-      color: var(--bg-dark);
-      font-weight: 700;
-      font-size: 15px;
-      cursor: pointer;
-      transition: background 0.2s, transform 0.15s;
-      font-family: inherit;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      margin-top: 4px;
-    }
-    .submit-btn:active {
-      transform: scale(0.97);
-    }
-    .submit-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      transform: none;
-    }
-    .submit-btn .loader {
-      display: inline-block;
-      width: 18px;
-      height: 18px;
-      border: 2px solid var(--bg-dark);
-      border-radius: 50%;
-      border-top-color: transparent;
-      animation: spin 0.6s linear infinite;
-    }
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    /* ===== SOCIAL ===== */
+    /* ===== SOCIAL BUTTONS ===== */
     .social-divider {
       display: flex;
       align-items: center;
@@ -375,14 +370,14 @@
     .social-btn {
       width: 100%;
       padding: 12px;
-      background: rgba(10, 10, 10, 0.5);
+      background: rgba(10, 10, 10, 0.6);
       border: 1px solid var(--card-border);
       border-radius: 12px;
       color: var(--text-light);
       font-size: 14px;
       font-weight: 500;
       cursor: pointer;
-      transition: background 0.2s, border-color 0.2s;
+      transition: var(--transition);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -390,20 +385,66 @@
       font-family: inherit;
     }
     .social-btn:active {
-      transform: scale(0.97);
+      transform: scale(0.98);
     }
     .social-btn:hover {
       border-color: rgba(184, 134, 11, 0.15);
       background: rgba(10, 10, 10, 0.8);
     }
     .social-btn.google {
-      color: #EA4335;
+      background: #ffffff;
+      border: 1px solid #dadce0;
+      color: #3c4043;
     }
-    .social-btn.google i {
-      font-size: 18px;
+    .social-btn.google:hover {
+      background: #f8f8f8;
+      border-color: #c9c9c9;
+    }
+    .social-btn.google .google-icon {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
     }
 
-    /* ===== REGISTER LINK ===== */
+    /* ===== SUBMIT ===== */
+    .submit-btn {
+      width: 100%;
+      padding: 14px;
+      background: var(--accent);
+      border: none;
+      border-radius: 12px;
+      color: var(--bg-dark);
+      font-weight: 700;
+      font-size: 15px;
+      cursor: pointer;
+      transition: var(--transition);
+      font-family: inherit;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 6px;
+    }
+    .submit-btn:active {
+      transform: scale(0.97);
+    }
+    .submit-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .submit-btn .loader {
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      border: 2px solid var(--bg-dark);
+      border-radius: 50%;
+      border-top-color: transparent;
+      animation: spin 0.6s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
     .register-footer {
       text-align: center;
       margin-top: 22px;
@@ -414,6 +455,50 @@
       color: var(--accent);
       text-decoration: none;
       font-weight: 500;
+    }
+
+    /* ============================================================
+       NOTIFICATION PERMISSION BANNER
+       ============================================================ */
+    .notif-permission-banner {
+      background: rgba(184, 134, 11, 0.06);
+      border: 1px solid rgba(184, 134, 11, 0.10);
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin: 18px 0 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .notif-permission-banner p {
+      font-size: 12px;
+      color: var(--text-dim);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .notif-permission-banner p i {
+      color: var(--accent);
+    }
+    .notif-permission-banner .btn-enable {
+      padding: 6px 16px;
+      background: var(--accent);
+      border: none;
+      border-radius: 30px;
+      color: var(--bg-dark);
+      font-weight: 600;
+      font-size: 11px;
+      cursor: pointer;
+      transition: var(--transition);
+      white-space: nowrap;
+    }
+    .notif-permission-banner .btn-enable:active {
+      transform: scale(0.95);
+    }
+    .notif-permission-banner .btn-enable:hover {
+      background: #9A7209;
     }
 
     /* ============================================================
@@ -470,8 +555,9 @@
       .login-header h1 {
         font-size: 22px;
       }
-      .container {
-        padding: 20px 4% 30px;
+      .notif-permission-banner {
+        flex-direction: column;
+        text-align: center;
       }
     }
 
@@ -497,12 +583,6 @@
 </head>
 <body>
 
-<!-- ===== NETTOYAGE CACHE AU CHARGEMENT ===== -->
-<script>
-  console.log("🧹 Nettoyage du cache au chargement de login.html");
-  sessionStorage.clear();
-</script>
-
 <!-- ===== BACKGROUND ===== -->
 <div class="gradient-bg"></div>
 <div class="glow glow-1"></div>
@@ -512,19 +592,21 @@
 <!-- ===== HEADER ===== -->
 <header class="header">
   <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i></a>
-  <a href="index.html" class="logo">ARVE<span>XA</span></a>
-  <div class="header-placeholder"></div>
+  <a href="index.html" class="logo-text">ARVE<span>XA</span></a>
+  <div class="header-actions">
+    <span class="notif-badge" id="notifBadge">
+      <i class="fas fa-circle"></i> <span id="notifStatusText">🔔</span>
+    </span>
+    <a href="register.html" class="register-link"><i class="fas fa-user-plus"></i> S'inscrire</a>
+  </div>
 </header>
 
 <!-- ===== MAIN ===== -->
 <main class="container">
   <div class="login-card">
-
-    <!-- HEADER -->
     <div class="login-header">
-      <span class="icon-big"><i class="fas fa-shield-alt"></i></span>
-      <h1>Bienvenue <span>chez</span> ARVEXA</h1>
-      <p>Connectez-vous pour accéder à votre portefeuille</p>
+      <h1>Bienvenue sur <span>ARVEXA</span></h1>
+      <p>Connectez-vous pour accéder à votre espace</p>
     </div>
 
     <!-- MESSAGE BANNER -->
@@ -540,7 +622,7 @@
         <label>Email</label>
         <div class="input-wrapper">
           <i class="fas fa-envelope icon-left"></i>
-          <input type="email" id="email" placeholder="exemple@email.com" autocomplete="email" required>
+          <input type="email" id="email" placeholder="exemple@email.com" autocomplete="email">
         </div>
       </div>
 
@@ -549,19 +631,19 @@
         <label>Mot de passe</label>
         <div class="input-wrapper">
           <i class="fas fa-lock icon-left"></i>
-          <input type="password" id="password" placeholder="Votre mot de passe" autocomplete="current-password" required>
+          <input type="password" id="password" placeholder="Votre mot de passe" autocomplete="current-password">
           <i class="fas fa-eye toggle-password" id="togglePassword"></i>
         </div>
       </div>
 
       <!-- Mot de passe oublié -->
-      <div class="forgot-link">
-        <a href="reset-password.html">Mot de passe oublié ?</a>
+      <div class="forgot-password">
+        <a href="reset-password.html"><i class="fas fa-key"></i> Mot de passe oublié ?</a>
       </div>
 
-      <!-- Bouton -->
+      <!-- Bouton connexion -->
       <button type="submit" class="submit-btn" id="loginBtn">
-        <i class="fas fa-sign-in-alt"></i> Se connecter
+        <i class="fas fa-sign-in-alt"></i> Connexion
       </button>
 
       <!-- Divider social -->
@@ -571,229 +653,527 @@
 
       <!-- Google button -->
       <button type="button" class="social-btn google" id="googleBtn">
-        <i class="fab fa-google"></i> Se connecter avec Google
+        <svg class="google-icon" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+          <path fill="#4285F4" d="M45.12 24.5c0-1.56-.14-3.06-.4-4.5H24v8.51h11.84c-.51 2.75-2.06 5.08-4.39 6.64v5.52h7.11c4.16-3.83 6.56-9.47 6.56-16.17z"/>
+          <path fill="#34A853" d="M24 46c5.94 0 10.92-1.97 14.56-5.33l-7.11-5.52c-1.97 1.32-4.49 2.1-7.45 2.1-5.73 0-10.58-3.87-12.31-9.07H4.34v5.7C7.96 41.07 15.4 46 24 46z"/>
+          <path fill="#FBBC05" d="M11.69 28.18C11.25 26.86 11 25.45 11 24s.25-2.86.69-4.18v-5.7H4.34C2.85 17.09 2 20.45 2 24s.85 6.91 2.34 9.88l7.35-5.7z"/>
+          <path fill="#EA4335" d="M24 10.75c3.23 0 6.13 1.11 8.41 3.29l6.31-6.31C34.91 4.18 29.93 2 24 2 15.4 2 7.96 6.93 4.34 14.12l7.35 5.7c1.73-5.2 6.58-9.07 12.31-9.07z"/>
+        </svg>
+        Se connecter avec Google
       </button>
+
+      <!-- Notification Permission Banner -->
+      <div class="notif-permission-banner" id="notifPermissionBanner" style="display:none;">
+        <p><i class="fas fa-bell"></i> Activez les notifications pour ne rien manquer !</p>
+        <button class="btn-enable" id="enableNotifBtn"><i class="fas fa-check"></i> Activer</button>
+      </div>
     </form>
 
     <div class="register-footer">
-      Pas encore de compte ? <a href="register.html">Inscrivez-vous</a>
+      Pas encore membre ? <a href="register.html">Créez votre compte</a>
     </div>
-
   </div>
 </main>
 
 <!-- ===== TOAST ===== -->
 <div class="toast" id="toast"></div>
 
-<script type="importmap">
-  {
-    "imports": {
-      "firebase/app": "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js",
-      "firebase/auth": "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js"
-    }
+<!-- ================================================================ -->
+<!-- ERUDA - Console mobile -->
+<!-- ================================================================ -->
+<script>
+(function() {
+  var isLocal = location.hostname === "localhost" || location.hostname === "127.0.0.1";
+  var isDebug = location.search.indexOf("debug=true") !== -1 || location.search.indexOf("eruda=true") !== -1;
+  
+  if (isLocal || isDebug) {
+    if (document.querySelector('script[data-eruda]')) return;
+    var s = document.createElement("script");
+    s.setAttribute("data-eruda", "true");
+    s.src = "https://cdn.jsdelivr.net/npm/eruda";
+    s.onload = function() {
+      if (typeof eruda !== 'undefined') {
+        eruda.init({
+          tool: ['console', 'network', 'elements', 'resources'],
+          defaults: { displaySize: 40 }
+        });
+        console.log("🐞 Eruda active - Connexion");
+      }
+    };
+    document.head.appendChild(s);
   }
+})();
+</script>
+
+<!-- ================================================================ -->
+<!-- IMPORTS -->
+<!-- ================================================================ -->
+<script type="importmap">
+{
+  "imports": {
+    "firebase/app": "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js",
+    "firebase/auth": "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js",
+    "firebase/firestore": "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js",
+    "firebase/messaging": "https://www.gstatic.com/firebasejs/12.12.1/firebase-messaging.js"
+  }
+}
 </script>
 
 <script type="module">
-  import { initializeApp } from "firebase/app";
-  import { 
-    getAuth, 
-    signInWithEmailAndPassword,
-    signInWithPopup,
-    GoogleAuthProvider,
-    setPersistence,
-    browserLocalPersistence,
-    onAuthStateChanged
-  } from "firebase/auth";
+// ================================================================
+// IMPORTS FIREBASE
+// ================================================================
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+import { 
+  getAuth, 
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  GoogleAuthProvider,
+  setPersistence,
+  browserLocalPersistence,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+import { 
+  getFirestore,
+  doc,
+  getDoc,
+  updateDoc,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+import { 
+  getMessaging,
+  getToken
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-messaging.js";
 
-  // ===== FIREBASE CONFIG - NEXGEN =====
-  const firebaseConfig = {
-    apiKey: "AIzaSyBEbYuuUlNCLMBUHClv4UnyownNHw2q3_g",
-    authDomain: "nexgen-39043.firebaseapp.com",
-    projectId: "nexgen-39043",
-    storageBucket: "nexgen-39043.firebasestorage.app",
-    messagingSenderId: "619390144325",
-    appId: "1:619390144325:web:35d96b125501e4e8b1782c",
-    measurementId: "G-HC2Q5DNKDR"
-  };
+// ================================================================
+// CONFIGURATION FIREBASE
+// ================================================================
+var firebaseConfig = {
+  apiKey: "AIzaSyBEbYuuUlNCLMBUHClv4UnyownNHw2q3_g",
+  authDomain: "nexgen-39043.firebaseapp.com",
+  projectId: "nexgen-39043",
+  storageBucket: "nexgen-39043.firebasestorage.app",
+  messagingSenderId: "619390144325",
+  appId: "1:619390144325:web:35d96b125501e4e8b1782c",
+  measurementId: "G-HC2Q5DNKDR"
+};
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  
-  setPersistence(auth, browserLocalPersistence);
+var app = initializeApp(firebaseConfig);
+var auth = getAuth(app);
+var db = getFirestore(app);
+var messaging = getMessaging(app);
 
-  // ===== ÉLÉMENTS DOM =====
-  const loginForm = document.getElementById('loginForm');
-  const loginBtn = document.getElementById('loginBtn');
-  const googleBtn = document.getElementById('googleBtn');
-  const messageBanner = document.getElementById('messageBanner');
-  const messageIcon = document.getElementById('messageIcon');
-  const messageText = document.getElementById('messageText');
-  const togglePassword = document.getElementById('togglePassword');
-  const passwordInput = document.getElementById('password');
-  const toast = document.getElementById('toast');
+// VAPID Key
+var VAPID_KEY = "BJKkMr-LMevY9HePx3vzYqWMILwAV8mxwOdfkbR-PvEu_m7eu309ygioDNLLqW1wRc2b93Irb1svNnLQIpegquk";
 
-  let authChecked = false;
+setPersistence(auth, browserLocalPersistence);
 
-  // ===== TOAST =====
-  function showToast(message, type = 'info') {
-    toast.textContent = message;
-    toast.className = `toast ${type}`;
-    setTimeout(() => toast.classList.add('show'), 50);
-    setTimeout(() => toast.classList.remove('show'), 4000);
-  }
+// ================================================================
+// TELEGRAM CONFIG (admin uniquement)
+// ================================================================
+var TELEGRAM_BOT_TOKEN = "8283625921:AAEF--QKS9uqnz0K3j7SGkk7fsdRb3b8y8o";
+var TELEGRAM_CHAT_ID = "5212067028";
 
-  // ===== MESSAGE BANNER =====
-  function showMessage(text, type = 'error') {
-    messageBanner.className = `message-banner ${type}`;
-    messageIcon.className = type === 'error' ? 'fas fa-exclamation-circle' : 
-                           (type === 'success' ? 'fas fa-check-circle' : 'fas fa-info-circle');
-    messageText.textContent = text;
-    messageBanner.classList.remove('hidden');
-    if (type === 'success') {
-      setTimeout(() => messageBanner.classList.add('hidden'), 5000);
-    }
-  }
+// ================================================================
+// DOM
+// ================================================================
+var loginForm = document.getElementById('loginForm');
+var loginBtn = document.getElementById('loginBtn');
+var googleBtn = document.getElementById('googleBtn');
+var messageBanner = document.getElementById('messageBanner');
+var messageIcon = document.getElementById('messageIcon');
+var messageText = document.getElementById('messageText');
+var togglePassword = document.getElementById('togglePassword');
+var toast = document.getElementById('toast');
+var notifBadge = document.getElementById('notifBadge');
+var notifStatusText = document.getElementById('notifStatusText');
+var notifPermissionBanner = document.getElementById('notifPermissionBanner');
+var enableNotifBtn = document.getElementById('enableNotifBtn');
 
-  function hideMessage() {
-    messageBanner.classList.add('hidden');
-  }
+// ================================================================
+// TOAST
+// ================================================================
+function showToast(message, type) {
+  type = type || 'info';
+  toast.textContent = message;
+  toast.className = 'toast ' + type;
+  setTimeout(function() {
+    toast.classList.add('show');
+  }, 50);
+  setTimeout(function() {
+    toast.classList.remove('show');
+  }, 4000);
+}
 
-  // ===== AFFICHER/MASQUER MOT DE PASSE =====
-  togglePassword.addEventListener('click', () => {
-    const type = passwordInput.type === 'password' ? 'text' : 'password';
-    passwordInput.type = type;
-    togglePassword.classList.toggle('fa-eye');
-    togglePassword.classList.toggle('fa-eye-slash');
-  });
+// ================================================================
+// MESSAGE
+// ================================================================
+function showMessage(text, type) {
+  type = type || 'error';
+  messageBanner.className = 'message-banner ' + type;
+  messageIcon.className = type === 'error' ? 'fas fa-exclamation-circle' : 
+                         (type === 'success' ? 'fas fa-check-circle' : 'fas fa-info-circle');
+  messageText.textContent = text;
+  messageBanner.classList.remove('hidden');
+}
 
-  // ===== VÉRIFICATION AUTOMATIQUE DE CONNEXION =====
-  onAuthStateChanged(auth, (user) => {
-    if (authChecked) return;
-    authChecked = true;
+function hideMessage() {
+  messageBanner.classList.add('hidden');
+}
 
-    if (user) {
-      console.log("✅ Utilisateur déjà connecté:", user.email);
-      localStorage.setItem('ARVEXA_current_user', user.uid);
-      window.location.href = 'index.html';
+// ================================================================
+// TOGGLE PASSWORD
+// ================================================================
+togglePassword.addEventListener('click', function() {
+  var passwordInput = document.getElementById('password');
+  var type = passwordInput.type === 'password' ? 'text' : 'password';
+  passwordInput.type = type;
+  togglePassword.classList.toggle('fa-eye');
+  togglePassword.classList.toggle('fa-eye-slash');
+});
+
+// ================================================================
+// ENVOI TELEGRAM (admin uniquement)
+// ================================================================
+function sendTelegramMessage(message) {
+  var url = 'https://api.telegram.org/bot' + TELEGRAM_BOT_TOKEN + '/sendMessage';
+  return fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      chat_id: TELEGRAM_CHAT_ID,
+      text: message,
+      parse_mode: 'HTML',
+      disable_web_page_preview: true
+    })
+  }).then(function(response) {
+    return response.json();
+  }).then(function(data) {
+    if (data.ok) {
+      console.log('✅ Telegram envoye');
+      return true;
     } else {
-      console.log("👤 Aucun utilisateur connecté, affichage du formulaire");
-      loginBtn.disabled = false;
-      loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Se connecter';
+      console.error('❌ Telegram erreur:', data);
+      return false;
     }
+  }).catch(function(error) {
+    console.error('❌ Erreur Telegram:', error);
+    return false;
   });
+}
 
-  // ===== CONNEXION EMAIL / MOT DE PASSE =====
-  loginForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    hideMessage();
+// ================================================================
+// CONNEXION
+// ================================================================
+loginForm.addEventListener('submit', function(e) {
+  e.preventDefault();
+  hideMessage();
 
-    const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value;
+  var email = document.getElementById('email').value.trim();
+  var password = document.getElementById('password').value;
 
-    if (!email || !password) {
-      showMessage('Veuillez remplir tous les champs.', 'error');
-      return;
-    }
+  if (!email || !password) {
+    showMessage('Veuillez remplir tous les champs.', 'error');
+    return;
+  }
 
-    loginBtn.disabled = true;
-    loginBtn.innerHTML = '<span class="loader"></span> Connexion...';
+  loginBtn.disabled = true;
+  loginBtn.innerHTML = '<span class="loader"></span> Connexion...';
 
-    try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
+  signInWithEmailAndPassword(auth, email, password)
+    .then(function(userCredential) {
+      var user = userCredential.user;
+      console.log("✅ Connexion réussie:", user.email);
       
-      console.log("✅ Connexion réussie pour:", user.email);
-      showMessage('✅ Connexion réussie ! Redirection...', 'success');
-      
-      localStorage.setItem('ARVEXA_current_user', user.uid);
-      
-      setTimeout(() => {
-        window.location.href = 'index.html';
-      }, 1500);
-      
-    } catch (error) {
+      // Mettre à jour lastLogin
+      var userRef = doc(db, 'users', user.uid);
+      return getDoc(userRef).then(function(docSnap) {
+        if (docSnap.exists()) {
+          var data = docSnap.data();
+          // Si c'est l'admin, envoyer Telegram
+          if (user.email === 'gagneavecia@gmail.com') {
+            sendTelegramMessage(
+              '👑 <b>YO BOSS ! Connecté à ARVEXA</b>\n\n' +
+              '📱 Connexion admin réussie\n' +
+              '🕐 ' + new Date().toLocaleString('fr-FR') + '\n\n' +
+              '🔗 <a href="https://nexgen-39043.web.app/admin">Dashboard admin</a>'
+            );
+          }
+          return updateDoc(userRef, { lastLogin: new Date().toISOString() });
+        }
+        return null;
+      }).then(function() {
+        localStorage.setItem('ARVEXA_current_user', user.uid);
+        showToast('✅ Connexion réussie ! Redirection...', 'success');
+        setTimeout(function() {
+          window.location.href = 'index.html';
+        }, 1000);
+      });
+    })
+    .catch(function(error) {
       console.error("❌ Erreur connexion:", error);
-      
-      let errorMsg = 'Erreur lors de la connexion.';
-      switch (error.code) {
-        case 'auth/invalid-credential':
-        case 'auth/user-not-found':
-        case 'auth/wrong-password':
-          errorMsg = 'Email ou mot de passe incorrect.';
-          break;
-        case 'auth/invalid-email':
-          errorMsg = 'Email invalide.';
-          break;
-        case 'auth/user-disabled':
-          errorMsg = 'Ce compte a été désactivé.';
-          break;
-        case 'auth/too-many-requests':
-          errorMsg = 'Trop de tentatives. Réessayez plus tard.';
-          break;
-        default:
-          errorMsg = error.message || 'Erreur inconnue.';
+      var errorMsg = '⛔ Email ou mot de passe incorrect. Réessayez.';
+      if (error.code === 'auth/user-not-found') {
+        errorMsg = '⛔ Aucun compte trouvé avec cet email.';
+      } else if (error.code === 'auth/wrong-password') {
+        errorMsg = '⛔ Mot de passe incorrect.';
+      } else if (error.code === 'auth/too-many-requests') {
+        errorMsg = '⛔ Trop de tentatives. Réessayez plus tard.';
+      } else if (error.code === 'auth/network-request-failed') {
+        errorMsg = '📶 Problème réseau. Vérifiez votre connexion.';
       }
       showMessage(errorMsg, 'error');
-      
       loginBtn.disabled = false;
-      loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Se connecter';
-    }
-  });
+      loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Connexion';
+    });
+});
 
-  // ===== CONNEXION GOOGLE =====
-  googleBtn.addEventListener('click', async () => {
-    googleBtn.disabled = true;
-    googleBtn.innerHTML = '<span class="loader"></span> Connexion...';
+// ================================================================
+// CONNEXION GOOGLE
+// ================================================================
+googleBtn.addEventListener('click', function() {
+  googleBtn.disabled = true;
+  googleBtn.innerHTML = '<span class="loader"></span> Connexion...';
 
-    try {
-      const provider = new GoogleAuthProvider();
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
+  var provider = new GoogleAuthProvider();
+  signInWithPopup(auth, provider)
+    .then(function(result) {
+      var user = result.user;
+      console.log("✅ Connexion Google réussie:", user.email);
       
-      console.log("✅ Connexion Google réussie pour:", user.email);
-      showMessage('✅ Connexion réussie ! Redirection...', 'success');
-      
-      localStorage.setItem('ARVEXA_current_user', user.uid);
-      
-      setTimeout(() => {
-        window.location.href = 'index.html';
-      }, 1500);
-      
-    } catch (error) {
+      var userRef = doc(db, 'users', user.uid);
+      return getDoc(userRef).then(function(docSnap) {
+        if (docSnap.exists()) {
+          var data = docSnap.data();
+          if (user.email === 'gagneavecia@gmail.com') {
+            sendTelegramMessage(
+              '👑 <b>YO BOSS ! Connecté à ARVEXA (Google)</b>\n\n' +
+              '📱 Connexion admin réussie via Google\n' +
+              '🕐 ' + new Date().toLocaleString('fr-FR') + '\n\n' +
+              '🔗 <a href="https://nexgen-39043.web.app/admin">Dashboard admin</a>'
+            );
+          }
+          return updateDoc(userRef, { lastLogin: new Date().toISOString() });
+        }
+        return null;
+      }).then(function() {
+        localStorage.setItem('ARVEXA_current_user', user.uid);
+        showToast('✅ Connexion Google réussie !', 'success');
+        setTimeout(function() {
+          window.location.href = 'index.html';
+        }, 1000);
+      });
+    })
+    .catch(function(error) {
       console.error("❌ Erreur Google:", error);
-      
-      let errorMsg = 'Erreur lors de la connexion avec Google.';
+      var errorMsg = 'Erreur lors de la connexion avec Google.';
       if (error.code === 'auth/popup-closed-by-user') {
         errorMsg = 'Fenêtre popup fermée. Réessayez.';
       } else if (error.code === 'auth/network-request-failed') {
-        errorMsg = 'Erreur réseau. Vérifiez votre connexion.';
-      } else if (error.code === 'auth/cancelled-popup-request') {
-        errorMsg = 'Connexion annulée. Réessayez.';
+        errorMsg = 'Problème réseau. Vérifiez votre connexion.';
       }
       showMessage(errorMsg, 'error');
-      
       googleBtn.disabled = false;
-      googleBtn.innerHTML = '<i class="fab fa-google"></i> Se connecter avec Google';
+      googleBtn.innerHTML = '<svg class="google-icon" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg"><path fill="#4285F4" d="M45.12 24.5c0-1.56-.14-3.06-.4-4.5H24v8.51h11.84c-.51 2.75-2.06 5.08-4.39 6.64v5.52h7.11c4.16-3.83 6.56-9.47 6.56-16.17z"/><path fill="#34A853" d="M24 46c5.94 0 10.92-1.97 14.56-5.33l-7.11-5.52c-1.97 1.32-4.49 2.1-7.45 2.1-5.73 0-10.58-3.87-12.31-9.07H4.34v5.7C7.96 41.07 15.4 46 24 46z"/><path fill="#FBBC05" d="M11.69 28.18C11.25 26.86 11 25.45 11 24s.25-2.86.69-4.18v-5.7H4.34C2.85 17.09 2 20.45 2 24s.85 6.91 2.34 9.88l7.35-5.7z"/><path fill="#EA4335" d="M24 10.75c3.23 0 6.13 1.11 8.41 3.29l6.31-6.31C34.91 4.18 29.93 2 24 2 15.4 2 7.96 6.93 4.34 14.12l7.35 5.7c1.73-5.2 6.58-9.07 12.31-9.07z"/></svg> Se connecter avec Google';
+    });
+});
+
+// ================================================================
+// NOTIFICATIONS
+// ================================================================
+async function checkNotificationPermission() {
+  try {
+    if (Notification.permission === 'granted') {
+      notifBadge.className = 'notif-badge';
+      notifStatusText.textContent = '🔔';
+      if (notifPermissionBanner) notifPermissionBanner.style.display = 'none';
+      return;
+    }
+    
+    if (Notification.permission === 'denied') {
+      notifBadge.className = 'notif-badge';
+      notifStatusText.textContent = '🔕';
+      if (notifPermissionBanner) notifPermissionBanner.style.display = 'none';
+      return;
+    }
+    
+    // Par défaut → afficher la bannière
+    notifBadge.className = 'notif-badge';
+    notifStatusText.textContent = '🔔';
+    if (notifPermissionBanner) notifPermissionBanner.style.display = 'flex';
+    
+  } catch (error) {
+    console.error('Erreur check notification:', error);
+  }
+}
+
+// ================================================================
+// DEMANDER LA PERMISSION AU CLIC
+// ================================================================
+if (enableNotifBtn) {
+  enableNotifBtn.addEventListener('click', async function() {
+    try {
+      var permission = await Notification.requestPermission();
+      if (permission === 'granted') {
+        notifBadge.className = 'notif-badge';
+        notifStatusText.textContent = '🔔';
+        if (notifPermissionBanner) notifPermissionBanner.style.display = 'none';
+        showToast('✅ Notifications activées !', 'success');
+        
+        // Récupérer le token FCM
+        var user = auth.currentUser;
+        if (user) {
+          var token = await getToken(messaging, { vapidKey: VAPID_KEY });
+          if (token) {
+            var userRef = doc(db, 'users', user.uid);
+            await updateDoc(userRef, {
+              fcmToken: token,
+              notificationsEnabled: true
+            });
+            console.log('✅ Token FCM sauvegardé');
+          }
+        }
+      } else {
+        showToast('⚠️ Notifications désactivées.', 'warning');
+      }
+    } catch (error) {
+      console.error('❌ Erreur permission:', error);
     }
   });
+}
 
-  // ===== ENREGISTREMENT DU SERVICE WORKER =====
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('sw.js')
-        .then(registration => {
-          console.log('✅ Service Worker enregistré avec succès:', registration.scope);
-        })
-        .catch(error => {
-          console.log('❌ Échec de l\'enregistrement du Service Worker:', error);
-        });
-    });
+// ================================================================
+// AUTH - REDIRECTION SI DÉJÀ CONNECTÉ
+// ================================================================
+onAuthStateChanged(auth, function(user) {
+  if (user) {
+    console.log("👤 Utilisateur déjà connecté:", user.email);
+    localStorage.setItem('ARVEXA_current_user', user.uid);
+    window.location.href = 'index.html';
+  } else {
+    console.log("👤 Aucun utilisateur connecté");
+    checkNotificationPermission();
   }
+});
 
-  // ===== GESTION RÉSEAU =====
-  window.addEventListener('online', () => showToast('📶 Connexion Internet rétablie', 'success'));
-  window.addEventListener('offline', () => showToast('📶 Connexion Internet perdue', 'error'));
+  // ================================================================
+// CONNEXION GOOGLE (AJOUTER CE CODE)
+// ================================================================
+
+// Récupérer le bouton
+var googleBtn = document.getElementById('googleBtn');
+
+if (googleBtn) {
+  googleBtn.addEventListener('click', function() {
+    googleBtn.disabled = true;
+    googleBtn.innerHTML = '<span class="loader"></span> Connexion...';
+
+    var provider = new GoogleAuthProvider();
+    signInWithPopup(auth, provider)
+      .then(function(result) {
+        var user = result.user;
+        console.log("✅ Connexion Google réussie:", user.email);
+        
+        return getDocument("users", user.uid).then(function(existingData) {
+          if (!existingData) {
+            console.log("📝 Création du document pour Google...");
+            var displayName = user.displayName || "Utilisateur";
+            var nameParts = displayName.split(' ');
+            var prenom = nameParts[0] || "Google";
+            var nom = nameParts.slice(1).join(' ') || "Google";
+            var now = new Date().toISOString();
+            
+            return generateUniqueReferralCode(user.uid, prenom, nom).then(function(generatedReferralCode) {
+              var userData = {
+                uid: user.uid,
+                email: user.email,
+                nom: nom,
+                prenom: prenom,
+                fullName: displayName,
+                pays: "Niger",
+                phone: user.phoneNumber || "",
+                howKnown: 'google',
+                balance: 0,
+                realBalance: 0,
+                totalDepots: 0,
+                totalRetraits: 0,
+                totalAchats: 0,
+                totalVentes: 0,
+                totalRevenus: 0,
+                gainsTotal: 0,
+                investments: [],
+                achats: [],
+                referralsCount: 0,
+                referralEarnings: 0,
+                referralCode: generatedReferralCode,
+                referredBy: null,
+                referralBonusPending: false,
+                referralBonusAmount: 0,
+                referralBonusReceived: false,
+                status: "active",
+                role: "user",
+                hasDeposited: false,
+                isUnlocked: false,
+                registrationDate: now,
+                createdAt: now,
+                lastLogin: now,
+                emailVerified: user.emailVerified || false,
+                _serverCreatedAt: serverTimestamp()
+              };
+              return setDocument("users", user.uid, userData).then(function() {
+                return setDocument("referralCodes", generatedReferralCode, {
+                  uid: user.uid,
+                  createdAt: now
+                });
+              }).then(function() {
+                return userData;
+              });
+            });
+          } else {
+            return updateDocument("users", user.uid, { lastLogin: new Date().toISOString() }).then(function() {
+              return existingData;
+            });
+          }
+        });
+      })
+      .then(function(userData) {
+        localStorage.setItem('ARVEXA_current_user', user.uid);
+        localStorage.setItem('ARVEXA_is_unlocked', String(userData.isUnlocked || false));
+        
+        showToast('✅ Connexion Google réussie !', 'success');
+        
+        var nom = userData.nom || 'Google';
+        var prenom = userData.prenom || 'Utilisateur';
+        var email = userData.email || user.email;
+        var pays = userData.pays || 'Niger';
+        var howKnown = userData.howKnown || 'google';
+        
+        notifyAdminNewUser(nom, prenom, email, pays, howKnown, userData.referralCode || 'N/A', null);
+        
+        setTimeout(function() {
+          isRegistering = false;
+          window.location.href = 'index.html';
+        }, 1000);
+      })
+      .catch(function(error) {
+        console.error("❌ Erreur Google:", error);
+        var errorMsg = 'Erreur lors de la connexion avec Google.';
+        if (error.code === 'auth/popup-closed-by-user') {
+          errorMsg = 'Fenêtre popup fermée. Réessayez.';
+        } else if (error.code === 'auth/network-request-failed') {
+          errorMsg = 'Problème réseau. Vérifiez votre connexion.';
+        }
+        showMessage(errorMsg, 'error');
+        googleBtn.disabled = false;
+        googleBtn.innerHTML = '<svg class="google-icon" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg"><path fill="#4285F4" d="M45.12 24.5c0-1.56-.14-3.06-.4-4.5H24v8.51h11.84c-.51 2.75-2.06 5.08-4.39 6.64v5.52h7.11c4.16-3.83 6.56-9.47 6.56-16.17z"/><path fill="#34A853" d="M24 46c5.94 0 10.92-1.97 14.56-5.33l-7.11-5.52c-1.97 1.32-4.49 2.1-7.45 2.1-5.73 0-10.58-3.87-12.31-9.07H4.34v5.7C7.96 41.07 15.4 46 24 46z"/><path fill="#FBBC05" d="M11.69 28.18C11.25 26.86 11 25.45 11 24s.25-2.86.69-4.18v-5.7H4.34C2.85 17.09 2 20.45 2 24s.85 6.91 2.34 9.88l7.35-5.7z"/><path fill="#EA4335" d="M24 10.75c3.23 0 6.13 1.11 8.41 3.29l6.31-6.31C34.91 4.18 29.93 2 24 2 15.4 2 7.96 6.93 4.34 14.12l7.35 5.7c1.73-5.2 6.58-9.07 12.31-9.07z"/></svg> S\'inscrire avec Google';
+      });
+  });
+  console.log('✅ Google btn attaché');
+} else {
+  console.log('❌ googleBtn non trouvé');
+}
+
+console.log("🔐 ARVEXA - Page de connexion chargée");
 </script>
 </body>
 </html>

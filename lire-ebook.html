@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+  <meta name="theme-color" content="#0A0A0A">
+  <meta name="description" content="ARVEXA - Lire un e-book">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3135/3135715.png">
+  
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📖</text></svg>">
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <style>
+    /* ===== ROOT ===== */
+    :root {
+      --bg-dark: #0A0A0A;
+      --bg-surface: #141414;
+      --text-light: #F5F0E8;
+      --text-dim: #8A8A7A;
+      --text-muted: #5A5A4A;
+      --accent: #B8860B;
+      --success: #2D7D5A;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Inter', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-light);
+      font-size: 14px;
+      line-height: 1.8;
+      min-height: 100vh;
+      overflow: hidden;
+      -webkit-overflow-scrolling: touch;
+      user-select: none;
+    }
+
+    /* ===== GRADIENT ===== */
+    .gradient-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -2;
+      background: radial-gradient(ellipse 40% 30% at 30% 20%, rgba(26, 58, 42, 0.08) 0%, transparent 70%),
+                  linear-gradient(180deg, #0A0A0A 0%, #060606 100%);
+      pointer-events: none;
+    }
+
+    /* ===== BARRE SUPÉRIEURE (TRÈS FINE) ===== */
+    .top-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 32px;
+      background: rgba(10, 10, 10, 0.92);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid rgba(184, 134, 11, 0.04);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 10px;
+      z-index: 50;
+    }
+    .top-bar .btn-close {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 14px;
+      cursor: pointer;
+      padding: 4px 6px;
+      transition: color 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-family: 'Inter', sans-serif;
+      font-weight: 400;
+    }
+    .top-bar .btn-close:hover {
+      color: var(--text-light);
+    }
+    .top-bar .btn-close i {
+      font-size: 12px;
+    }
+    .top-bar .top-title {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-dim);
+      letter-spacing: 0.3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 60%;
+    }
+    .top-bar .top-counter {
+      font-size: 10px;
+      font-weight: 400;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    /* ===== CONTENEUR DU CONTENU ===== */
+    .content-wrapper {
+      position: fixed;
+      top: 32px;
+      left: 0;
+      right: 0;
+      bottom: 24px;
+      overflow: hidden;
+    }
+
+    .slides-container {
+      display: flex;
+      height: 100%;
+      transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+      will-change: transform;
+    }
+
+    .slide {
+      min-width: 100%;
+      height: 100%;
+      overflow-y: auto;
+      padding: 20px 24px 16px;
+      -webkit-overflow-scrolling: touch;
+    }
+    .slide::-webkit-scrollbar {
+      width: 2px;
+    }
+    .slide::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .slide::-webkit-scrollbar-thumb {
+      background: rgba(184, 134, 11, 0.2);
+      border-radius: 4px;
+    }
+
+    /* ===== STYLE DU CONTENU ===== */
+    .slide h1 {
+      font-size: clamp(22px, 4vw, 32px);
+      font-weight: 700;
+      font-family: 'Playfair Display', serif;
+      color: var(--text-light);
+      margin-bottom: 16px;
+      line-height: 1.2;
+    }
+    .slide h2 {
+      font-size: clamp(18px, 3vw, 24px);
+      font-weight: 600;
+      font-family: 'Playfair Display', serif;
+      color: var(--text-light);
+      margin: 20px 0 10px;
+      line-height: 1.3;
+    }
+    .slide h3 {
+      font-size: clamp(16px, 2.5vw, 20px);
+      font-weight: 600;
+      color: var(--accent);
+      margin: 16px 0 8px;
+    }
+    .slide p {
+      font-size: clamp(14px, 2vw, 17px);
+      color: var(--text-dim);
+      line-height: 1.9;
+      margin-bottom: 12px;
+    }
+    .slide strong {
+      color: var(--text-light);
+    }
+    .slide ul, .slide ol {
+      margin: 8px 0 14px 20px;
+      color: var(--text-dim);
+    }
+    .slide li {
+      font-size: clamp(13px, 1.8vw, 16px);
+      line-height: 1.8;
+      margin-bottom: 4px;
+    }
+    .slide .chapter-divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(184, 134, 11, 0.08), transparent);
+      margin: 20px 0 16px;
+    }
+    .slide .intro-text {
+      font-size: clamp(15px, 2.2vw, 19px);
+      color: var(--text-light);
+      font-weight: 400;
+      border-left: 3px solid var(--accent);
+      padding-left: 16px;
+      margin-bottom: 16px;
+    }
+
+    /* ===== INDICATEUR (TRÈS FIN) ===== */
+    .indicator {
+      position: fixed;
+      bottom: 6px;
+      left: 0;
+      right: 0;
+      height: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      z-index: 50;
+    }
+    .indicator .dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.08);
+      transition: all 0.3s ease;
+    }
+    .indicator .dot.active {
+      background: var(--accent);
+      width: 8px;
+      height: 5px;
+      border-radius: 4px;
+    }
+
+    /* ===== TOAST ===== */
+    .toast {
+      position: fixed;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%) translateY(120px);
+      max-width: 90%;
+      width: 380px;
+      padding: 12px 18px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 500;
+      transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      z-index: 9999;
+      text-align: center;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      pointer-events: none;
+      background: #0D2A1F;
+      border: 1px solid #2D7D5A;
+      color: #2D7D5A;
+    }
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* ============================================================
+       RESPONSIVE
+       ============================================================ */
+    @media (max-width: 480px) {
+      .top-bar {
+        height: 28px;
+        padding: 0 8px;
+      }
+      .top-bar .btn-close {
+        font-size: 12px;
+        padding: 2px 4px;
+      }
+      .top-bar .btn-close i {
+        font-size: 10px;
+      }
+      .top-bar .top-title {
+        font-size: 10px;
+        max-width: 50%;
+      }
+      .top-bar .top-counter {
+        font-size: 9px;
+      }
+      .content-wrapper {
+        top: 28px;
+        bottom: 18px;
+      }
+      .slide {
+        padding: 14px 16px 10px;
+      }
+      .indicator {
+        bottom: 4px;
+        gap: 4px;
+      }
+      .indicator .dot {
+        width: 4px;
+        height: 4px;
+      }
+      .indicator .dot.active {
+        width: 6px;
+        height: 4px;
+      }
+    }
+
+    @media (min-width: 768px) {
+      .slide {
+        padding: 30px 40px 20px;
+        max-width: 700px;
+        margin: 0 auto;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== BACKGROUND ===== -->
+<div class="gradient-bg"></div>
+
+<!-- ===== BARRE SUPÉRIEURE (TRÈS FINE) ===== -->
+<div class="top-bar">
+  <button class="btn-close" id="closeBtn">
+    <i class="fas fa-times"></i> <span>Fermer</span>
+  </button>
+  <span class="top-title" id="topTitle">Chargement...</span>
+  <span class="top-counter" id="topCounter">0/0</span>
+</div>
+
+<!-- ===== CONTENU ===== -->
+<div class="content-wrapper">
+  <div class="slides-container" id="slidesContainer">
+    <!-- Rempli par JavaScript -->
+  </div>
+</div>
+
+<!-- ===== INDICATEUR ===== -->
+<div class="indicator" id="indicator"></div>
+
+<!-- ===== TOAST ===== -->
+<div class="toast" id="toast"></div>
+
+<!-- ============================================================ -->
+<!-- ===== SCRIPTS ===== -->
+<!-- ============================================================ -->
+<script type="importmap">
+{
+  "imports": {
+    "firebase/app": "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js",
+    "firebase/firestore": "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js"
+  }
+}
+</script>
+
+<script type="module">
+// ================================================================
+// IMPORTS
+// ================================================================
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+import { 
+  getFirestore, 
+  doc, 
+  getDoc, 
+  collection, 
+  getDocs, 
+  query, 
+  orderBy 
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+
+// ================================================================
+// CONFIGURATION FIREBASE
+// ================================================================
+const firebaseConfig = {
+  apiKey: "AIzaSyBEbYuuUlNCLMBUHClv4UnyownNHw2q3_g",
+  authDomain: "nexgen-39043.firebaseapp.com",
+  projectId: "nexgen-39043",
+  storageBucket: "nexgen-39043.firebasestorage.app",
+  messagingSenderId: "619390144325",
+  appId: "1:619390144325:web:35d96b125501e4e8b1782c",
+  measurementId: "G-HC2Q5DNKDR"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// ================================================================
+// DOM
+// ================================================================
+const slidesContainer = document.getElementById('slidesContainer');
+const indicator = document.getElementById('indicator');
+const topTitle = document.getElementById('topTitle');
+const topCounter = document.getElementById('topCounter');
+const closeBtn = document.getElementById('closeBtn');
+const toast = document.getElementById('toast');
+
+let ebooks = [];
+let currentIndex = 0;
+let isTransitioning = false;
+let touchStartX = 0;
+let touchStartY = 0;
+
+// ================================================================
+// TOAST
+// ================================================================
+function showToast(message) {
+  toast.textContent = message;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+// ================================================================
+// RENDRE LES E-BOOKS
+// ================================================================
+function renderEbooks() {
+  if (ebooks.length === 0) {
+    slidesContainer.innerHTML = `
+      <div class="slide" style="display:flex;align-items:center;justify-content:center;text-align:center;color:var(--text-muted);">
+        <div>
+          <i class="fas fa-book-open" style="font-size:40px;opacity:0.2;display:block;margin-bottom:12px;"></i>
+          <p>Aucun e-book disponible.</p>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  // Créer les slides
+  slidesContainer.innerHTML = ebooks.map((ebook, index) => {
+    const content = ebook.content || '<p>Contenu à venir...</p>';
+    return `
+      <div class="slide" data-index="${index}">
+        ${content}
+      </div>
+    `;
+  }).join('');
+
+  // Mettre à jour l'indicateur
+  updateIndicator();
+
+  // Mettre à jour le titre
+  if (ebooks.length > 0 && ebooks[currentIndex]) {
+    topTitle.textContent = ebooks[currentIndex].title || 'E-book';
+    topCounter.textContent = `${currentIndex + 1}/${ebooks.length}`;
+  }
+
+  // Positionner le slide actif
+  updatePosition(false);
+}
+
+// ================================================================
+// METTRE À JOUR LA POSITION
+// ================================================================
+function updatePosition(animate = true) {
+  if (!animate) {
+    slidesContainer.style.transition = 'none';
+  } else {
+    slidesContainer.style.transition = 'transform 0.35s cubic-bezier(0.25, 1, 0.5, 1)';
+  }
+  slidesContainer.style.transform = `translateX(-${currentIndex * 100}%)`;
+  
+  if (!animate) {
+    // Forcer un reflow pour appliquer la transition ensuite
+    void slidesContainer.offsetHeight;
+    slidesContainer.style.transition = 'transform 0.35s cubic-bezier(0.25, 1, 0.5, 1)';
+  }
+
+  // Mettre à jour l'indicateur
+  updateIndicator();
+
+  // Mettre à jour le titre et le compteur
+  if (ebooks.length > 0 && ebooks[currentIndex]) {
+    topTitle.textContent = ebooks[currentIndex].title || 'E-book';
+    topCounter.textContent = `${currentIndex + 1}/${ebooks.length}`;
+  }
+}
+
+// ================================================================
+// INDICATEUR
+// ================================================================
+function updateIndicator() {
+  if (ebooks.length === 0) {
+    indicator.innerHTML = '';
+    return;
+  }
+
+  indicator.innerHTML = ebooks.map((_, index) => {
+    const active = index === currentIndex ? 'active' : '';
+    return `<span class="dot ${active}"></span>`;
+  }).join('');
+}
+
+// ================================================================
+// CHANGER D'E-BOOK
+// ================================================================
+function goTo(index) {
+  if (isTransitioning) return;
+  if (index < 0 || index >= ebooks.length) return;
+  if (index === currentIndex) return;
+
+  isTransitioning = true;
+  currentIndex = index;
+  updatePosition(true);
+  setTimeout(() => {
+    isTransitioning = false;
+  }, 400);
+}
+
+// ================================================================
+// NAVIGATION TOUCHE (Swipe)
+// ================================================================
+document.addEventListener('touchstart', (e) => {
+  touchStartX = e.changedTouches[0].screenX;
+  touchStartY = e.changedTouches[0].screenY;
+}, { passive: true });
+
+document.addEventListener('touchend', (e) => {
+  if (isTransitioning) return;
+  const deltaX = e.changedTouches[0].screenX - touchStartX;
+  const deltaY = e.changedTouches[0].screenY - touchStartY;
+
+  // Ignorer si le mouvement est principalement vertical
+  if (Math.abs(deltaY) > Math.abs(deltaX) * 1.5) return;
+
+  const threshold = 40;
+  if (deltaX < -threshold) {
+    // Swipe gauche → suivant
+    goTo(currentIndex + 1);
+  } else if (deltaX > threshold) {
+    // Swipe droite → précédent
+    goTo(currentIndex - 1);
+  }
+}, { passive: true });
+
+// ================================================================
+// NAVIGATION CLAVIER
+// ================================================================
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowLeft') {
+    e.preventDefault();
+    goTo(currentIndex - 1);
+  } else if (e.key === 'ArrowRight') {
+    e.preventDefault();
+    goTo(currentIndex + 1);
+  } else if (e.key === 'Escape') {
+    window.location.href = 'ebooks.html';
+  }
+});
+
+// ================================================================
+// FERMER
+// ================================================================
+closeBtn.addEventListener('click', () => {
+  window.location.href = 'ebooks.html';
+});
+
+// ================================================================
+// CHARGER LES E-BOOKS
+// ================================================================
+async function loadEbooks() {
+  try {
+    // Récupérer tous les e-books
+    const q = query(collection(db, 'ebooks'), orderBy('createdAt', 'desc'));
+    const snapshot = await getDocs(q);
+    
+    if (!snapshot.empty) {
+      snapshot.forEach((doc) => {
+        ebooks.push({ id: doc.id, ...doc.data() });
+      });
+    } else {
+      showToast('⚠️ Aucun e-book trouvé.');
+      return;
+    }
+
+    // Vérifier si un ID spécifique est demandé
+    const urlParams = new URLSearchParams(window.location.search);
+    const requestedId = urlParams.get('id');
+
+    if (requestedId) {
+      const index = ebooks.findIndex(e => e.id === requestedId);
+      if (index !== -1) {
+        currentIndex = index;
+      }
+    }
+
+    renderEbooks();
+    updatePosition(false);
+
+  } catch (error) {
+    console.error('Erreur chargement e-books:', error);
+    showToast('❌ Erreur de chargement');
+  }
+}
+
+// ================================================================
+// DÉMARRAGE
+// ================================================================
+loadEbooks();
+
+console.log('📖 ARVEXA - Lecteur d\'e-books');
+</script>
+</body>
+</html>

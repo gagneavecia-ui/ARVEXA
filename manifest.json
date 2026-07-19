@@ -1,7 +1,7 @@
 {
-  "name": "ARVEXA - Investissement & Finance",
+  "name": "ARVEXA - Affiliation & Finance",
   "short_name": "ARVEXA",
-  "description": "Plateforme d'investissement et de finance pour la croissance durable",
+  "description": "Plateforme d'affiliation et de finance pour la croissance durable",
   "start_url": "index.html",
   "display": "standalone",
   "orientation": "portrait",
@@ -12,25 +12,25 @@
   "lang": "fr",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
+      "src": "icon.png",
       "sizes": "64x64",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
+      "src": "icon.png",
       "sizes": "144x144",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
+      "src": "icon.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
+      "src": "icon.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"

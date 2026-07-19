@@ -129,29 +129,26 @@
       font-size: clamp(14px, 1.8vw, 18px);
     }
 
+    .notif-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 30px;
+      font-size: 10px;
+      font-weight: 500;
+      transition: var(--transition);
+      background: rgba(45, 125, 90, 0.08);
+      color: var(--success);
+      border: 1px solid rgba(45, 125, 90, 0.10);
+    }
+    .notif-badge i {
+      font-size: 12px;
+    }
+
     .header-placeholder {
       width: clamp(32px, 4vw, 40px);
       flex-shrink: 0;
-    }
-
-    /* ===== BANNER LECTURE SEULE ===== */
-    #readOnlyBanner {
-      background: rgba(184, 134, 11, 0.08);
-      border-bottom: 1px solid var(--accent);
-      padding: 10px 16px;
-      text-align: center;
-      font-size: 12px;
-      color: var(--accent);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-    #readOnlyBanner a {
-      color: var(--accent);
-      font-weight: 600;
-      text-decoration: underline;
     }
 
     /* ===== CONTAINER ===== */
@@ -193,6 +190,10 @@
       text-transform: uppercase;
       letter-spacing: 1.5px;
       margin-bottom: 4px;
+    }
+    .id-card-label i {
+      color: var(--accent);
+      margin-right: 6px;
     }
     .id-card-number {
       font-family: 'Playfair Display', 'Georgia', serif;
@@ -346,7 +347,6 @@
       -moz-appearance: textfield;
     }
 
-    /* ===== MONTANT AFFICHÉ (SANS FRAIS) ===== */
     .amount-display {
       margin-top: 14px;
       padding: clamp(12px, 1.5vw, 16px);
@@ -377,8 +377,8 @@
       color: var(--text-muted);
       opacity: 0.4;
     }
-    
-        /* ===== PAYMENT METHODS ===== */
+
+    /* ===== PAYMENT METHODS ===== */
     .payment-methods {
       margin-bottom: 20px;
       width: 100%;
@@ -460,7 +460,6 @@
       font-size: clamp(18px, 2vw, 24px);
     }
 
-    /* ===== MONTANT MINIMUM ===== */
     .min-amount-hint {
       font-size: 11px;
       color: var(--text-muted);
@@ -470,6 +469,48 @@
     }
     .min-amount-hint strong {
       color: var(--accent);
+    }
+
+    /* ===== NOTIFICATION BANNER ===== */
+    .notif-permission-banner {
+      background: rgba(184, 134, 11, 0.06);
+      border: 1px solid rgba(184, 134, 11, 0.10);
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin: 18px 0 10px;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .notif-permission-banner p {
+      font-size: 12px;
+      color: var(--text-dim);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .notif-permission-banner p i {
+      color: var(--accent);
+    }
+    .notif-permission-banner .btn-enable {
+      padding: 6px 16px;
+      background: var(--accent);
+      border: none;
+      border-radius: 30px;
+      color: var(--bg-dark);
+      font-weight: 600;
+      font-size: 11px;
+      cursor: pointer;
+      transition: var(--transition);
+      white-space: nowrap;
+    }
+    .notif-permission-banner .btn-enable:active {
+      transform: scale(0.95);
+    }
+    .notif-permission-banner .btn-enable:hover {
+      background: #9A7209;
     }
 
     /* ===== ADMIN NOTE ===== */
@@ -655,7 +696,9 @@
 <header class="header">
   <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i></a>
   <a href="index.html" class="logo">ARVE<span>XA</span></a>
-  <div class="header-placeholder"></div>
+  <span class="notif-badge" id="notifBadge">
+    <i class="fas fa-circle"></i> <span id="notifStatusText">🔔</span>
+  </span>
 </header>
 
 <!-- ===== MAIN ===== -->
@@ -697,7 +740,6 @@
       <input type="number" id="amountInput" placeholder="Ex: 5000" min="3000" step="100">
     </div>
 
-    <!-- AFFICHAGE MONTANT (SANS FRAIS) -->
     <div class="amount-display" id="amountDisplay">
       <div class="label">💰 Montant qui sera crédité</div>
       <div class="value zero" id="displayAmount">0 FCFA</div>
@@ -707,8 +749,8 @@
       ⚠️ Montant minimum : <strong>3 000 FCFA</strong>
     </div>
   </div>
-  
-    <!-- MOYENS DE PAIEMENT -->
+
+  <!-- MOYENS DE PAIEMENT -->
   <div class="payment-methods">
     <span class="title"><i class="fas fa-credit-card"></i> Moyens de paiement acceptés</span>
     <div class="payment-grid">
@@ -745,7 +787,13 @@
     Envoyer la demande via WhatsApp
   </a>
 
-  <!-- HISTORIQUE DES DÉPÔTS -->
+  <!-- NOTIFICATION PERMISSION BANNER -->
+  <div class="notif-permission-banner" id="notifPermissionBanner">
+    <p><i class="fas fa-bell"></i> Activez les notifications pour suivre vos dépôts !</p>
+    <button class="btn-enable" id="enableNotifBtn"><i class="fas fa-check"></i> Activer</button>
+  </div>
+
+  <!-- HISTORIQUE -->
   <div class="card" style="margin-top:18px;padding-bottom:8px;">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
       <span style="font-size:13px;font-weight:600;color:var(--text-light);">📋 Historique des dépôts</span>
@@ -770,26 +818,13 @@
 <!-- ===== TOAST ===== -->
 <div class="toast" id="toast"></div>
 
-<!-- ============================================================ -->
-<!-- ===== IMPORTS ===== -->
-<script type="importmap">
-  {
-    "imports": {
-      "firebase/app": "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js",
-      "firebase/auth": "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js",
-      "firebase/firestore": "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js"
-    }
-  }
-</script>
-
 <!-- ================================================================ -->
-<!-- ERUDA - Console mobile (développement uniquement) -->
+<!-- ERUDA -->
 <!-- ================================================================ -->
 <script>
 (function() {
   var isLocal = location.hostname === "localhost" || location.hostname === "127.0.0.1";
   var isDebug = location.search.indexOf("debug=true") !== -1 || location.search.indexOf("eruda=true") !== -1;
-  
   if (isLocal || isDebug) {
     if (document.querySelector('script[data-eruda]')) return;
     var s = document.createElement("script");
@@ -797,10 +832,7 @@
     s.src = "https://cdn.jsdelivr.net/npm/eruda";
     s.onload = function() {
       if (typeof eruda !== 'undefined') {
-        eruda.init({
-          tool: ['console', 'network', 'elements', 'resources'],
-          defaults: { displaySize: 40 }
-        });
+        eruda.init({ tool: ['console', 'network', 'elements'], defaults: { displaySize: 40 } });
         console.log("🐞 Eruda active - Recharger");
       }
     };
@@ -809,9 +841,23 @@
 })();
 </script>
 
+<!-- ================================================================ -->
+<!-- IMPORTS -->
+<!-- ================================================================ -->
+<script type="importmap">
+{
+  "imports": {
+    "firebase/app": "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js",
+    "firebase/auth": "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js",
+    "firebase/firestore": "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js",
+    "firebase/messaging": "https://www.gstatic.com/firebasejs/12.12.1/firebase-messaging.js"
+  }
+}
+</script>
+
 <script type="module">
 // ================================================================
-// IMPORTS FIREBASE v12
+// IMPORTS
 // ================================================================
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
 import { 
@@ -824,6 +870,7 @@ import {
   getFirestore,
   doc,
   getDoc,
+  getDocs,
   collection,
   query,
   where,
@@ -833,11 +880,15 @@ import {
   onSnapshot,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+import { 
+  getMessaging,
+  getToken
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-messaging.js";
 
 // ================================================================
 // CONFIGURATION FIREBASE
 // ================================================================
-const firebaseConfig = {
+var firebaseConfig = {
   apiKey: "AIzaSyBEbYuuUlNCLMBUHClv4UnyownNHw2q3_g",
   authDomain: "nexgen-39043.firebaseapp.com",
   projectId: "nexgen-39043",
@@ -847,56 +898,64 @@ const firebaseConfig = {
   measurementId: "G-HC2Q5DNKDR"
 };
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+var app = initializeApp(firebaseConfig);
+var auth = getAuth(app);
+var db = getFirestore(app);
+var messaging = getMessaging(app);
+
+// VAPID Key
+var VAPID_KEY = "BJKkMr-LMevY9HePx3vzYqWMILwAV8mxwOdfkbR-PvEu_m7eu309ygioDNLLqW1wRc2b93Irb1svNnLQIpegquk";
+
 setPersistence(auth, browserLocalPersistence);
 
 // ================================================================
 // TELEGRAM CONFIG (admin uniquement)
 // ================================================================
-const TELEGRAM_BOT_TOKEN = "8283625921:AAEF--QKS9uqnz0K3j7SGkk7fsdRb3b8y8o";
-const TELEGRAM_CHAT_ID = "5212067028";
+var TELEGRAM_BOT_TOKEN = "8283625921:AAEF--QKS9uqnz0K3j7SGkk7fsdRb3b8y8o";
+var TELEGRAM_CHAT_ID = "5212067028";
 
 // ================================================================
 // CONSTANTES
 // ================================================================
-const WHATSAPP_NUMBER = "22798064667";
-const MIN_DEPOSIT = 3000;
-const MAX_DEPOSIT = 1000000;
-const MAX_REQUESTS_PER_DAY = 2;
+var WHATSAPP_NUMBER = "22798064667";
+var MIN_DEPOSIT = 3000;
+var MAX_DEPOSIT = 1000000;
+var MAX_REQUESTS_PER_DAY = 2;
 
 // ================================================================
 // DOM
 // ================================================================
-const userIdDisplay = document.getElementById('userIdDisplay');
-const copyIdBtn = document.getElementById('copyIdBtn');
-const amountInput = document.getElementById('amountInput');
-const displayAmount = document.getElementById('displayAmount');
-const amountDisplay = document.getElementById('amountDisplay');
-const whatsappBtn = document.getElementById('whatsappBtn');
-const historyList = document.getElementById('historyList');
-const toast = document.getElementById('toast');
+var userIdDisplay = document.getElementById('userIdDisplay');
+var copyIdBtn = document.getElementById('copyIdBtn');
+var amountInput = document.getElementById('amountInput');
+var displayAmount = document.getElementById('displayAmount');
+var amountDisplay = document.getElementById('amountDisplay');
+var whatsappBtn = document.getElementById('whatsappBtn');
+var historyList = document.getElementById('historyList');
+var toast = document.getElementById('toast');
+var notifBadge = document.getElementById('notifBadge');
+var notifStatusText = document.getElementById('notifStatusText');
+var notifPermissionBanner = document.getElementById('notifPermissionBanner');
+var enableNotifBtn = document.getElementById('enableNotifBtn');
 
-let currentUserId = null;
-let currentAuthUser = null;
-let userData = null;
-let unsubscribeHistory = null;
-let notificationTimeout = null;
+var currentUserId = null;
+var currentAuthUser = null;
+var userData = null;
+var unsubscribeHistory = null;
+var notificationTimeout = null;
 
 // ================================================================
 // HELPERS
 // ================================================================
-async function getDocument(collectionName, docId) {
-  try {
-    const ref = doc(db, collectionName, docId);
-    const snap = await getDoc(ref);
+function getDocument(collectionName, docId) {
+  var ref = doc(db, collectionName, docId);
+  return getDoc(ref).then(function(snap) {
     if (!snap.exists()) return null;
     return { id: snap.id, ...snap.data() };
-  } catch (error) {
+  }).catch(function(error) {
     console.error('Erreur getDocument:', error);
     return null;
-  }
+  });
 }
 
 function showToast(message, type) {
@@ -934,97 +993,194 @@ function escapeHtml(str) {
 // ================================================================
 // ENVOI TELEGRAM (admin uniquement)
 // ================================================================
-async function sendTelegramMessage(message) {
-  try {
-    var url = 'https://api.telegram.org/bot' + TELEGRAM_BOT_TOKEN + '/sendMessage';
-    var response = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        chat_id: TELEGRAM_CHAT_ID,
-        text: message,
-        parse_mode: 'HTML',
-        disable_web_page_preview: true
-      })
-    });
-    var data = await response.json();
+function sendTelegramMessage(message) {
+  var url = 'https://api.telegram.org/bot' + TELEGRAM_BOT_TOKEN + '/sendMessage';
+  return fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      chat_id: TELEGRAM_CHAT_ID,
+      text: message,
+      parse_mode: 'HTML',
+      disable_web_page_preview: true
+    })
+  }).then(function(response) {
+    return response.json();
+  }).then(function(data) {
+    console.log('Telegram envoye:', data.ok);
     return data.ok;
-  } catch (error) {
+  }).catch(function(error) {
     console.error('Erreur Telegram:', error);
     return false;
-  }
+  });
 }
 
 // ================================================================
-// NOTIFICATION ADMIN (nouvelle demande de dépôt)
+// MOTIVATION MESSAGES
 // ================================================================
-async function notifyAdminDeposit(userName, userId, amount, depositId) {
-  try {
-    var message = '💰 <b>NOUVELLE DEMANDE DE DEPOT</b>\n\n' +
-                  '👤 <b>Utilisateur:</b> ' + escapeHtml(userName) + '\n' +
-                  '🆔 <b>ID:</b> ' + escapeHtml(userId) + '\n' +
-                  '💵 <b>Montant:</b> ' + formatCurrency(amount) + '\n' +
-                  '🕐 <b>Date:</b> ' + new Date().toLocaleString('fr-FR') + '\n\n' +
-                  '🔗 <a href="https://nexgen-39043.web.app/admin">Voir dans l\'admin</a>';
-    
-    await sendTelegramMessage(message);
+function getMotivationMessage(type, userName, amount) {
+  var messages = {
+    deposit: [
+      '💰 Encaissement effectué ! ' + userName + ' vient de recharger ' + formatCurrency(amount) + '. 🚀',
+      '✅ Dépôt validé ! ' + userName + ' a ajouté ' + formatCurrency(amount) + ' à son portefeuille. 🔥',
+      '🎯 Bravo ! ' + userName + ' vient d\'investir ' + formatCurrency(amount) + '. Continuez comme ça ! 💪',
+      '📈 Nouveau dépôt de ' + formatCurrency(amount) + ' par ' + userName + '. La croissance continue ! ⚡',
+      '💵 ' + userName + ' vient de recharger ' + formatCurrency(amount) + '. Votre plateforme grandit ! 🌟'
+    ]
+  };
+  var list = messages[type] || ['✅ Action effectuée avec succès ! 🚀'];
+  return list[Math.floor(Math.random() * list.length)];
+}
 
-    await addDoc(collection(db, 'notifications'), {
-      type: 'deposit_pending',
-      title: '💰 Nouveau depôt - ' + formatCurrency(amount),
-      body: userName + ' - ID: ' + userId,
-      userId: currentAuthUser ? currentAuthUser.uid : '',
-      userName: userName,
-      amount: amount,
-      depositId: depositId,
-      read: false,
-      createdAt: new Date().toISOString(),
-      target: 'admin'
-    });
+// ================================================================
+// NOTIFICATION ADMIN
+// ================================================================
+function notifyAdminDeposit(userName, userId, amount, depositId) {
+  var message = '💰 <b>ALERTE DEPOT !</b>\n\n' +
+                '👤 ' + escapeHtml(userName) + '\n' +
+                '💵 ' + formatCurrency(amount) + '\n' +
+                '🆔 ' + escapeHtml(userId) + '\n' +
+                '🕐 ' + new Date().toLocaleString('fr-FR') + '\n\n' +
+                '📲 Valider: <a href="https://nexgen-39043.web.app/admin">Voir dans l\'admin</a>';
+  
+  sendTelegramMessage(message);
 
-    console.log('Notification admin envoyee pour depot:', amount);
-  } catch (error) {
+  var notifData = {
+    type: 'deposit_pending',
+    title: '💰 Nouveau dépôt - ' + formatCurrency(amount),
+    body: userName + ' - ID: ' + userId,
+    userId: currentAuthUser ? currentAuthUser.uid : '',
+    userName: userName,
+    amount: amount,
+    depositId: depositId,
+    read: false,
+    createdAt: new Date().toISOString(),
+    target: 'admin'
+  };
+  
+  addDoc(collection(db, 'notifications'), notifData).catch(function(error) {
     console.error('Erreur notification admin:', error);
+  });
+}
+
+// ================================================================
+// CHECK REFERRAL BONUS
+// ================================================================
+async function checkReferralBonus(userId, amount) {
+  try {
+    var userRef = doc(db, 'users', userId);
+    var userSnap = await getDoc(userRef);
+    if (!userSnap.exists()) return;
+    
+    var userData = userSnap.data();
+    var referredBy = userData.referredBy;
+    var hasReceivedBonus = userData.referralBonusReceived === true;
+    
+    if (!referredBy || hasReceivedBonus) return;
+    
+    var isFirstDeposit = userData.hasDeposited !== true;
+    if (!isFirstDeposit || amount < 3000) return;
+    
+    console.log('🎯 Premier dépôt détecté pour', userId, ' - Recherche du parrain:', referredBy);
+    
+    var usersRef = collection(db, 'users');
+    var q = query(usersRef, where('referralCode', '==', referredBy));
+    var querySnapshot = await getDocs(q);
+    
+    if (querySnapshot.empty) {
+      console.log('⚠️ Parrain non trouvé avec le code:', referredBy);
+      return;
+    }
+    
+    var parrainDoc = querySnapshot.docs[0];
+    var parrainData = parrainDoc.data();
+    var parrainId = parrainDoc.id;
+    
+    console.log('👤 Parrain trouvé:', parrainData.prenom || 'Utilisateur');
+    
+    var newBalance = (parrainData.balance || 0) + 1000;
+    var newReferralEarnings = (parrainData.referralEarnings || 0) + 1000;
+    var newReferralsCount = (parrainData.referralsCount || 0) + 1;
+    
+    await updateDoc(doc(db, 'users', parrainId), {
+      balance: newBalance,
+      referralEarnings: newReferralEarnings,
+      referralsCount: newReferralsCount,
+      lastReferralDate: new Date().toISOString()
+    });
+    
+    await updateDoc(userRef, {
+      referralBonusReceived: true,
+      referralBonusAmount: 500,
+      referralBonusDate: new Date().toISOString(),
+      hasDeposited: true,
+      firstDepositAmount: amount,
+      firstDepositDate: new Date().toISOString()
+    });
+    
+    var parrainName = parrainData.prenom || parrainData.fullName || 'Utilisateur';
+    var filleulName = userData.prenom || userData.fullName || 'Utilisateur';
+    
+    var msg = '🎉 <b>BOUM ! Bonus parrainage validé !</b>\n\n' +
+              '👤 <b>Parrain:</b> ' + parrainName + '\n' +
+              '👤 <b>Filleul:</b> ' + filleulName + '\n' +
+              '💵 <b>Montant:</b> 500 FCFA\n' +
+              '💰 <b>Dépôt du filleul:</b> ' + formatCurrency(amount) + '\n' +
+              '🕐 <b>Date:</b> ' + new Date().toLocaleString('fr-FR') + '\n\n' +
+              '🔗 <a href="https://nexgen-39043.web.app/admin">Gérer les parrainages</a>';
+    
+    await sendTelegramMessage(msg);
+    showToast('🎉 ' + parrainName + ' a reçu +500 FCFA pour parrainage !', 'success');
+    console.log('✅ Bonus de parrainage crédité à', parrainName);
+    
+  } catch (error) {
+    console.error('❌ Erreur checkReferralBonus:', error);
   }
 }
 
 // ================================================================
-// VALIDATION TELEPHONE
+// NOTIFICATION APRES VALIDATION D'UN DEPOT
 // ================================================================
-function validatePhone(phone) {
-  if (!phone) return false;
-  var clean = phone.replace(/\D/g, '');
-  return clean.length >= 7 && clean.length <= 9;
+async function notifyDepositValidated(userId, userName, amount, depositId) {
+  var message = getMotivationMessage('deposit', userName, amount);
+  
+  var fullMessage = '✅ <b>ENCAISSEMENT EFFECTUE !</b>\n\n' +
+                    '💰 ' + message + '\n\n' +
+                    '👤 ' + userName + '\n' +
+                    '💵 ' + formatCurrency(amount) + '\n' +
+                    '🕐 ' + new Date().toLocaleString('fr-FR') + '\n\n' +
+                    '🔗 <a href="https://nexgen-39043.web.app/admin">Gérer les dépôts</a>';
+  
+  await sendTelegramMessage(fullMessage);
+  await checkReferralBonus(userId, amount);
 }
 
 // ================================================================
-// VERIFIER LA LIMITE DE DEMANDES PAR JOUR
+// CHECK DAILY LIMIT
 // ================================================================
-async function checkDailyLimit(uid) {
-  if (!uid) return { allowed: false, count: 0 };
+function checkDailyLimit(uid) {
+  if (!uid) return Promise.resolve({ allowed: false, count: 0 });
 
-  try {
-    var today = new Date().toISOString().split('T')[0];
-    var q = query(
-      collection(db, 'depots'),
-      where('userId', '==', uid),
-      where('date', '==', today),
-      where('statut', 'in', ['en_attente', 'pending'])
-    );
-    var snapshot = await getDocs(q);
-    
+  var today = new Date().toISOString().split('T')[0];
+  var q = query(
+    collection(db, 'depots'),
+    where('userId', '==', uid),
+    where('date', '==', today),
+    where('statut', 'in', ['en_attente', 'pending'])
+  );
+  
+  return getDocs(q).then(function(snapshot) {
     var count = snapshot.size;
     var allowed = count < MAX_REQUESTS_PER_DAY;
-    
     return { allowed: allowed, count: count };
-  } catch (error) {
+  }).catch(function(error) {
     console.error('Erreur checkDailyLimit:', error);
     return { allowed: true, count: 0 };
-  }
+  });
 }
 
 // ================================================================
-// ECOUTE EN TEMPS REEL DE L'HISTORIQUE
+// ECOUTE EN TEMPS REEL DE L'HISTORIQUE (SANS INDEX)
 // ================================================================
 function listenToHistory(uid) {
   if (unsubscribeHistory) {
@@ -1032,12 +1188,14 @@ function listenToHistory(uid) {
     unsubscribeHistory = null;
   }
 
-  if (!uid) return;
+  if (!uid) {
+    historyList.innerHTML = '<div class="empty-state"><i class="fas fa-clock"></i><p>Aucun depot effectue</p></div>';
+    return;
+  }
 
   var q = query(
     collection(db, 'depots'),
-    where('userId', '==', uid),
-    orderBy('timestamp', 'desc')
+    where('userId', '==', uid)
   );
 
   unsubscribeHistory = onSnapshot(q, function(snapshot) {
@@ -1046,79 +1204,156 @@ function listenToHistory(uid) {
       return;
     }
 
-    historyList.innerHTML = '';
+    var items = [];
     snapshot.forEach(function(docSnap) {
       var data = docSnap.data();
+      items.push({
+        id: docSnap.id,
+        montant: data.montant || 0,
+        date: data.date || 'Date inconnue',
+        statut: data.statut || 'en_attente',
+        timestamp: data.timestamp || data.createdAt || data.date || ''
+      });
+    });
+
+    items.sort(function(a, b) {
+      var dateA = a.timestamp ? new Date(a.timestamp).getTime() : 0;
+      var dateB = b.timestamp ? new Date(b.timestamp).getTime() : 0;
+      return dateB - dateA;
+    });
+
+    var displayItems = items.slice(0, 20);
+    historyList.innerHTML = '';
+
+    displayItems.forEach(function(data) {
       var item = document.createElement('div');
       item.className = 'history-item';
       
       var statusClass = 'pending';
       var statusLabel = '⏳ En attente';
       
-      if (data.statut === 'valide' || data.statut === 'validé') {
+      var statut = data.statut || 'en_attente';
+      if (statut === 'valide' || statut === 'validé' || statut === 'confirmed') {
         statusClass = 'validated';
         statusLabel = '✅ Valide';
-      } else if (data.statut === 'rejete' || data.statut === 'rejeté') {
+      } else if (statut === 'rejete' || statut === 'rejeté' || statut === 'rejected') {
         statusClass = 'rejected';
         statusLabel = '❌ Rejete';
       }
 
-      item.innerHTML = '<div class="left"><span class="amount">' + formatCurrency(data.montant || 0) + '</span><span class="date">' + (data.date || 'Date inconnue') + '</span></div><div class="right"><span class="status-badge ' + statusClass + '">' + statusLabel + '</span></div>';
+      item.innerHTML = '<div class="left"><span class="amount">' + formatCurrency(data.montant) + '</span><span class="date">' + (data.date || 'Date inconnue') + '</span></div><div class="right"><span class="status-badge ' + statusClass + '">' + statusLabel + '</span></div>';
       historyList.appendChild(item);
     });
+
+    // Détecter les nouveaux dépôts validés
+    snapshot.docChanges().forEach(function(change) {
+      if (change.type === 'modified') {
+        var data = change.doc.data();
+        var oldData = change.doc.data(); 
+        if (data.statut === 'valide' || data.statut === 'validé') {
+          var userName = userData ? (userData.prenom || 'Utilisateur') : 'Utilisateur';
+          notifyDepositValidated(currentAuthUser.uid, userName, data.montant || 0, change.doc.id);
+        }
+      }
+    });
+
   }, function(error) {
     console.error('Erreur ecoute historique:', error);
+    if (error.code === 'failed-precondition') {
+      loadHistoryOnce(uid);
+    }
+  });
+}
+
+// ================================================================
+// CHARGEMENT UNIQUE (FALLBACK)
+// ================================================================
+function loadHistoryOnce(uid) {
+  var q = query(collection(db, 'depots'), where('userId', '==', uid));
+  
+  getDocs(q).then(function(snapshot) {
+    if (snapshot.empty) {
+      historyList.innerHTML = '<div class="empty-state"><i class="fas fa-clock"></i><p>Aucun depot effectue</p></div>';
+      return;
+    }
+
+    var items = [];
+    snapshot.forEach(function(docSnap) {
+      var data = docSnap.data();
+      items.push({
+        id: docSnap.id,
+        montant: data.montant || 0,
+        date: data.date || 'Date inconnue',
+        statut: data.statut || 'en_attente',
+        timestamp: data.timestamp || data.createdAt || data.date || ''
+      });
+    });
+
+    items.sort(function(a, b) {
+      var dateA = a.timestamp ? new Date(a.timestamp).getTime() : 0;
+      var dateB = b.timestamp ? new Date(b.timestamp).getTime() : 0;
+      return dateB - dateA;
+    });
+
+    var displayItems = items.slice(0, 20);
+    historyList.innerHTML = '';
+
+    displayItems.forEach(function(data) {
+      var item = document.createElement('div');
+      item.className = 'history-item';
+      
+      var statusClass = 'pending';
+      var statusLabel = '⏳ En attente';
+      
+      var statut = data.statut || 'en_attente';
+      if (statut === 'valide' || statut === 'validé' || statut === 'confirmed') {
+        statusClass = 'validated';
+        statusLabel = '✅ Valide';
+      } else if (statut === 'rejete' || statut === 'rejeté' || statut === 'rejected') {
+        statusClass = 'rejected';
+        statusLabel = '❌ Rejete';
+      }
+
+      item.innerHTML = '<div class="left"><span class="amount">' + formatCurrency(data.montant) + '</span><span class="date">' + (data.date || 'Date inconnue') + '</span></div><div class="right"><span class="status-badge ' + statusClass + '">' + statusLabel + '</span></div>';
+      historyList.appendChild(item);
+    });
+  }).catch(function(error) {
+    console.error('Erreur fallback:', error);
     historyList.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>Erreur de chargement</p></div>';
   });
 }
 
 // ================================================================
-// AUTH
+// CHARGEMENT UTILISATEUR
 // ================================================================
-onAuthStateChanged(auth, function(user) {
-  if (user) {
-    currentAuthUser = user;
-    localStorage.setItem('ARVEXA_current_user', user.uid);
-    
-    var cached = localStorage.getItem('ARVEXA_user_data');
-    if (cached) {
-      try {
-        userData = JSON.parse(cached);
-      } catch(e) {}
-    }
-
-    getDocument('users', user.uid).then(function(data) {
-      if (data) {
-        userData = data;
-        currentUserId = data.id || data.customerId || generateId();
-        
-        if (!data.id && !data.customerId) {
-          var userRef = doc(db, 'users', user.uid);
-          updateDoc(userRef, { id: currentUserId, customerId: currentUserId });
-        }
-        
-        userIdDisplay.textContent = currentUserId || 'ID indisponible';
-        listenToHistory(user.uid);
-        localStorage.setItem('ARVEXA_user_data', JSON.stringify(data));
-        sessionStorage.setItem('arvexa_loaded', 'true');
+function loadUserData(uid) {
+  var userRef = doc(db, 'users', uid);
+  
+  getDoc(userRef).then(function(docSnap) {
+    if (docSnap.exists()) {
+      userData = docSnap.data();
+      
+      if (!userData.indicatif) userData.indicatif = '+227';
+      if (!userData.phone) userData.phone = '';
+      if (!userData.prenom) userData.prenom = 'Utilisateur';
+      
+      currentUserId = userData.id || userData.customerId || generateId();
+      
+      if (!userData.id && !userData.customerId) {
+        var ref = doc(db, 'users', uid);
+        updateDoc(ref, { id: currentUserId, customerId: currentUserId });
       }
-    }).catch(function(error) {
-      console.error('Erreur chargement:', error);
-    });
-    
-  } else {
-    var savedUid = localStorage.getItem('ARVEXA_current_user');
-    if (savedUid) {
-      setTimeout(function() {
-        if (!auth.currentUser) {
-          window.location.href = 'login.html';
-        }
-      }, 2000);
-    } else {
-      window.location.href = 'login.html';
+      
+      userIdDisplay.textContent = currentUserId || 'ID indisponible';
+      listenToHistory(uid);
+      
+      localStorage.setItem('ARVEXA_user_data', JSON.stringify(userData));
+      sessionStorage.setItem('arvexa_loaded', 'true');
     }
-  }
-});
+  }).catch(function(error) {
+    console.error('Erreur chargement user:', error);
+  });
+}
 
 // ================================================================
 // COPIER L'ID
@@ -1201,9 +1436,9 @@ function updateWhatsAppLink(amount) {
   whatsappBtn.style.opacity = '1';
   whatsappBtn.innerHTML = '<i class="fab fa-whatsapp"></i> Envoyer la demande';
   
-  var phone = userData ? userData.phone : '';
-  var indicatif = userData ? userData.indicatif : '+227';
-  var userName = userData ? (userData.prenom || userData.fullName || 'Utilisateur') : 'Utilisateur';
+  var phone = (userData && userData.phone) || '';
+  var indicatif = (userData && userData.indicatif) || '+227';
+  var userName = (userData && (userData.prenom || userData.fullName)) || 'Utilisateur';
   var cleanPhone = phone.replace(/\D/g, '');
   
   var message = 'NOUVELLE DEMANDE DE RECHARGE\n\n' +
@@ -1224,9 +1459,11 @@ whatsappBtn.addEventListener('click', function(event) {
   event.preventDefault();
 
   var amount = parseInt(amountInput.value, 10) || 0;
-  var phone = userData ? userData.phone : '';
-  var indicatif = userData ? userData.indicatif : '+227';
+  var phone = (userData && userData.phone) || '';
+  var indicatif = (userData && userData.indicatif) || '+227';
   var cleanPhone = phone.replace(/\D/g, '');
+  var userName = (userData && (userData.prenom || userData.fullName)) || 'Utilisateur';
+  var userEmail = (userData && userData.email) || (currentAuthUser ? currentAuthUser.email : '');
 
   if (!currentAuthUser || !currentUserId) {
     showToast('Veuillez vous reconnecter.', 'error');
@@ -1254,36 +1491,143 @@ whatsappBtn.addEventListener('click', function(event) {
       return;
     }
 
-    var userName = userData ? (userData.prenom || userData.fullName || 'Utilisateur') : 'Utilisateur';
-
     var depositData = {
       userId: currentAuthUser.uid,
-      displayId: currentUserId,
+      displayId: currentUserId || 'ID_INCONNU',
       userName: userName,
-      userEmail: userData ? (userData.email || currentAuthUser.email) : currentAuthUser.email,
+      userEmail: userEmail,
       userPhone: cleanPhone,
-      userIndicatif: indicatif,
-      fullPhone: indicatif + ' ' + cleanPhone,
+      userIndicatif: indicatif || '+227',
+      fullPhone: (indicatif || '+227') + ' ' + cleanPhone,
       montant: amount,
       date: new Date().toISOString().split('T')[0],
       timestamp: new Date().toISOString(),
       statut: 'en_attente',
       type: 'recharge',
       source: 'whatsapp',
-      paymentMethod: 'whatsapp'
+      paymentMethod: 'whatsapp',
+      createdAt: new Date().toISOString()
     };
 
-    addDoc(collection(db, 'depots'), depositData).then(function(docRef) {
+    return addDoc(collection(db, 'depots'), depositData).then(function(docRef) {
       notifyAdminDeposit(userName, currentUserId, amount, docRef.id);
       showToast('Demande de ' + formatCurrency(amount) + ' enregistree.', 'success');
-      window.open(whatsappBtn.href, '_blank', 'noopener,noreferrer');
+      
+      var message = 'NOUVELLE DEMANDE DE RECHARGE\n\n' +
+                    'Nom: ' + userName + '\n' +
+                    'ID: ' + currentUserId + '\n' +
+                    'Telephone: ' + (indicatif || '+227') + ' ' + cleanPhone + '\n' +
+                    'Montant: ' + formatCurrency(amount) + '\n' +
+                    'Date: ' + new Date().toLocaleDateString('fr-FR') + '\n\n' +
+                    'Valider: https://nexgen-39043.web.app/admin/index.html';
+      
+      var waUrl = 'https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(message);
+      window.open(waUrl, '_blank', 'noopener,noreferrer');
+      
       amountInput.value = '';
       updateAmountDisplay();
-    }).catch(function(error) {
-      console.error('Erreur:', error);
-      showToast('Erreur lors de l\'enregistrement.', 'error');
     });
+  }).catch(function(error) {
+    console.error('Erreur:', error);
+    showToast('Erreur lors de l\'enregistrement: ' + error.message, 'error');
   });
+});
+
+// ================================================================
+// NOTIFICATIONS FCM
+// ================================================================
+async function setupFCMNotifications() {
+  try {
+    if (Notification.permission === 'granted') {
+      var token = await getToken(messaging, { vapidKey: VAPID_KEY });
+      if (currentAuthUser) {
+        var userRef = doc(db, 'users', currentAuthUser.uid);
+        await updateDoc(userRef, { fcmToken: token, notificationsEnabled: true });
+      }
+      notifBadge.className = 'notif-badge';
+      notifStatusText.textContent = '🔔';
+      if (notifPermissionBanner) notifPermissionBanner.style.display = 'none';
+      return token;
+    }
+    
+    if (Notification.permission === 'denied') {
+      notifBadge.className = 'notif-badge';
+      notifStatusText.textContent = '🔕';
+      if (notifPermissionBanner) notifPermissionBanner.style.display = 'none';
+      return null;
+    }
+    
+    // Par défaut → afficher la bannière
+    notifBadge.className = 'notif-badge';
+    notifStatusText.textContent = '🔔';
+    if (notifPermissionBanner) notifPermissionBanner.style.display = 'flex';
+    return null;
+  } catch (error) {
+    console.error('❌ Erreur FCM:', error);
+    return null;
+  }
+}
+
+// ================================================================
+// DEMANDER LA PERMISSION AU CLIC
+// ================================================================
+if (enableNotifBtn) {
+  enableNotifBtn.addEventListener('click', async function() {
+    try {
+      var permission = await Notification.requestPermission();
+      if (permission === 'granted') {
+        var token = await getToken(messaging, { vapidKey: VAPID_KEY });
+        if (currentAuthUser) {
+          var userRef = doc(db, 'users', currentAuthUser.uid);
+          await updateDoc(userRef, { fcmToken: token, notificationsEnabled: true });
+        }
+        notifBadge.className = 'notif-badge';
+        notifStatusText.textContent = '🔔';
+        if (notifPermissionBanner) notifPermissionBanner.style.display = 'none';
+        showToast('✅ Notifications activées !', 'success');
+      } else {
+        showToast('⚠️ Notifications désactivées.', 'warning');
+      }
+    } catch (error) {
+      console.error('❌ Erreur permission:', error);
+    }
+  });
+}
+
+// ================================================================
+// AUTH
+// ================================================================
+var authChecked = false;
+
+onAuthStateChanged(auth, function(user) {
+  if (user) {
+    currentAuthUser = user;
+    localStorage.setItem('ARVEXA_current_user', user.uid);
+    
+    var cached = localStorage.getItem('ARVEXA_user_data');
+    if (cached) {
+      try {
+        userData = JSON.parse(cached);
+        if (!userData.indicatif) userData.indicatif = '+227';
+      } catch(e) {}
+    }
+
+    loadUserData(user.uid);
+    setupFCMNotifications();
+    authChecked = true;
+  } else {
+    var savedUid = localStorage.getItem('ARVEXA_current_user');
+    if (savedUid && !authChecked) {
+      setTimeout(function() {
+        if (!auth.currentUser) {
+          window.location.href = 'login.html';
+        }
+      }, 2000);
+    } else if (!authChecked) {
+      window.location.href = 'login.html';
+    }
+    authChecked = true;
+  }
 });
 
 // ================================================================
@@ -1291,10 +1635,7 @@ whatsappBtn.addEventListener('click', function(event) {
 // ================================================================
 amountInput.addEventListener('input', updateAmountDisplay);
 
-console.log('ARVEXA - Page Recharger chargee');
-</script>
-</body>
-</html>
+console.log('💰 ARVEXA - Page Recharger chargee (version stable)');
 </script>
 </body>
 </html>

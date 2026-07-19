@@ -10,6 +10,7 @@
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3135/3135715.png">
   
+  <!-- Favicon -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>">
   
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -39,7 +40,12 @@
       --danger: #8A3A3A;
     }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
 
     body {
       font-family: 'Inter', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
@@ -60,10 +66,13 @@
       100% { opacity: 1; }
     }
 
+    /* ===== BACKGROUND ===== */
     .gradient-bg {
       position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
       z-index: -2;
       background: radial-gradient(ellipse 40% 30% at 30% 20%, rgba(26, 58, 42, 0.10) 0%, transparent 70%),
                   linear-gradient(180deg, #0A0A0A 0%, #060606 100%);
@@ -111,7 +120,10 @@
       font-family: 'Playfair Display', 'Georgia', serif;
       letter-spacing: 2px;
     }
-    .logo span { color: var(--accent); font-style: italic; }
+    .logo span {
+      color: var(--accent);
+      font-style: italic;
+    }
 
     .back-btn {
       width: clamp(32px, 4vw, 40px);
@@ -132,7 +144,9 @@
       transform: scale(0.94);
       background: rgba(184, 134, 11, 0.08);
     }
-    .back-btn i { font-size: clamp(14px, 1.8vw, 18px); }
+    .back-btn i {
+      font-size: clamp(14px, 1.8vw, 18px);
+    }
 
     .header-placeholder {
       width: clamp(32px, 4vw, 40px);
@@ -141,9 +155,9 @@
 
     /* ===== CONTAINER ===== */
     .container {
-      max-width: 1000px;
+      max-width: 700px;
       margin: 0 auto;
-      padding: 16px 20px 40px;
+      padding: 16px 5% 40px;
       width: 100%;
     }
 
@@ -169,42 +183,51 @@
       letter-spacing: 1px;
       text-transform: uppercase;
     }
-    .hero-badge i { color: var(--accent); font-size: 8px; }
+    .hero-badge i {
+      color: var(--accent);
+      font-size: 8px;
+    }
     .hero-title {
-      font-size: clamp(28px, 5vw, 42px);
+      font-size: clamp(28px, 5vw, 36px);
       font-weight: 700;
       font-family: 'Playfair Display', 'Georgia', serif;
       line-height: 1.2;
       margin-bottom: 10px;
       color: var(--text-light);
     }
-    .hero-title span { color: var(--accent); font-style: italic; }
+    .hero-title span {
+      color: var(--accent);
+      font-style: italic;
+    }
     .hero-description {
       font-size: 14px;
       color: var(--text-dim);
       font-weight: 300;
-      max-width: 600px;
+      max-width: 500px;
       margin: 0 auto;
     }
 
-    /* ================================================================
-       FORMATION CARD - STYLE HORIZONTAL (comme index)
-       ================================================================ */
+    /* ===== FORMATIONS GRID ===== */
+    .formations-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
     .formation-card {
-      display: flex;
       background: var(--bg-card);
       backdrop-filter: blur(8px);
       border: 1px solid var(--card-border);
       border-radius: var(--radius);
       overflow: hidden;
-      transition: all 0.3s ease;
+      transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
       cursor: pointer;
-      margin-bottom: 20px;
       animation: fadeInUp 0.5s ease forwards;
-      opacity: 0;
-      height: 200px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
     }
-
     .formation-card:nth-child(1) { animation-delay: 0.05s; }
     .formation-card:nth-child(2) { animation-delay: 0.10s; }
     .formation-card:nth-child(3) { animation-delay: 0.15s; }
@@ -213,60 +236,54 @@
     .formation-card:nth-child(6) { animation-delay: 0.30s; }
     .formation-card:nth-child(7) { animation-delay: 0.35s; }
     .formation-card:nth-child(8) { animation-delay: 0.40s; }
-    .formation-card:nth-child(9) { animation-delay: 0.45s; }
-    .formation-card:nth-child(10) { animation-delay: 0.50s; }
 
     @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(20px); }
+      from { opacity: 0; transform: translateY(25px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
-    .formation-card:hover {
-      border-color: rgba(184, 134, 11, 0.15);
-      transform: translateY(-2px);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    .formation-card:active {
+      transform: scale(0.97);
     }
-    .formation-card:active { transform: scale(0.98); }
+    .formation-card:hover {
+      border-color: rgba(184, 134, 11, 0.12);
+      transform: translateY(-4px);
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.35);
+    }
 
     .formation-card .image-wrap {
-      width: 200px;
-      min-width: 200px;
       position: relative;
       overflow: hidden;
+      aspect-ratio: 16/9;
       background: var(--bg-dark);
-      flex-shrink: 0;
     }
-
     .formation-card .formation-image {
       width: 100%;
       height: 100%;
       object-fit: cover;
       display: block;
       transition: transform 0.5s ease;
-      filter: brightness(0.75) saturate(0.9);
+      filter: brightness(0.7) saturate(0.9);
     }
-
-    .formation-card:hover .formation-image {
+    .formation-card .formation-image:hover {
       filter: brightness(0.85) saturate(1);
-      transform: scale(1.05);
     }
 
     .formation-card .formation-badge {
       position: absolute;
       top: 10px;
       left: 10px;
-      font-size: 9px;
+      font-size: 8px;
       font-weight: 600;
-      padding: 4px 12px;
+      padding: 3px 10px;
       border-radius: 20px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      background: rgba(10, 10, 10, 0.85);
-      border: 1px solid rgba(184, 134, 11, 0.15);
+      background: rgba(10, 10, 10, 0.8);
+      border: 1px solid rgba(184, 134, 11, 0.1);
       color: var(--accent);
       backdrop-filter: blur(4px);
     }
-
     .formation-card .formation-badge.premium {
       background: rgba(184, 134, 11, 0.15);
       color: var(--accent);
@@ -277,80 +294,67 @@
       position: absolute;
       top: 10px;
       right: 10px;
-      font-size: 16px;
+      font-size: 14px;
       color: var(--accent);
       opacity: 0.7;
       background: rgba(10, 10, 10, 0.7);
-      padding: 4px 10px;
+      padding: 4px 8px;
       border-radius: 8px;
       backdrop-filter: blur(4px);
     }
 
     .formation-card .formation-content {
+      padding: 14px 16px 16px;
       flex: 1;
-      padding: 20px 24px;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
     }
-
     .formation-card .formation-category {
-      font-size: 11px;
+      font-size: 9px;
       font-weight: 500;
       color: var(--accent);
       text-transform: uppercase;
-      letter-spacing: 0.8px;
-      margin-bottom: 4px;
+      letter-spacing: 0.5px;
+      padding: 2px 8px;
+      border-radius: 12px;
+      background: rgba(184, 134, 11, 0.04);
+      align-self: flex-start;
+      margin-bottom: 6px;
+      border: 1px solid rgba(184, 134, 11, 0.04);
     }
-
     .formation-card .formation-title {
-      font-size: 20px;
+      font-size: 15px;
       font-weight: 700;
       font-family: 'Playfair Display', 'Georgia', serif;
       color: var(--text-light);
       line-height: 1.3;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
       display: -webkit-box;
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
     }
-
     .formation-card .formation-description {
-      font-size: 14px;
+      font-size: 11px;
       color: var(--text-dim);
       font-weight: 300;
-      line-height: 1.6;
+      line-height: 1.4;
       display: -webkit-box;
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
       flex: 1;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
     }
-
-    .formation-card .formation-meta {
-      display: flex;
-      gap: 16px;
-      font-size: 12px;
-      color: var(--text-muted);
-      margin-bottom: 8px;
-    }
-    .formation-card .formation-meta i {
-      color: var(--accent);
-      margin-right: 4px;
-    }
-
     .formation-card .formation-footer {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding-top: 12px;
-      border-top: 1px solid rgba(255, 255, 255, 0.03);
+      padding-top: 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.02);
     }
-
     .formation-card .formation-price {
-      font-size: 16px;
+      font-size: 14px;
       font-weight: 700;
       font-family: 'Playfair Display', 'Georgia', serif;
       color: var(--accent);
@@ -358,17 +362,15 @@
     .formation-card .formation-price.free {
       color: var(--success);
     }
-    .formation-card .formation-price.achete {
-      color: var(--success);
+    .formation-card .formation-actions {
+      display: flex;
+      gap: 6px;
     }
-
-    .formation-card .formation-actions { display: flex; gap: 8px; }
-
     .formation-card .formation-btn {
-      padding: 8px 20px;
+      padding: 6px 12px;
       border: none;
       border-radius: 8px;
-      font-size: 13px;
+      font-size: 10px;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.2s;
@@ -376,159 +378,26 @@
       text-decoration: none;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 4px;
     }
-
     .formation-card .formation-btn.primary {
       background: var(--accent);
       color: var(--bg-dark);
     }
-    .formation-card .formation-btn.primary:active { transform: scale(0.95); }
-    .formation-card .formation-btn.primary:hover { background: #9A7209; }
-
+    .formation-card .formation-btn.primary:active {
+      transform: scale(0.95);
+    }
+    .formation-card .formation-btn.primary:hover {
+      background: #9A7209;
+    }
     .formation-card .formation-btn.locked {
       background: rgba(184, 134, 11, 0.12);
       color: var(--accent);
       border: 1px solid rgba(184, 134, 11, 0.15);
     }
-    .formation-card .formation-btn.locked:hover {
-      background: rgba(184, 134, 11, 0.2);
-    }
-
-    .formation-card .formation-btn.success {
-      background: rgba(45, 125, 90, 0.15);
-      color: var(--success);
-      border: 1px solid rgba(45, 125, 90, 0.2);
-    }
 
     /* ============================================================
-       POPUP ACHAT FORMATION
-       ============================================================ */
-    .achat-popup-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.88);
-      backdrop-filter: blur(16px);
-      z-index: 9999;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
-      visibility: hidden;
-      transition: all 0.4s ease;
-      padding: 20px;
-    }
-    .achat-popup-overlay.show {
-      opacity: 1;
-      visibility: visible;
-    }
-
-    .achat-popup {
-      background: linear-gradient(145deg, #141414, #0A0A0A);
-      border: 1px solid var(--accent);
-      border-radius: var(--radius);
-      padding: 36px 32px;
-      max-width: 460px;
-      width: 100%;
-      text-align: center;
-      transform: scale(0.9) translateY(30px);
-      transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
-      position: relative;
-      overflow: hidden;
-    }
-    .achat-popup-overlay.show .achat-popup {
-      transform: scale(1) translateY(0);
-    }
-
-    .achat-popup::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 3px;
-      background: linear-gradient(90deg, var(--accent), var(--success), var(--accent));
-    }
-
-    .achat-popup .popup-icon {
-      font-size: 48px;
-      display: block;
-      margin-bottom: 12px;
-    }
-
-    .achat-popup h2 {
-      font-size: 24px;
-      font-weight: 700;
-      font-family: 'Playfair Display', 'Georgia', serif;
-      color: var(--text-light);
-      margin-bottom: 4px;
-    }
-    .achat-popup h2 span { color: var(--accent); font-style: italic; }
-
-    .achat-popup .popup-subtitle {
-      font-size: 14px;
-      color: var(--text-dim);
-      line-height: 1.6;
-      margin-bottom: 8px;
-    }
-
-    .achat-popup .popup-price {
-      font-size: 28px;
-      font-weight: 700;
-      font-family: 'Playfair Display', 'Georgia', serif;
-      color: var(--accent);
-      margin-bottom: 16px;
-    }
-
-    .achat-popup .popup-balance {
-      font-size: 13px;
-      color: var(--text-dim);
-      margin-bottom: 16px;
-    }
-    .achat-popup .popup-balance strong {
-      color: var(--text-light);
-    }
-
-    .achat-popup .popup-buttons {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .achat-popup .popup-buttons .btn-acheter {
-      padding: 14px 20px;
-      background: var(--success);
-      border: none;
-      border-radius: 12px;
-      color: white;
-      font-weight: 700;
-      font-size: 16px;
-      cursor: pointer;
-      transition: all 0.2s;
-      font-family: 'Inter', sans-serif;
-    }
-    .achat-popup .popup-buttons .btn-acheter:active { transform: scale(0.96); }
-    .achat-popup .popup-buttons .btn-acheter:hover {
-      opacity: 0.85;
-    }
-    .achat-popup .popup-buttons .btn-annuler {
-      padding: 12px;
-      background: transparent;
-      border: none;
-      color: var(--text-muted);
-      font-size: 13px;
-      cursor: pointer;
-      transition: all 0.2s;
-      font-family: 'Inter', sans-serif;
-      font-weight: 400;
-    }
-    .achat-popup .popup-buttons .btn-annuler:hover { color: var(--text-dim); }
-
-    /* ============================================================
-       POPUP PREMIUM GLOBAL
+       POPUP PREMIUM "OPPORTUNITÉ EN OR"
        ============================================================ */
     .premium-popup-overlay {
       position: fixed;
@@ -536,9 +405,9 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background: rgba(0, 0, 0, 0.88);
+      background: rgba(0, 0, 0, 0.85);
       backdrop-filter: blur(16px);
-      z-index: 9998;
+      z-index: 9999;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -556,8 +425,8 @@
       background: linear-gradient(145deg, #141414, #0A0A0A);
       border: 1px solid var(--accent);
       border-radius: var(--radius);
-      padding: 40px 36px;
-      max-width: 500px;
+      padding: 36px 28px;
+      max-width: 420px;
       width: 100%;
       text-align: center;
       transform: scale(0.9) translateY(30px);
@@ -581,74 +450,67 @@
     }
 
     .premium-popup .popup-icon {
-      font-size: 52px;
+      font-size: 48px;
       display: block;
       margin-bottom: 12px;
       animation: pulseGold 2s ease-in-out infinite;
     }
     @keyframes pulseGold {
       0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.08); }
+      50% { transform: scale(1.1); }
     }
 
     .premium-popup h2 {
-      font-size: 28px;
+      font-size: 26px;
       font-weight: 700;
       font-family: 'Playfair Display', 'Georgia', serif;
       color: var(--text-light);
-      margin-bottom: 4px;
+      margin-bottom: 8px;
     }
-    .premium-popup h2 span { color: var(--accent); font-style: italic; }
+    .premium-popup h2 span {
+      color: var(--accent);
+      font-style: italic;
+    }
 
     .premium-popup .popup-subtitle {
       font-size: 14px;
       color: var(--text-dim);
       line-height: 1.6;
-      margin-bottom: 16px;
+      margin-bottom: 18px;
     }
-    .premium-popup .popup-subtitle strong { color: var(--accent); }
+    .premium-popup .popup-subtitle strong {
+      color: var(--accent);
+    }
 
-    .premium-popup .features-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
+    .premium-popup .features-list {
       text-align: left;
-      margin: 16px 0 20px;
+      margin: 12px 0 20px;
+      padding: 0 12px;
     }
-    .premium-popup .features-grid .feature {
+    .premium-popup .features-list li {
+      list-style: none;
+      padding: 6px 0;
+      color: var(--text-dim);
+      font-size: 13px;
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 8px 12px;
-      border-radius: 8px;
-      background: rgba(255,255,255,0.02);
-      font-size: 13px;
-      color: var(--text-dim);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.02);
     }
-    .premium-popup .features-grid .feature i {
+    .premium-popup .features-list li:last-child {
+      border-bottom: none;
+    }
+    .premium-popup .features-list li i {
       color: var(--success);
       font-size: 14px;
-      width: 18px;
-    }
-
-    .premium-popup .popup-price {
-      font-size: 22px;
-      font-weight: 700;
-      font-family: 'Playfair Display', 'Georgia', serif;
-      color: var(--accent);
-      margin-bottom: 16px;
-    }
-    .premium-popup .popup-price small {
-      font-size: 14px;
-      font-weight: 400;
-      color: var(--text-dim);
-      font-family: 'Inter', sans-serif;
+      width: 20px;
     }
 
     .premium-popup .popup-buttons {
       display: flex;
       flex-direction: column;
       gap: 10px;
+      margin-top: 6px;
     }
     .premium-popup .popup-buttons .btn-recharge {
       padding: 14px 20px;
@@ -667,7 +529,9 @@
       gap: 8px;
       font-family: 'Inter', sans-serif;
     }
-    .premium-popup .popup-buttons .btn-recharge:active { transform: scale(0.96); }
+    .premium-popup .popup-buttons .btn-recharge:active {
+      transform: scale(0.96);
+    }
     .premium-popup .popup-buttons .btn-recharge:hover {
       background: #9A7209;
       box-shadow: 0 0 30px rgba(184, 134, 11, 0.15);
@@ -683,9 +547,11 @@
       font-family: 'Inter', sans-serif;
       font-weight: 400;
     }
-    .premium-popup .popup-buttons .btn-later:hover { color: var(--text-dim); }
+    .premium-popup .popup-buttons .btn-later:hover {
+      color: var(--text-dim);
+    }
 
-        /* ============================================================
+    /* ============================================================
        TOAST
        ============================================================ */
     .toast {
@@ -705,98 +571,162 @@
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
       pointer-events: none;
     }
-    .toast.show { transform: translateX(-50%) translateY(0); }
-    .toast.success { background: #0D2A1F; border: 1px solid #2D7D5A; color: #2D7D5A; }
-    .toast.error { background: #2A0D0D; border: 1px solid #8A3A3A; color: #8A3A3A; }
-    .toast.warning { background: #2A1A0D; border: 1px solid #B8860B; color: #B8860B; }
-    .toast.info { background: #0D1A2A; border: 1px solid #4A7A8A; color: #4A7A8A; }
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+    }
+    .toast.success {
+      background: #0D2A1F;
+      border: 1px solid #2D7D5A;
+      color: #2D7D5A;
+    }
+    .toast.error {
+      background: #2A0D0D;
+      border: 1px solid #8A3A3A;
+      color: #8A3A3A;
+    }
+    .toast.warning {
+      background: #2A1A0D;
+      border: 1px solid #B8860B;
+      color: #B8860B;
+    }
+    .toast.info {
+      background: #0D1A2A;
+      border: 1px solid #4A7A8A;
+      color: #4A7A8A;
+    }
+
+    /* ============================================================
+   SKELETON LOADING
+   ============================================================ */
+.skeleton-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.skeleton-card {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.02);
+  animation: skeletonPulse 1.5s ease-in-out infinite;
+}
+.skeleton-card .skeleton-image {
+  aspect-ratio: 16/9;
+  background: rgba(255, 255, 255, 0.03);
+}
+.skeleton-card .skeleton-content {
+  padding: 14px 16px 16px;
+}
+.skeleton-card .skeleton-line {
+  height: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 6px;
+  margin-bottom: 8px;
+}
+.skeleton-card .skeleton-line:last-child {
+  margin-bottom: 0;
+}
+.skeleton-card .skeleton-line.long {
+  width: 80%;
+}
+.skeleton-card .skeleton-line.short {
+  width: 40%;
+}
+
+@keyframes skeletonPulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.6; }
+}
+
+@media (min-width: 601px) and (max-width: 768px) {
+  .skeleton-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+}
+@media (min-width: 769px) {
+  .skeleton-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+  }
+}
+@media (min-width: 1024px) {
+  .skeleton-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+  }
+}
 
     /* ============================================================
        RESPONSIVE
        ============================================================ */
-    @media (max-width: 600px) {
-      .container { padding: 12px 12px 30px; }
-      .hero-title { font-size: 24px; }
-      
-      .formation-card { 
-        flex-direction: column; 
-        height: auto; 
+    @media (max-width: 480px) {
+      .formations-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
       }
-      .formation-card .image-wrap {
-        width: 100%;
-        min-width: 100%;
-        aspect-ratio: 16/9;
-        height: auto;
-        max-height: 200px;
+      .formation-card .formation-content {
+        padding: 10px 12px 12px;
       }
-      .formation-card .formation-content { 
-        padding: 14px 16px; 
-        min-height: auto; 
+      .formation-card .formation-title {
+        font-size: 13px;
       }
-      .formation-card .formation-title { font-size: 16px; }
-      .formation-card .formation-description { 
-        font-size: 12px; 
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
+      .formation-card .formation-description {
+        font-size: 10px;
+        display: none;
+      }
+      .container {
+        padding: 12px 4% 30px;
+      }
+      .premium-popup {
+        padding: 24px 18px;
+        margin: 10px;
+      }
+      .premium-popup h2 {
+        font-size: 22px;
       }
       .formation-card .formation-footer {
-        flex-wrap: wrap;
-        gap: 8px;
+        flex-direction: column;
+        gap: 6px;
+        align-items: stretch;
       }
-      .formation-card .formation-actions { 
-        width: 100%; 
-        justify-content: stretch; 
+      .formation-card .formation-actions {
+        justify-content: stretch;
       }
-      .formation-card .formation-actions .formation-btn { 
-        flex: 1; 
-        justify-content: center; 
+      .formation-card .formation-actions .formation-btn {
+        flex: 1;
+        justify-content: center;
       }
-      
-      .premium-popup { padding: 24px 18px; margin: 10px; }
-      .premium-popup h2 { font-size: 22px; }
-      .premium-popup .features-grid { grid-template-columns: 1fr 1fr; gap: 6px; }
-      .premium-popup .features-grid .feature { font-size: 11px; padding: 6px 10px; }
-      .premium-popup .popup-price { font-size: 18px; }
-
-      .achat-popup { padding: 24px 18px; margin: 10px; }
-      .achat-popup h2 { font-size: 20px; }
-      .achat-popup .popup-price { font-size: 22px; }
     }
 
-    @media (max-width: 400px) {
-      .premium-popup .features-grid { grid-template-columns: 1fr; }
-      .hero-title { font-size: 20px; }
+    @media (min-width: 601px) and (max-width: 768px) {
+      .formations-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+      }
     }
 
-    @media (min-width: 601px) and (max-width: 900px) {
-      .container { padding: 16px 16px 30px; }
-      .formation-card { height: 180px; }
-      .formation-card .image-wrap { width: 160px; min-width: 160px; }
-      .formation-card .formation-content { padding: 16px 18px; }
-      .formation-card .formation-title { font-size: 17px; }
-      .formation-card .formation-description { font-size: 13px; }
-      .premium-popup { padding: 30px 24px; max-width: 450px; }
+    @media (min-width: 769px) {
+      .container {
+        max-width: 850px;
+        padding: 24px 5%;
+      }
+      .formations-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
+      }
     }
 
-    @media (min-width: 901px) {
-      .container { max-width: 1000px; padding: 24px 32px 40px; }
-      .formation-card { height: 220px; }
-      .formation-card .image-wrap { width: 200px; min-width: 200px; }
-      .formation-card .formation-content { padding: 22px 26px; }
-      .formation-card .formation-title { font-size: 20px; }
-      .formation-card .formation-description { font-size: 14px; }
-      .premium-popup { padding: 40px 36px; max-width: 520px; }
-    }
-
-    @media (min-width: 1200px) {
-      .container { max-width: 1200px; padding: 32px 40px 40px; }
-      .formation-card { height: 240px; }
-      .formation-card .image-wrap { width: 220px; min-width: 220px; }
-      .formation-card .formation-content { padding: 24px 30px; }
-      .formation-card .formation-title { font-size: 22px; }
-      .formation-card .formation-description { font-size: 15px; }
+    @media (min-width: 1024px) {
+      .container {
+        max-width: 1050px;
+        padding: 32px 5%;
+      }
+      .formations-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+      }
     }
   </style>
 </head>
@@ -808,45 +738,25 @@
 <div class="glow glow-2"></div>
 <div class="glow glow-3"></div>
 
-<!-- ===== POPUP PREMIUM GLOBAL ===== -->
+<!-- ===== POPUP PREMIUM ===== -->
 <div class="premium-popup-overlay" id="premiumPopup">
   <div class="premium-popup">
-    <span class="popup-icon">🚀</span>
-    <h2>Débloquez le <span>Premium</span></h2>
+    <span class="popup-icon">💰</span>
+    <h2>Opportunité en <span>Or</span></h2>
     <p class="popup-subtitle">
-      Faites votre premier dépôt de <strong>3 000 FCFA</strong> et accédez à <strong>tous</strong> les services ARVEXA !
+      🔥 Rechargez <strong>3 000 FCFA</strong> et débloquez <strong>TOUT</strong> le contenu premium ARVEXA !
     </p>
-    <div class="features-grid">
-      <div class="feature"><i class="fas fa-check-circle"></i> 10+ Formations</div>
-      <div class="feature"><i class="fas fa-check-circle"></i> E-books exclusifs</div>
-      <div class="feature"><i class="fas fa-check-circle"></i> Investissements</div>
-      <div class="feature"><i class="fas fa-check-circle"></i> Parrainage 500 FCFA</div>
-      <div class="feature"><i class="fas fa-check-circle"></i> Retraits rapides</div>
-      <div class="feature"><i class="fas fa-check-circle"></i> Forum communautaire</div>
-    </div>
-    <div class="popup-price">3 000 FCFA <small>→ Tout débloqué</small></div>
+    <ul class="features-list">
+      <li><i class="fas fa-check-circle"></i> Formations exclusives</li>
+      <li><i class="fas fa-check-circle"></i> E-books illimités</li>
+      <li><i class="fas fa-check-circle"></i> Investissements</li>
+      <li><i class="fas fa-check-circle"></i> Parrainage & bonus</li>
+    </ul>
     <div class="popup-buttons">
       <a href="recharger.html" class="btn-recharge">
-        <i class="fas fa-plus-circle"></i> Débloquer maintenant
+        <i class="fas fa-plus-circle"></i> Recharger maintenant
       </a>
-      <button class="btn-later" id="premiumPopupLaterBtn">✕ Explorer sans débloquer</button>
-    </div>
-  </div>
-</div>
-
-<!-- ===== POPUP ACHAT FORMATION ===== -->
-<div class="achat-popup-overlay" id="achatPopup">
-  <div class="achat-popup">
-    <span class="popup-icon">🛒</span>
-    <h2>Acheter <span id="achatFormationTitle">Formation</span></h2>
-    <p class="popup-subtitle" id="achatFormationDesc">Description de la formation</p>
-    <div class="popup-price" id="achatFormationPrice">0 FCFA</div>
-    <div class="popup-balance">💰 Solde disponible : <strong id="achatUserBalance">0 FCFA</strong></div>
-    <div class="popup-buttons">
-      <button class="btn-acheter" id="achatBtn">
-        <i class="fas fa-check"></i> Confirmer l'achat
-      </button>
-      <button class="btn-annuler" id="achatAnnulerBtn">✕ Annuler</button>
+      <button class="btn-later" id="popupLaterBtn">✕ Plus tard</button>
     </div>
   </div>
 </div>
@@ -871,9 +781,76 @@
     <p class="hero-description">Apprenez les secrets de la finance, de l'investissement et de l'entrepreneuriat.</p>
   </div>
 
-  <!-- ===== FORMATIONS ===== -->
-  <div id="formationsGrid">
-    <!-- Rempli par JavaScript -->
+  <!-- ===== SKELETON LOADING ===== -->
+<div class="skeleton-grid" id="skeletonGrid">
+  <div class="skeleton-card">
+    <div class="skeleton-image"></div>
+    <div class="skeleton-content">
+      <div class="skeleton-line" style="width:60%;"></div>
+      <div class="skeleton-line" style="width:80%;"></div>
+      <div class="skeleton-line" style="width:40%;"></div>
+    </div>
+  </div>
+  <div class="skeleton-card">
+    <div class="skeleton-image"></div>
+    <div class="skeleton-content">
+      <div class="skeleton-line" style="width:60%;"></div>
+      <div class="skeleton-line" style="width:80%;"></div>
+      <div class="skeleton-line" style="width:40%;"></div>
+    </div>
+  </div>
+  <div class="skeleton-card">
+    <div class="skeleton-image"></div>
+    <div class="skeleton-content">
+      <div class="skeleton-line" style="width:60%;"></div>
+      <div class="skeleton-line" style="width:80%;"></div>
+      <div class="skeleton-line" style="width:40%;"></div>
+    </div>
+  </div>
+  <div class="skeleton-card">
+    <div class="skeleton-image"></div>
+    <div class="skeleton-content">
+      <div class="skeleton-line" style="width:60%;"></div>
+      <div class="skeleton-line" style="width:80%;"></div>
+      <div class="skeleton-line" style="width:40%;"></div>
+    </div>
+  </div>
+  <div class="skeleton-card">
+    <div class="skeleton-image"></div>
+    <div class="skeleton-content">
+      <div class="skeleton-line" style="width:60%;"></div>
+      <div class="skeleton-line" style="width:80%;"></div>
+      <div class="skeleton-line" style="width:40%;"></div>
+    </div>
+  </div>
+  <div class="skeleton-card">
+    <div class="skeleton-image"></div>
+    <div class="skeleton-content">
+      <div class="skeleton-line" style="width:60%;"></div>
+      <div class="skeleton-line" style="width:80%;"></div>
+      <div class="skeleton-line" style="width:40%;"></div>
+    </div>
+  </div>
+  <div class="skeleton-card">
+    <div class="skeleton-image"></div>
+    <div class="skeleton-content">
+      <div class="skeleton-line" style="width:60%;"></div>
+      <div class="skeleton-line" style="width:80%;"></div>
+      <div class="skeleton-line" style="width:40%;"></div>
+    </div>
+  </div>
+  <div class="skeleton-card">
+    <div class="skeleton-image"></div>
+    <div class="skeleton-content">
+      <div class="skeleton-line" style="width:60%;"></div>
+      <div class="skeleton-line" style="width:80%;"></div>
+      <div class="skeleton-line" style="width:40%;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== FORMATIONS ===== -->
+<div class="formations-grid" id="formationsGrid" style="display:none;"></div>
   </div>
 
 </main>
@@ -887,16 +864,16 @@
 <script type="importmap">
 {
   "imports": {
-    "firebase/app": "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js",
-    "firebase/auth": "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js",
-    "firebase/firestore": "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js"
+    "firebase/app": "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js",
+    "firebase/auth": "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js",
+    "firebase/firestore": "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js"
   }
 }
 </script>
 
 <script type="module">
 // ================================================================
-// IMPORTS
+// IMPORTS FIREBASE
 // ================================================================
 import { initializeApp } from "firebase/app";
 import { 
@@ -906,22 +883,18 @@ import {
   browserLocalPersistence
 } from "firebase/auth";
 import { 
-  getFirestore,
-  doc,
-  getDoc,
-  getDocs,
+  getFirestore, 
+  doc, 
+  getDoc, 
+  onSnapshot, 
+  updateDoc,
   collection,
   query,
-  orderBy,
-  onSnapshot,
-  setDoc,
-  deleteDoc,
-  updateDoc,
-  increment
+  orderBy
 } from "firebase/firestore";
 
 // ================================================================
-// FIREBASE CONFIG
+// CONFIGURATION FIREBASE
 // ================================================================
 const firebaseConfig = {
   apiKey: "AIzaSyBEbYuuUlNCLMBUHClv4UnyownNHw2q3_g",
@@ -936,37 +909,20 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-setPersistence(auth, browserLocalPersistence);
 
-// ================================================================
-// HELPERS
-// ================================================================
-async function getDocument(collectionName, docId) {
-  const ref = doc(db, collectionName, docId);
-  const snap = await getDoc(ref);
-  if (!snap.exists()) return null;
-  return { id: snap.id, ...snap.data() };
-}
+setPersistence(auth, browserLocalPersistence);
 
 // ================================================================
 // DOM
 // ================================================================
 const formationsGrid = document.getElementById('formationsGrid');
 const premiumPopup = document.getElementById('premiumPopup');
-const premiumPopupLaterBtn = document.getElementById('premiumPopupLaterBtn');
-const achatPopup = document.getElementById('achatPopup');
-const achatFormationTitle = document.getElementById('achatFormationTitle');
-const achatFormationDesc = document.getElementById('achatFormationDesc');
-const achatFormationPrice = document.getElementById('achatFormationPrice');
-const achatUserBalance = document.getElementById('achatUserBalance');
-const achatBtn = document.getElementById('achatBtn');
-const achatAnnulerBtn = document.getElementById('achatAnnulerBtn');
+const popupLaterBtn = document.getElementById('popupLaterBtn');
 const toast = document.getElementById('toast');
 
 let isUnlocked = false;
 let currentUser = null;
-let userData = null;
-let formationAchat = null;
+let userAchats = [];
 
 // ================================================================
 // TOAST
@@ -982,221 +938,199 @@ function showToast(message, type = 'info') {
 // FORMATIONS PAR DÉFAUT
 // ================================================================
 const DEFAULT_FORMATIONS = [
-  {
-    id: 'formation_001',
-    title: "Les bases de la finance personnelle",
-    category: "Finance",
-    description: "Apprenez à gérer votre budget, à épargner et à préparer votre avenir financier.",
-    price: 10000,
-    coverImage: "https://images.pexels.com/photos/6266282/pexels-photo-6266282.jpeg",
-    level: "Débutant",
-    duration: "2h",
-    pdfUrl: "formation_001.pdf",
-    isFree: false,
-    createdAt: new Date().toISOString()
-  },
-  {
-    id: 'formation_002',
-    title: "Investir en bourse pour débutants",
-    category: "Investissement",
-    description: "Découvrez comment investir en bourse avec des stratégies simples et efficaces.",
-    price: 8000,
-    coverImage: "https://images.pexels.com/photos/186461/pexels-photo-186461.jpeg",
-    level: "Débutant",
-    duration: "3h",
-    pdfUrl: "formation_002.pdf",
-    isFree: false,
-    createdAt: new Date().toISOString()
-  },
-  {
-    id: 'formation_003',
-    title: "Cryptomonnaies : Guide complet",
-    category: "Crypto",
-    description: "Comprenez la blockchain, le Bitcoin et investissez dans les cryptos en toute sécurité.",
-    price: 20000,
-    coverImage: "https://images.pexels.com/photos/6771669/pexels-photo-6771669.jpeg",
-    level: "Débutant",
-    duration: "2h30",
-    pdfUrl: "formation_003.pdf",
-    isFree: false,
-    createdAt: new Date().toISOString()
-  },
-  {
-    id: 'formation_004',
-    title: "Devenir rentier en 5 ans",
-    category: "Finance",
-    description: "Planifiez votre indépendance financière en 5 ans avec des stratégies prouvées.",
-    price: 15000,
-    coverImage: "https://images.pexels.com/photos/27960363/pexels-photo-27960363.jpeg",
-    level: "Avancé",
-    duration: "4h",
-    pdfUrl: "formation_004.pdf",
-    isFree: false,
-    createdAt: new Date().toISOString()
-  },
-  {
-    id: 'formation_005',
-    title: "Entrepreneuriat sans capital",
-    category: "Entrepreneuriat",
-    description: "Lancez votre entreprise avec peu ou pas d'argent. Stratégies concrètes.",
-    price: 25000,
-    coverImage: "https://images.pexels.com/photos/9301316/pexels-photo-9301316.jpeg",
-    level: "Débutant",
-    duration: "2h30",
-    pdfUrl: "formation_005.pdf",
-    isFree: false,
-    createdAt: new Date().toISOString()
-  },
-  {
-    id: 'formation_006',
-    title: "Marketing digital pour entrepreneurs",
-    category: "Marketing",
-    description: "Maîtrisez les stratégies de marketing digital pour développer votre business.",
-    price: 5000,
-    coverImage: "https://images.pexels.com/photos/6476260/pexels-photo-6476260.jpeg",
-    level: "Intermédiaire",
-    duration: "3h30",
-    isFree: false,
-    createdAt: new Date().toISOString()
-  },
-  {
-    id: 'formation_007',
-    title: "Négociation et vente",
-    category: "Développement",
-    description: "Développez vos compétences en négociation et vendez n'importe quoi.",
-    price: 12000,
-    coverImage: "https://images.pexels.com/photos/7144204/pexels-photo-7144204.jpeg",
-    level: "Intermédiaire",
-    duration: "2h",
-    isFree: false,
-    createdAt: new Date().toISOString()
-  },
-  {
-    id: 'formation_008',
-    title: "Investissement immobilier en Afrique",
-    category: "Immobilier",
-    description: "Découvrez comment investir dans l'immobilier en Afrique et générer des revenus passifs.",
-    price: 18000,
-    coverImage: "https://images.pexels.com/photos/29134213/pexels-photo-29134213.jpeg",
-    level: "Intermédiaire",
-    duration: "3h",
-    isFree: false,
-    createdAt: new Date().toISOString()
-  },
-  {
-    id: 'formation_009',
-    title: "Gérer son budget et épargner",
-    category: "Finance",
-    description: "Apprenez à maîtriser vos finances personnelles et à gérer efficacement votre budget.",
-    price: 6000,
-    coverImage: "https://images.pexels.com/photos/5466798/pexels-photo-5466798.jpeg",
-    level: "Débutant",
-    duration: "1h45",
-    isFree: false,
-    createdAt: new Date().toISOString()
-  },
-  {
-    id: 'formation_010',
-    title: "Les 7 habitudes des investisseurs",
-    category: "Développement",
-    description: "Les habitudes des investisseurs qui réussissent : discipline, patience, planification.",
-    price: 7000,
-    coverImage: "https://images.pexels.com/photos/6120166/pexels-photo-6120166.jpeg",
-    level: "Débutant",
-    duration: "2h",
-    isFree: false,
-    createdAt: new Date().toISOString()
-  }
-];
-
-// ================================================================
-// INITIALISER LES FORMATIONS (SEULEMENT SI LA COLLECTION EST VIDE)
-// ================================================================
-async function initializeFormations() {
-  try {
-    const snapshot = await getDocs(collection(db, 'formations'));
-    
-    if (snapshot.empty) {
-      console.log('📚 Création des 10 formations par défaut...');
-      for (const formation of DEFAULT_FORMATIONS) {
-        const docRef = doc(db, 'formations', formation.id);
-        await setDoc(docRef, formation);
+ 
+     {
+        id: 'formation_001',
+        title: "Créer un business rentable avec l'IA de A à Z",
+        category: "Intelligence Artificielle",
+        description: "Le guide complet pour lancer et scaler un business profitable en exploitant la puissance de l'IA.",
+        price: 5000,
+        isFree: false,
+        level: "Débutant",
+        duration: "4h30",
+        coverImage: "formations/cover-ia.png",
+        isPopular: true,
+        isNew: true,
+        createdAt: new Date().toISOString()
+      },
+      {
+        id: 'formation_002',
+        title: "Créer un site web professionnel sans coder",
+        category: "Web",
+        description: "Apprenez à créer un site web professionnel sans écrire une seule ligne de code.",
+        price: 3000,
+        isFree: false,
+        level: "Débutant",
+        duration: "2h00",
+        coverImage: "formations/cover-site.png",
+        isPopular: false,
+        isNew: true,
+        createdAt: new Date().toISOString()
+      },
+      {
+        id: 'formation_003',
+        title: "Devenir freelance et trouver ses premiers clients",
+        category: "Freelance",
+        description: "Les stratégies concrètes pour trouver vos premiers clients freelance et décoller votre activité.",
+        price: 4000,
+        isFree: false,
+        level: "Débutant",
+        duration: "2h30",
+        coverImage: "formations/cover-freelance.png",
+        isPopular: true,
+        isNew: false,
+        createdAt: new Date().toISOString()
+      },
+      {
+        id: 'formation_004',
+        title: "Créer une boutique e-commerce qui vend",
+        category: "E-commerce",
+        description: "Lancez votre boutique en ligne et générez vos premières ventes rapidement.",
+        price: 5000,
+        isFree: false,
+        level: "Intermédiaire",
+        duration: "3h00",
+        coverImage: "formations/cover-ecommerce.png",
+        isPopular: false,
+        isNew: false,
+        createdAt: new Date().toISOString()
+      },
+      {
+        id: 'formation_005',
+        title: "Créer et vendre une formation en ligne",
+        category: "Formation",
+        description: "Créez votre formation en ligne et générez des revenus passifs.",
+        price: 6000,
+        isFree: false,
+        level: "Intermédiaire",
+        duration: "3h30",
+        coverImage: "formations/cover-formation.png",
+        isPopular: false,
+        isNew: false,
+        createdAt: new Date().toISOString()
+      },
+      {
+        id: 'formation_006',
+        title: "Maîtriser TikTok, Instagram et YouTube",
+        category: "Réseaux Sociaux",
+        description: "Apprenez à créer du contenu viral et à monétiser votre audience sur les réseaux sociaux.",
+        price: 4000,
+        isFree: false,
+        level: "Débutant",
+        duration: "2h30",
+        coverImage: "formations/cover-social.png",
+        isPopular: true,
+        isNew: false,
+        createdAt: new Date().toISOString()
+      },
+      {
+        id: 'formation_007',
+        title: "Automatiser son business avec l'IA et le no-code",
+        category: "Automatisation",
+        description: "Maîtrisez l'automatisation IA et no-code pour gagner du temps et augmenter vos profits.",
+        price: 7000,
+        isFree: false,
+        level: "Intermédiaire",
+        duration: "4h00",
+        coverImage: "formations/cover-auto.png",
+        isPopular: false,
+        isNew: false,
+        createdAt: new Date().toISOString()
+      },
+      {
+        id: 'formation_008',
+        title: "Créer un SaaS avec l'IA sans être développeur",
+        category: "SaaS",
+        description: "Construisez un SaaS rentable en utilisant l'IA et le no-code.",
+        price: 8000,
+        isFree: false,
+        level: "Avancé",
+        duration: "4h30",
+        coverImage: "formations/cover-saas.png",
+        isPopular: false,
+        isNew: false,
+        createdAt: new Date().toISOString()
+      },
+      {
+        id: 'formation_009',
+        title: "Copywriting et techniques de vente qui convertissent",
+        category: "Vente",
+        description: "Maîtrisez l'art du copywriting pour vendre plus et mieux.",
+        price: 4000,
+        isFree: false,
+        level: "Débutant",
+        duration: "2h00",
+        coverImage: "formations/cover-copy.png",
+        isPopular: false,
+        isNew: true,
+        createdAt: new Date().toISOString()
+      },
+      {
+        id: 'formation_010',
+        title: "Construire un business en ligne jusqu'à 1 000 000 FCFA/mois",
+        category: "Business",
+        description: "Le plan d'action pour atteindre 1 000 000 FCFA de revenus mensuels avec votre business en ligne.",
+        price: 10000,
+        isFree: false,
+        level: "Avancé",
+        duration: "5h00",
+        coverImage: "formations/cover-milion.png",
+        isPopular: true,
+        isNew: false,
+        createdAt: new Date().toISOString()
       }
-      console.log('✅ 10 formations créées');
-    } else {
-      console.log('✅ Formations déjà existantes');
-    }
-  } catch (error) {
-    console.error('❌ Erreur initialisation formations:', error);
-  }
-}
+    ];
 
 // ================================================================
-// ACHETER UNE FORMATION
+// ACHETER UNE FORMATION (fonction Firestore)
 // ================================================================
-async function acheterFormation(formationId, price) {
-  if (!currentUser) {
-    showToast('⚠️ Veuillez vous connecter', 'error');
-    return false;
-  }
-
+async function acheterFormation(userId, formationId, price) {
   try {
-    const userRef = doc(db, 'users', currentUser.uid);
+    const userRef = doc(db, 'users', userId);
     const userSnap = await getDoc(userRef);
     
     if (!userSnap.exists()) {
-      showToast('❌ Utilisateur introuvable', 'error');
-      return false;
+      return { success: false, error: 'Utilisateur introuvable' };
     }
-
-    const data = userSnap.data();
-    const balance = data.balance || 0;
-    const achats = data.achats || [];
-
+    
+    const userData = userSnap.data();
+    
+    // Vérifier si l'utilisateur a assez de solde
+    if ((userData.balance || 0) < price) {
+      return { success: false, error: 'Solde insuffisant. Rechargez votre compte.' };
+    }
+    
     // Vérifier si déjà acheté
+    const achats = userData.achats || [];
     if (achats.includes(formationId)) {
-      showToast('✅ Formation déjà achetée', 'info');
-      return true;
+      return { success: false, error: 'Déjà acheté' };
     }
-
-    // Vérifier solde
-    if (balance < price) {
-      showToast(`❌ Solde insuffisant. Il vous manque ${(price - balance).toLocaleString('fr-FR')} FCFA`, 'error');
-      return false;
-    }
-
+    
     // Effectuer l'achat
+    const newBalance = (userData.balance || 0) - price;
+    const newAchats = [...achats, formationId];
+    const newTotalAchats = (userData.totalAchats || 0) + price;
+    
     await updateDoc(userRef, {
-      balance: increment(-price),
-      achats: [...achats, formationId],
-      totalAchats: (data.totalAchats || 0) + price
+      balance: newBalance,
+      achats: newAchats,
+      totalAchats: newTotalAchats
     });
-
-    showToast('✅ Formation achetée avec succès !', 'success');
     
-    // Mettre à jour les données locales
-    userData = await getDocument('users', currentUser.uid);
-    renderFormations(formationsData);
-    
-    return true;
+    return { success: true, newBalance };
   } catch (error) {
-    console.error('❌ Erreur achat:', error);
-    showToast('❌ Erreur lors de l\'achat', 'error');
-    return false;
+    console.error('Erreur acheterFormation:', error);
+    return { success: false, error: error.message };
   }
 }
 
 // ================================================================
 // RENDRE LES FORMATIONS
 // ================================================================
-let formationsData = [];
-
 function renderFormations(formations) {
-  formationsData = formations;
-  
   if (!formations || formations.length === 0) {
     formationsGrid.innerHTML = `
-      <div style="text-align:center;padding:40px 20px;color:var(--text-dim);">
+      <div style="grid-column:1/-1;text-align:center;padding:40px 20px;color:var(--text-dim);">
         <i class="fas fa-graduation-cap" style="font-size:40px;opacity:0.2;display:block;margin-bottom:12px;"></i>
         <p>Aucune formation disponible pour le moment.</p>
       </div>
@@ -1204,45 +1138,45 @@ function renderFormations(formations) {
     return;
   }
 
-  const achats = userData?.achats || [];
-
   formationsGrid.innerHTML = formations.map((formation, index) => {
-    const isAchete = achats.includes(formation.id);
-    const isPremium = formation.price > 0;
+    const isFree = formation.isFree || formation.price === 0;
+    const isAchete = userAchats && userAchats.includes(formation.id);
     
     // Déterminer le prix affiché
     let priceText = '';
     let priceClass = '';
     
-    if (isAchete) {
-      priceText = '✅ ACHETÉE';
-      priceClass = 'achete';
-    } else if (isPremium) {
-      priceText = `${formation.price.toLocaleString('fr-FR')} FCFA`;
-      priceClass = '';
-    } else {
+    if (isFree) {
       priceText = '🎁 GRATUIT';
       priceClass = 'free';
+    } else if (isAchete) {
+      priceText = '✅ DÉJÀ ACHETÉ';
+      priceClass = 'free';
+    } else {
+      priceText = `${formation.price.toLocaleString('fr-FR')} FCFA`;
+      priceClass = '';
     }
     
-    // Badge
-    const showPremiumBadge = isPremium && !isUnlocked && !isAchete;
-    const showLock = isPremium && !isUnlocked && !isAchete;
-    
-    // Bouton
+    // Bouton principal
     let btnText = '📖 Voir';
     let btnClass = 'primary';
+    let btnAction = 'voir';
     
-    if (isAchete) {
-      btnText = '📖 Lire';
-      btnClass = 'success';
-    } else if (isPremium && !isUnlocked) {
-      btnText = '🔓 Débloquer';
-      btnClass = 'locked';
-    } else if (isPremium && isUnlocked) {
-      btnText = '🛒 Acheter';
-      btnClass = 'primary';
+    if (!isFree && !isAchete) {
+      if (isUnlocked) {
+        btnText = '🛒 Acheter';
+        btnClass = 'primary';
+        btnAction = 'acheter';
+      } else {
+        btnText = '🔒 Débloquer';
+        btnClass = 'locked';
+        btnAction = 'unlock';
+      }
     }
+
+    // Badge niveau
+    const levelBadge = formation.level || 'Débutant';
+    const duration = formation.duration || '2h';
 
     const safeTitle = (formation.title || '').replace(/"/g, '&quot;');
     const safeDescription = (formation.description || '').replace(/"/g, '&quot;');
@@ -1251,28 +1185,25 @@ function renderFormations(formations) {
     return `
       <div class="formation-card" data-id="${formation.id}" style="animation-delay: ${index * 0.05}s;">
         <div class="image-wrap">
-          <img src="${formation.coverImage || 'https://via.placeholder.com/200x270/1A3A2A/B8860B?text=🎓'}" 
+          <img src="${formation.coverImage || 'https://via.placeholder.com/400x225/1A3A2A/B8860B?text=📚'}" 
                alt="${safeTitle}" 
                class="formation-image"
                loading="lazy"
-               onerror="this.src='https://via.placeholder.com/200x270/1A3A2A/B8860B?text=🎓'">
-          ${showPremiumBadge ? '<span class="formation-badge premium">🔒 Premium</span>' : ''}
-          ${showLock ? '<span class="premium-lock"><i class="fas fa-lock"></i></span>' : ''}
+               onerror="this.src='https://via.placeholder.com/400x225/1A3A2A/B8860B?text=🎓'">
+          ${!isFree && !isUnlocked ? '<span class="premium-lock"><i class="fas fa-lock"></i></span>' : ''}
+          <span class="formation-badge">${levelBadge}</span>
         </div>
         <div class="formation-content">
-          <div>
-            <div class="formation-category">${safeCategory}</div>
-            <h3 class="formation-title">${safeTitle}</h3>
-            <p class="formation-description">${safeDescription}</p>
-            <div class="formation-meta">
-              <span><i class="fas fa-signal"></i> ${formation.level || 'Débutant'}</span>
-              <span><i class="fas fa-clock"></i> ${formation.duration || '2h'}</span>
-            </div>
+          <span class="formation-category">${safeCategory}</span>
+          <h3 class="formation-title">${safeTitle}</h3>
+          <p class="formation-description">${safeDescription}</p>
+          <div style="font-size:10px;color:var(--text-muted);margin-bottom:6px;">
+            <i class="fas fa-clock"></i> ${duration}
           </div>
           <div class="formation-footer">
             <span class="formation-price ${priceClass}">${priceText}</span>
             <div class="formation-actions">
-              <button class="formation-btn ${btnClass}" data-id="${formation.id}">
+              <button class="formation-btn ${btnClass}" data-id="${formation.id}" data-action="${btnAction}">
                 ${btnText}
               </button>
             </div>
@@ -1282,60 +1213,100 @@ function renderFormations(formations) {
     `;
   }).join('');
 
-  // Écouteurs
+  // Écouteurs des boutons
+  document.querySelectorAll('.formation-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const id = btn.dataset.id;
+      const action = btn.dataset.action;
+      const formation = formations.find(f => f.id === id);
+      if (formation) {
+        handleFormationAction(formation, action);
+      }
+    });
+  });
+
+  // Écouteurs sur la carte
   document.querySelectorAll('.formation-card').forEach(card => {
     card.addEventListener('click', (e) => {
       if (e.target.closest('.formation-btn')) return;
       const id = card.dataset.id;
       const formation = formations.find(f => f.id === id);
       if (formation) {
-        handleFormationClick(formation);
-      }
-    });
-  });
-
-  document.querySelectorAll('.formation-btn').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const id = btn.dataset.id;
-      const formation = formations.find(f => f.id === id);
-      if (formation) {
-        handleFormationClick(formation);
+        handleFormationAction(formation, 'voir');
       }
     });
   });
 }
 
 // ================================================================
-// GESTION DU CLIC
+// GESTION DES ACTIONS SUR UNE FORMATION
 // ================================================================
-function handleFormationClick(formation) {
-  const isAchete = userData?.achats?.includes(formation.id) || false;
+async function handleFormationAction(formation, action) {
+  const isFree = formation.isFree || formation.price === 0;
+  const isAchete = userAchats && userAchats.includes(formation.id);
   
-  // Si déjà achetée → ouvrir
+  // Si gratuite → voir directement
+  if (isFree) {
+    window.location.href = `formation-detail.html?id=${formation.id}`;
+    return;
+  }
+  
+  // Si déjà achetée → voir
   if (isAchete) {
-    window.location.href = `lire-formation.html?id=${formation.id}`;
+    window.location.href = `formation-detail.html?id=${formation.id}`;
     return;
   }
-
-  // Si gratuite → ouvrir directement
-  if (formation.price === 0) {
-    window.location.href = `lire-formation.html?id=${formation.id}`;
-    return;
-  }
-
-  // Si non débloqué → popup premium
+  
+  // Si non débloqué → popup
   if (!isUnlocked) {
     showPremiumPopup();
     return;
   }
-
-  // Si débloqué mais pas achetée → popup achat
-  showAchatPopup(formation);
+  
+  // Si débloqué mais pas achetée → acheter
+  if (action === 'acheter' || action === 'voir') {
+    await acheterFormationAction(formation);
+  }
 }
 
 // ================================================================
-// POPUP PREMIUM
+// ACHETER UNE FORMATION (action)
+// ================================================================
+async function acheterFormationAction(formation) {
+  if (!currentUser) {
+    showToast('⚠️ Veuillez vous connecter', 'error');
+    return;
+  }
+  
+  if (userAchats && userAchats.includes(formation.id)) {
+    window.location.href = `formations/${formation.id}.html`;
+    return;
+  }
+  
+  // Confirmer l'achat
+  if (!confirm(`Acheter la formation "${formation.title}" pour ${formation.price.toLocaleString('fr-FR')} FCFA ?`)) {
+    return;
+  }
+  
+  try {
+    const result = await acheterFormation(currentUser.uid, formation.id, formation.price);
+    
+    if (result.success) {
+      showToast(`✅ "${formation.title}" achetée avec succès !`, 'success');
+      // Recharger les formations
+      loadFormations();
+    } else {
+      showToast(`❌ ${result.error}`, 'error');
+    }
+  } catch (error) {
+    console.error('Erreur achat:', error);
+    showToast('❌ Erreur lors de l\'achat', 'error');
+  }
+}
+
+// ================================================================
+// GESTION DU POPUP PREMIUM
 // ================================================================
 function showPremiumPopup() {
   premiumPopup.classList.add('show');
@@ -1347,76 +1318,61 @@ function hidePremiumPopup() {
   document.body.style.overflow = '';
 }
 
-premiumPopupLaterBtn.addEventListener('click', hidePremiumPopup);
+popupLaterBtn.addEventListener('click', hidePremiumPopup);
 
 premiumPopup.addEventListener('click', (e) => {
   if (e.target === premiumPopup) hidePremiumPopup();
 });
 
 document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') {
-    hidePremiumPopup();
-    hideAchatPopup();
-  }
+  if (e.key === 'Escape') hidePremiumPopup();
 });
 
 // ================================================================
-// POPUP ACHAT
-// ================================================================
-function showAchatPopup(formation) {
-  formationAchat = formation;
-  achatFormationTitle.textContent = formation.title;
-  achatFormationDesc.textContent = formation.description || '';
-  achatFormationPrice.textContent = `${formation.price.toLocaleString('fr-FR')} FCFA`;
-  achatUserBalance.textContent = `${(userData?.balance || 0).toLocaleString('fr-FR')} FCFA`;
-  achatPopup.classList.add('show');
-  document.body.style.overflow = 'hidden';
-}
-
-function hideAchatPopup() {
-  achatPopup.classList.remove('show');
-  document.body.style.overflow = '';
-  formationAchat = null;
-}
-
-achatAnnulerBtn.addEventListener('click', hideAchatPopup);
-
-achatPopup.addEventListener('click', (e) => {
-  if (e.target === achatPopup) hideAchatPopup();
-});
-
-// ================================================================
-// CONFIRMER ACHAT
-// ================================================================
-achatBtn.addEventListener('click', async () => {
-  if (!formationAchat) return;
-  
-  const success = await acheterFormation(formationAchat.id, formationAchat.price);
-  if (success) {
-    hideAchatPopup();
-    // Recharger les formations
-    loadFormations();
-  }
-});
-
-// ================================================================
-// CHARGER LES FORMATIONS
+// CHARGER LES FORMATIONS AVEC SKELETON
 // ================================================================
 function loadFormations() {
-  const q = query(collection(db, 'formations'), orderBy('createdAt', 'desc'));
-  onSnapshot(q, (snapshot) => {
-    const formations = [];
-    snapshot.forEach(doc => {
-      formations.push({ id: doc.id, ...doc.data() });
+  skeletonGrid.style.display = 'grid';
+  formationsGrid.style.display = 'none';
+
+  try {
+    const q = query(collection(db, 'formations'), orderBy('createdAt', 'desc'));
+    onSnapshot(q, (snapshot) => {
+      const formations = [];
+      snapshot.forEach(doc => {
+        formations.push({ id: doc.id, ...doc.data() });
+      });
+      
+      skeletonGrid.style.display = 'none';
+      formationsGrid.style.display = 'grid';
+      
+      if (formations.length > 0) {
+        renderFormations(formations);
+      } else {
+        renderFormations(DEFAULT_FORMATIONS);
+      }
     });
-    if (formations.length > 0) {
-      renderFormations(formations);
-    } else {
-      renderFormations(DEFAULT_FORMATIONS);
-    }
-  }, (error) => {
-    console.error('Erreur chargement formations:', error);
+  } catch (error) {
+    console.warn('Erreur chargement formations, fallback:', error);
+    skeletonGrid.style.display = 'none';
+    formationsGrid.style.display = 'grid';
     renderFormations(DEFAULT_FORMATIONS);
+  }
+}
+
+// ================================================================
+// CHARGER LES ACHATS DE L'UTILISATEUR
+// ================================================================
+function loadUserAchats(uid) {
+  if (!uid) return;
+  const userRef = doc(db, 'users', uid);
+  onSnapshot(userRef, (snap) => {
+    if (snap.exists()) {
+      const data = snap.data();
+      userAchats = data.achats || [];
+      // Recharger les formations pour mettre à jour les boutons
+      loadFormations();
+    }
   });
 }
 
@@ -1425,15 +1381,21 @@ function loadFormations() {
 // ================================================================
 async function loadUser(uid) {
   try {
-    const data = await getDocument('users', uid);
-    if (data) {
-      userData = data;
+    const userRef = doc(db, 'users', uid);
+    const docSnap = await getDoc(userRef);
+    if (docSnap.exists()) {
+      const data = docSnap.data();
       isUnlocked = data.isUnlocked === true || data.hasDeposited === true;
+      userAchats = data.achats || [];
+      
+      // ✅ Si premium, fermer le popup
       if (isUnlocked && premiumPopup.classList.contains('show')) {
         hidePremiumPopup();
+        showToast('🎉 Compte premium activé !', 'success');
       }
+      return data;
     }
-    return data;
+    return null;
   } catch (error) {
     console.error('Erreur chargement utilisateur:', error);
     return null;
@@ -1441,24 +1403,59 @@ async function loadUser(uid) {
 }
 
 // ================================================================
+// ÉCOUTER UTILISATEUR EN TEMPS RÉEL
+// ================================================================
+function listenUser(uid) {
+  if (!uid) return;
+  const userRef = doc(db, 'users', uid);
+  onSnapshot(userRef, (snap) => {
+    if (snap.exists()) {
+      const data = snap.data();
+      const wasUnlocked = isUnlocked;
+      isUnlocked = data.isUnlocked === true || data.hasDeposited === true;
+      userAchats = data.achats || [];
+      
+      if (isUnlocked && !wasUnlocked) {
+        if (premiumPopup.classList.contains('show')) {
+          hidePremiumPopup();
+          showToast('🎉 Compte débloqué !', 'success');
+        }
+      }
+      
+      // Recharger les formations pour mettre à jour les boutons
+      loadFormations();
+    }
+  }, (error) => {
+    console.error('Erreur onSnapshot:', error);
+  });
+}
+
+// ================================================================
 // AUTH
 // ================================================================
-onAuthStateChanged(auth, async (user) => {
+onAuthStateChanged(auth, (user) => {
   if (user) {
     currentUser = user;
     localStorage.setItem('ARVEXA_current_user', user.uid);
     
-    // Initialiser les formations dans Firestore
-    await initializeFormations();
-    
-    await loadUser(user.uid);
-    loadFormations();
-    
-    if (!isUnlocked) {
-      setTimeout(() => {
-        showPremiumPopup();
-      }, 800);
-    }
+    // ✅ Charger l'utilisateur et ses données
+    loadUser(user.uid).then(() => {
+      // ✅ Écouter les changements en temps réel
+      listenUser(user.uid);
+      loadUserAchats(user.uid);
+      loadFormations();
+      
+      // ✅ Vérifier le premium après le chargement
+      if (!isUnlocked) {
+        setTimeout(() => {
+          showPremiumPopup();
+        }, 800);
+      }
+    }).catch((error) => {
+      console.error('Erreur chargement utilisateur:', error);
+      loadFormations();
+    });
+
   } else {
     const savedUid = localStorage.getItem('ARVEXA_current_user');
     if (savedUid) {

@@ -1,0 +1,1402 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+  <meta name="theme-color" content="#0A0A0A">
+  <meta name="description" content="ARVEXA - Épargne programmable">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3135/3135715.png">
+  
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐷</text></svg>">
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --primary: #1A3A2A;
+      --primary-dark: #0A1A12;
+      --primary-light: #2A5A3A;
+      --accent: #B8860B;
+      --accent-dim: rgba(184, 134, 11, 0.08);
+      --success: #2D7D5A;
+      --danger: #8A3A3A;
+      --bg-dark: #0A0A0A;
+      --bg-surface: #141414;
+      --bg-card: rgba(20, 20, 20, 0.7);
+      --text-light: #F5F0E8;
+      --text-dim: #8A8A7A;
+      --text-muted: #5A5A4A;
+      --card-border: rgba(184, 134, 11, 0.06);
+      --glass-bg: rgba(26, 58, 42, 0.15);
+      --glass-border: rgba(184, 134, 11, 0.04);
+      --transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+      --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      --radius: 16px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      font-family: 'Inter', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-light);
+      font-size: 14px;
+      line-height: 1.6;
+      min-height: 100vh;
+      overflow-x: hidden;
+      opacity: 0;
+      animation: pageFadeIn 0.5s ease forwards;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 80px;
+    }
+
+    @keyframes pageFadeIn {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+
+    .gradient-bg {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: -2;
+      background: radial-gradient(ellipse 40% 30% at 30% 20%, rgba(26, 58, 42, 0.10) 0%, transparent 70%),
+                  linear-gradient(180deg, #0A0A0A 0%, #060606 100%);
+      pointer-events: none;
+    }
+
+    .glow {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: -1;
+      opacity: 0.15;
+      animation: glowMove 10s ease-in-out infinite alternate;
+    }
+    .glow-1 { width: 350px; height: 350px; background: rgba(26, 58, 42, 0.15); top: -80px; right: -80px; }
+    .glow-2 { width: 200px; height: 200px; background: rgba(184, 134, 11, 0.03); bottom: 0; left: 0; animation-delay: -4s; }
+    .glow-3 { width: 250px; height: 250px; background: rgba(26, 58, 42, 0.08); top: 40%; left: 50%; transform: translate(-50%,-50%); animation-delay: -8s; }
+    @keyframes glowMove {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(30px, -20px) scale(1.1); }
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 5%;
+      background: rgba(10, 10, 10, 0.95);
+      backdrop-filter: blur(12px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 1px solid rgba(184, 134, 11, 0.04);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+      color: var(--text-light);
+      font-size: clamp(16px, 2.5vw, 22px);
+      font-weight: 700;
+      font-family: 'Playfair Display', 'Georgia', serif;
+      letter-spacing: 2px;
+    }
+    .logo span { color: var(--accent); font-style: italic; }
+
+    .back-btn {
+      width: clamp(32px, 4vw, 40px);
+      height: clamp(32px, 4vw, 40px);
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-light);
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s, border-color 0.2s;
+      flex-shrink: 0;
+    }
+    .back-btn:active {
+      transform: scale(0.94);
+      background: rgba(184, 134, 11, 0.08);
+    }
+    .back-btn i { font-size: clamp(14px, 1.8vw, 18px); }
+
+    .notif-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 30px;
+      font-size: 10px;
+      font-weight: 500;
+      transition: var(--transition);
+      background: rgba(45, 125, 90, 0.08);
+      color: var(--success);
+      border: 1px solid rgba(45, 125, 90, 0.10);
+    }
+    .notif-badge i {
+      font-size: 12px;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 16px 16px 40px;
+      width: 100%;
+    }
+
+    /* ===== HERO ===== */
+    .hero {
+      background: linear-gradient(135deg, rgba(26, 58, 42, 0.20), rgba(10, 26, 18, 0.10));
+      border-radius: var(--radius);
+      padding: 28px 20px;
+      margin-bottom: 20px;
+      border: 1px solid rgba(184, 134, 11, 0.10);
+      text-align: center;
+    }
+    .hero-icon { font-size: 40px; color: var(--accent); margin-bottom: 10px; display: block; }
+    .hero h1 { font-size: 24px; font-weight: 700; font-family: 'Playfair Display', serif; color: var(--text-light); }
+    .hero h1 span { color: var(--accent); font-style: italic; }
+    .hero p { color: var(--text-dim); font-size: 13px; margin-top: 6px; }
+
+    /* ===== TOTAL ===== */
+    .total-card {
+      text-align: center;
+      padding: clamp(16px, 2.5vw, 24px);
+      border-color: rgba(184, 134, 11, 0.08);
+      background: linear-gradient(135deg, rgba(20,20,20,0.8), rgba(10,10,10,0.9));
+    }
+    .total-card .label {
+      font-size: clamp(10px, 1.2vw, 12px);
+      font-weight: 500;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+    }
+    .total-card .label i {
+      color: var(--accent);
+      margin-right: 6px;
+    }
+    .total-card .amount {
+      font-family: 'Playfair Display', 'Georgia', serif;
+      font-size: clamp(28px, 5vw, 40px);
+      font-weight: 700;
+      color: var(--text-light);
+      margin: 6px 0 4px;
+    }
+    .total-card .sub {
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+
+    /* ===== SECTION ===== */
+    .section-header {
+      margin-bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .section-header-left {
+      border-left: 2px solid var(--accent);
+      padding-left: 10px;
+    }
+    .section-subtitle {
+      color: var(--accent);
+      font-size: 9px;
+      font-weight: 400;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      opacity: 0.5;
+    }
+    .section-title {
+      font-size: clamp(18px, 3vw, 22px);
+      font-weight: 700;
+      font-family: 'Playfair Display', serif;
+      color: var(--text-light);
+    }
+    .section-title span { color: var(--accent); font-style: italic; }
+
+    .btn-add {
+      padding: 8px 16px;
+      background: var(--accent);
+      border: none;
+      border-radius: 30px;
+      color: var(--bg-dark);
+      font-weight: 600;
+      font-size: 12px;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-add:active { transform: scale(0.95); }
+    .btn-add:hover { background: #9A7209; }
+
+    /* ===== CARD ===== */
+    .card {
+      background: var(--bg-card);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: clamp(16px, 3vw, 24px);
+      margin-bottom: 18px;
+      box-shadow: var(--shadow);
+      transition: border-color 0.2s;
+      width: 100%;
+      overflow: hidden;
+    }
+    .card:hover { border-color: rgba(184, 134, 11, 0.08); }
+
+    /* ===== ÉPARGNE ITEM ===== */
+    .epargne-item {
+      padding: 14px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.03);
+    }
+    .epargne-item:last-child { border-bottom: none; }
+
+    .epargne-item .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+      background: transparent;
+      padding: 0;
+      border: none;
+      position: static;
+      backdrop-filter: none;
+    }
+    .epargne-item .header .name {
+      font-weight: 600;
+      font-size: 15px;
+      color: var(--text-light);
+    }
+    .epargne-item .header .status {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 10px;
+      border-radius: 20px;
+    }
+    .epargne-item .header .status.active {
+      background: rgba(45, 125, 90, 0.12);
+      color: var(--success);
+      border: 1px solid rgba(45, 125, 90, 0.15);
+    }
+    .epargne-item .header .status.completed {
+      background: rgba(184, 134, 11, 0.12);
+      color: var(--accent);
+      border: 1px solid rgba(184, 134, 11, 0.15);
+    }
+
+    .epargne-item .progress {
+      margin: 6px 0 8px;
+    }
+    .epargne-item .progress-bar {
+      width: 100%;
+      height: 6px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .epargne-item .progress-bar .fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--success));
+      border-radius: 4px;
+      transition: width 0.5s ease;
+      width: 0%;
+    }
+
+    .epargne-item .details {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+    .epargne-item .details .percent {
+      font-weight: 600;
+      color: var(--accent);
+    }
+    .epargne-item .details .amounts {
+      font-weight: 500;
+    }
+
+    .epargne-item .actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .epargne-item .actions .btn-small {
+      padding: 6px 14px;
+      border: none;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      font-family: 'Inter', sans-serif;
+    }
+    .epargne-item .actions .btn-small:active { transform: scale(0.95); }
+    .epargne-item .actions .btn-deposit {
+      background: var(--accent);
+      color: var(--bg-dark);
+    }
+    .epargne-item .actions .btn-deposit:hover { background: #9A7209; }
+    .epargne-item .actions .btn-detail {
+      background: rgba(255,255,255,0.04);
+      color: var(--text-dim);
+      border: 1px solid rgba(255,255,255,0.04);
+    }
+    .epargne-item .actions .btn-detail:hover {
+      background: rgba(255,255,255,0.08);
+      color: var(--text-light);
+    }
+
+    /* ===== EMPTY ===== */
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-dim);
+    }
+    .empty-state i {
+      font-size: 48px;
+      opacity: 0.2;
+      display: block;
+      margin-bottom: 12px;
+    }
+    .empty-state p { font-size: 14px; }
+    .empty-state .sub { font-size: 12px; margin-top: 4px; opacity: 0.6; }
+
+    /* ============================================================
+       MODAL
+       ============================================================ */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(3, 3, 5, 0.96);
+      backdrop-filter: blur(16px);
+      z-index: 2000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-overlay.show {
+      opacity: 1;
+      visibility: visible;
+    }
+    .modal {
+      background: var(--bg-card);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(184, 134, 11, 0.15);
+      border-radius: var(--radius);
+      width: 100%;
+      max-width: 400px;
+      max-height: 85vh;
+      overflow: hidden;
+      transform: scale(0.92);
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .modal-overlay.show .modal { transform: scale(1); }
+
+    .modal-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--glass-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .modal-header h3 {
+      font-size: 18px;
+      font-weight: 700;
+      font-family: 'Playfair Display', serif;
+      color: var(--text-light);
+    }
+    .modal-header h3 span {
+      color: var(--accent);
+      font-style: italic;
+    }
+    .modal-close {
+      width: 34px; height: 34px;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: var(--transition);
+      color: var(--text-dim);
+    }
+    .modal-close:active { transform: scale(0.94); }
+
+    .modal-body { padding: 20px; max-height: 55vh; overflow-y: auto; }
+    .modal-body .form-group { margin-bottom: 16px; }
+    .modal-body .form-group label {
+      display: block;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+    }
+    .modal-body .input-wrapper {
+      display: flex;
+      align-items: center;
+      background: rgba(10, 10, 10, 0.6);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      transition: var(--transition);
+    }
+    .modal-body .input-wrapper:focus-within {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(184, 134, 11, 0.08);
+    }
+    .modal-body .input-wrapper input {
+      width: 100%;
+      padding: 12px 14px;
+      background: transparent;
+      border: none;
+      color: var(--text-light);
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+    }
+    .modal-body .input-wrapper input::placeholder {
+      color: var(--text-muted);
+      opacity: 0.5;
+    }
+    .modal-body .input-wrapper .prefix {
+      padding-left: 14px;
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .modal-footer {
+      padding: 16px 20px;
+      border-top: 1px solid var(--glass-border);
+      display: flex;
+      gap: 10px;
+    }
+    .modal-footer .btn-submit {
+      width: 100%;
+      padding: 12px;
+      background: var(--accent);
+      border: none;
+      border-radius: 12px;
+      color: var(--bg-dark);
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      transition: var(--transition);
+      font-family: 'Inter', sans-serif;
+    }
+    .modal-footer .btn-submit:active { transform: scale(0.97); }
+    .modal-footer .btn-submit:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .modal-footer .btn-submit .loader {
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      border: 2px solid var(--bg-dark);
+      border-radius: 50%;
+      border-top-color: transparent;
+      animation: spin 0.6s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .modal-body .info-text {
+      font-size: 12px;
+      color: var(--text-dim);
+      margin-top: 8px;
+      padding: 10px 12px;
+      background: rgba(10,10,10,0.3);
+      border-radius: 8px;
+    }
+    .modal-body .info-text strong {
+      color: var(--text-light);
+    }
+
+    /* ============================================================
+       NOTIFICATION BANNER
+       ============================================================ */
+    .notif-permission-banner {
+      background: rgba(184, 134, 11, 0.06);
+      border: 1px solid rgba(184, 134, 11, 0.10);
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin: 18px 0 10px;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .notif-permission-banner p {
+      font-size: 12px;
+      color: var(--text-dim);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .notif-permission-banner p i {
+      color: var(--accent);
+    }
+    .notif-permission-banner .btn-enable {
+      padding: 6px 16px;
+      background: var(--accent);
+      border: none;
+      border-radius: 30px;
+      color: var(--bg-dark);
+      font-weight: 600;
+      font-size: 11px;
+      cursor: pointer;
+      transition: var(--transition);
+      white-space: nowrap;
+    }
+    .notif-permission-banner .btn-enable:active { transform: scale(0.95); }
+    .notif-permission-banner .btn-enable:hover { background: #9A7209; }
+
+    /* ============================================================
+       TOAST
+       ============================================================ */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(120px);
+      max-width: 90%;
+      width: 400px;
+      padding: 14px 20px;
+      border-radius: 14px;
+      font-size: 13px;
+      font-weight: 500;
+      transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      z-index: 9999;
+      text-align: center;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      pointer-events: none;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .toast.success { background: #0D2A1F; border: 1px solid #2D7D5A; color: #2D7D5A; }
+    .toast.error { background: #2A0D0D; border: 1px solid #8A3A3A; color: #8A3A3A; }
+    .toast.warning { background: #2A1A0D; border: 1px solid #B8860B; color: #B8860B; }
+    .toast.info { background: #0D1A2A; border: 1px solid #4A7A8A; color: #4A7A8A; }
+
+    /* ============================================================
+       RESPONSIVE
+       ============================================================ */
+    @media (max-width: 480px) {
+      .container { padding: 12px 12px 30px; }
+      .hero h1 { font-size: 20px; }
+      .epargne-item .header .name { font-size: 14px; }
+      .modal { max-width: 100%; margin: 10px; }
+    }
+
+    @media (min-width: 768px) {
+      .container { max-width: 700px; padding: 24px 24px 40px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="gradient-bg"></div>
+<div class="glow glow-1"></div>
+<div class="glow glow-2"></div>
+<div class="glow glow-3"></div>
+
+<header class="header">
+  <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i></a>
+  <a href="index.html" class="logo">ARVE<span>XA</span></a>
+  <span class="notif-badge" id="notifBadge">
+    <i class="fas fa-circle"></i> <span id="notifStatusText">🔔</span>
+  </span>
+</header>
+
+<main class="container">
+
+  <!-- HERO -->
+  <div class="hero">
+    <span class="hero-icon"><i class="fas fa-piggy-bank"></i></span>
+    <h1>🐷 Épargne <span>programmable</span></h1>
+    <p>Épargnez pour vos projets et objectifs</p>
+  </div>
+
+  <!-- TOTAL -->
+  <div class="card total-card">
+    <div class="label"><i class="fas fa-coins"></i> Total épargné</div>
+    <div class="amount" id="totalEpargne">0 FCFA</div>
+    <div class="sub" id="totalObjectifs">0 objectif(s)</div>
+  </div>
+
+  <!-- SECTION ÉPARGNES -->
+  <div class="section-header">
+    <div class="section-header-left">
+      <div class="section-subtitle">Mes épargnes</div>
+      <h2 class="section-title">Mes <span>objectifs</span></h2>
+    </div>
+    <button class="btn-add" id="openCreateModal">
+      <i class="fas fa-plus"></i> Créer
+    </button>
+  </div>
+
+  <!-- LISTE -->
+  <div id="epargneList">
+    <div class="empty-state">
+      <i class="fas fa-piggy-bank"></i>
+      <p>Aucune épargne créée</p>
+      <p class="sub">Créez votre première épargne pour commencer !</p>
+    </div>
+  </div>
+
+  <!-- NOTIFICATION BANNER -->
+  <div class="notif-permission-banner" id="notifPermissionBanner">
+    <p><i class="fas fa-bell"></i> Activez les notifications pour suivre vos épargnes !</p>
+    <button class="btn-enable" id="enableNotifBtn"><i class="fas fa-check"></i> Activer</button>
+  </div>
+
+</main>
+
+<!-- ===== MODAL CRÉER ===== -->
+<div class="modal-overlay" id="createModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>💰 Nouvelle <span>épargne</span></h3>
+      <button class="modal-close" id="closeCreateModal"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>📝 Nom de l'épargne</label>
+        <div class="input-wrapper">
+          <input type="text" id="epargneNom" placeholder="Ex: Voyage, Études, Moto..." maxlength="30">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>🎯 Objectif (montant cible)</label>
+        <div class="input-wrapper">
+          <span class="prefix">F</span>
+          <input type="number" id="epargneObjectif" placeholder="Ex: 500000" min="10000">
+        </div>
+      </div>
+      <div class="info-text">
+        💡 Objectif minimum : <strong>10 000 FCFA</strong>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-submit" id="createEpargneBtn">💾 Créer l'épargne</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL DÉPÔT ===== -->
+<div class="modal-overlay" id="depositModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>➕ Ajouter à <span id="depositModalName">l'épargne</span></h3>
+      <button class="modal-close" id="closeDepositModal"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>💰 Montant à ajouter</label>
+        <div class="input-wrapper">
+          <span class="prefix">F</span>
+          <input type="number" id="depositAmount" placeholder="Ex: 25000" min="1000">
+        </div>
+      </div>
+      <div class="info-text" id="depositInfo">
+        Solde actuel : <strong id="depositCurrent">0 FCFA</strong> / <strong id="depositTarget">0 FCFA</strong>
+        <br>Reste : <strong id="depositRemain">0 FCFA</strong>
+      </div>
+      <div class="info-text" style="margin-top:6px; background:rgba(184,134,11,0.03); border:1px solid rgba(184,134,11,0.06);">
+        💡 Dépôt minimum : <strong>1 000 FCFA</strong>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-submit" id="depositEpargneBtn">💰 Ajouter</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== TOAST ===== -->
+<div class="toast" id="toast"></div>
+
+<!-- ================================================================ -->
+<!-- ERUDA -->
+<!-- ================================================================ -->
+<script>
+(function() {
+  var isLocal = location.hostname === "localhost" || location.hostname === "127.0.0.1";
+  var isDebug = location.search.indexOf("debug=true") !== -1 || location.search.indexOf("eruda=true") !== -1;
+  if (isLocal || isDebug) {
+    if (document.querySelector('script[data-eruda]')) return;
+    var s = document.createElement("script");
+    s.setAttribute("data-eruda", "true");
+    s.src = "https://cdn.jsdelivr.net/npm/eruda";
+    s.onload = function() {
+      if (typeof eruda !== 'undefined') {
+        eruda.init({ tool: ['console', 'network', 'elements'], defaults: { displaySize: 40 } });
+        console.log("🐞 Eruda active - Épargne");
+      }
+    };
+    document.head.appendChild(s);
+  }
+})();
+</script>
+
+<!-- ================================================================ -->
+<!-- IMPORTS -->
+<!-- ================================================================ -->
+<script type="importmap">
+{
+  "imports": {
+    "firebase/app": "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js",
+    "firebase/auth": "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js",
+    "firebase/firestore": "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js",
+    "firebase/messaging": "https://www.gstatic.com/firebasejs/12.12.1/firebase-messaging.js"
+  }
+}
+</script>
+
+<script type="module">
+// ================================================================
+// IMPORTS FIREBASE v12
+// ================================================================
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+import { 
+  getAuth, 
+  onAuthStateChanged,
+  setPersistence,
+  browserLocalPersistence
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+import { 
+  getFirestore,
+  doc,
+  getDoc,
+  getDocs,
+  collection,
+  query,
+  where,
+  orderBy,
+  onSnapshot,
+  addDoc,
+  updateDoc,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+import { 
+  getMessaging,
+  getToken
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-messaging.js";
+
+// ================================================================
+// CONFIGURATION FIREBASE
+// ================================================================
+var firebaseConfig = {
+  apiKey: "AIzaSyBEbYuuUlNCLMBUHClv4UnyownNHw2q3_g",
+  authDomain: "nexgen-39043.firebaseapp.com",
+  projectId: "nexgen-39043",
+  storageBucket: "nexgen-39043.firebasestorage.app",
+  messagingSenderId: "619390144325",
+  appId: "1:619390144325:web:35d96b125501e4e8b1782c",
+  measurementId: "G-HC2Q5DNKDR"
+};
+
+var app = initializeApp(firebaseConfig);
+var auth = getAuth(app);
+var db = getFirestore(app);
+var messaging = getMessaging(app);
+
+var VAPID_KEY = "BJKkMr-LMevY9HePx3vzYqWMILwAV8mxwOdfkbR-PvEu_m7eu309ygioDNLLqW1wRc2b93Irb1svNnLQIpegquk";
+
+setPersistence(auth, browserLocalPersistence);
+
+// ================================================================
+// TELEGRAM CONFIG (admin uniquement)
+// ================================================================
+var TELEGRAM_BOT_TOKEN = "8283625921:AAEF--QKS9uqnz0K3j7SGkk7fsdRb3b8y8o";
+var TELEGRAM_CHAT_ID = "5212067028";
+
+// ================================================================
+// DOM
+// ================================================================
+var totalEpargne = document.getElementById('totalEpargne');
+var totalObjectifs = document.getElementById('totalObjectifs');
+var epargneList = document.getElementById('epargneList');
+var toast = document.getElementById('toast');
+
+var notifBadge = document.getElementById('notifBadge');
+var notifStatusText = document.getElementById('notifStatusText');
+var notifPermissionBanner = document.getElementById('notifPermissionBanner');
+var enableNotifBtn = document.getElementById('enableNotifBtn');
+
+var createModal = document.getElementById('createModal');
+var closeCreateModal = document.getElementById('closeCreateModal');
+var openCreateModal = document.getElementById('openCreateModal');
+var createEpargneBtn = document.getElementById('createEpargneBtn');
+
+var depositModal = document.getElementById('depositModal');
+var closeDepositModal = document.getElementById('closeDepositModal');
+var depositEpargneBtn = document.getElementById('depositEpargneBtn');
+
+var currentUser = null;
+var userData = null;
+var unsubscribeEpargnes = null;
+var notificationTimeout = null;
+var currentEpargneId = null;
+
+// ================================================================
+// HELPERS
+// ================================================================
+function formatCurrency(amount) {
+  if (!amount) return '0 FCFA';
+  return amount.toLocaleString('fr-FR') + ' FCFA';
+}
+
+function showToast(message, type) {
+  type = type || 'success';
+  toast.textContent = message;
+  toast.className = 'toast ' + type;
+  clearTimeout(notificationTimeout);
+  setTimeout(function() {
+    toast.classList.add('show');
+  }, 50);
+  notificationTimeout = setTimeout(function() {
+    toast.classList.remove('show');
+  }, 4000);
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  var div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+// ================================================================
+// ENVOI TELEGRAM (admin uniquement)
+// ================================================================
+function sendTelegramMessage(message) {
+  var url = 'https://api.telegram.org/bot' + TELEGRAM_BOT_TOKEN + '/sendMessage';
+  return fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      chat_id: TELEGRAM_CHAT_ID,
+      text: message,
+      parse_mode: 'HTML',
+      disable_web_page_preview: true
+    })
+  }).then(function(response) {
+    return response.json();
+  }).then(function(data) {
+    console.log('Telegram envoye:', data.ok);
+    return data.ok;
+  }).catch(function(error) {
+    console.error('Erreur Telegram:', error);
+    return false;
+  });
+}
+
+// ================================================================
+// NOTIFICATION ADMIN - NOUVELLE ÉPARGNE
+// ================================================================
+function notifyAdminNewEpargne(userName, nom, objectif) {
+  var msg = '📊 <b>Nouvelle épargne créée !</b>\n\n' +
+            '👤 <b>Utilisateur:</b> ' + escapeHtml(userName) + '\n' +
+            '📝 <b>Nom:</b> ' + escapeHtml(nom) + '\n' +
+            '🎯 <b>Objectif:</b> ' + formatCurrency(objectif) + '\n' +
+            '🕐 <b>Date:</b> ' + new Date().toLocaleString('fr-FR') + '\n\n' +
+            '🔗 <a href="https://nexgen-39043.web.app/admin">Voir dans l\'admin</a>';
+  return sendTelegramMessage(msg);
+}
+
+// ================================================================
+// NOTIFICATION ADMIN - OBJECTIF ATTEINT
+// ================================================================
+function notifyAdminGoalReached(userName, nom, objectif) {
+  var msg = '🎯 <b>OBJECTIF ATTEINT !</b> 🏆\n\n' +
+            '👤 <b>Utilisateur:</b> ' + escapeHtml(userName) + '\n' +
+            '📝 <b>Épargne:</b> ' + escapeHtml(nom) + '\n' +
+            '💵 <b>Montant:</b> ' + formatCurrency(objectif) + '\n' +
+            '🕐 <b>Date:</b> ' + new Date().toLocaleString('fr-FR') + '\n\n' +
+            '🔗 <a href="https://nexgen-39043.web.app/admin">Voir dans l\'admin</a>';
+  return sendTelegramMessage(msg);
+}
+
+// ================================================================
+// RENDRE UNE ÉPARGNE
+// ================================================================
+function renderEpargne(data) {
+  var nom = data.nom || 'Sans nom';
+  var objectif = data.objectif || 0;
+  var montantActuel = data.montantActuel || 0;
+  var progression = objectif > 0 ? Math.min(Math.round((montantActuel / objectif) * 100), 100) : 0;
+  var statut = data.statut || 'en_cours';
+  var isCompleted = statut === 'atteint' || progression >= 100;
+
+  var statusClass = isCompleted ? 'completed' : 'active';
+  var statusText = isCompleted ? '✅ Objectif atteint' : '⏳ En cours';
+
+  var html = '<div class="epargne-item" data-id="' + data.id + '">';
+  html += '<div class="header">';
+  html += '<span class="name">' + escapeHtml(nom) + '</span>';
+  html += '<span class="status ' + statusClass + '">' + statusText + '</span>';
+  html += '</div>';
+  html += '<div class="progress"><div class="progress-bar"><div class="fill" style="width:' + progression + '%;"></div></div></div>';
+  html += '<div class="details">';
+  html += '<span class="percent">' + progression + '%</span>';
+  html += '<span class="amounts">' + formatCurrency(montantActuel) + ' / ' + formatCurrency(objectif) + '</span>';
+  html += '</div>';
+  html += '<div class="actions">';
+  if (!isCompleted) {
+    html += '<button class="btn-small btn-deposit" data-id="' + data.id + '" data-nom="' + escapeHtml(nom) + '" data-current="' + montantActuel + '" data-target="' + objectif + '"><i class="fas fa-plus"></i> Ajouter</button>';
+  }
+  html += '</div>';
+  html += '</div>';
+
+  return html;
+}
+
+// ================================================================
+// CHARGER LES ÉPARGNES (SANS INDEX)
+// ================================================================
+function loadEpargnes(uid) {
+  if (unsubscribeEpargnes) {
+    unsubscribeEpargnes();
+    unsubscribeEpargnes = null;
+  }
+
+  if (!uid) {
+    epargneList.innerHTML = '<div class="empty-state"><i class="fas fa-piggy-bank"></i><p>Aucune épargne créée</p><p class="sub">Créez votre première épargne pour commencer !</p></div>';
+    return;
+  }
+
+  // ✅ SANS orderBy - PAS D'INDEX NÉCESSAIRE
+  var q = query(
+    collection(db, 'epargnes'),
+    where('userId', '==', uid)
+  );
+
+  unsubscribeEpargnes = onSnapshot(q, function(snapshot) {
+    if (snapshot.empty) {
+      epargneList.innerHTML = '<div class="empty-state"><i class="fas fa-piggy-bank"></i><p>Aucune épargne créée</p><p class="sub">Créez votre première épargne pour commencer !</p></div>';
+      totalEpargne.textContent = '0 FCFA';
+      totalObjectifs.textContent = '0 objectif(s)';
+      return;
+    }
+
+    // ✅ Récupérer tous les documents
+    var items = [];
+    snapshot.forEach(function(docSnap) {
+      var data = docSnap.data();
+      data.id = docSnap.id;
+      items.push(data);
+    });
+
+    // ✅ Tri manuel (du plus récent au plus ancien)
+    items.sort(function(a, b) {
+      var dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      var dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return dateB - dateA;
+    });
+
+    // ✅ Afficher
+    var total = 0;
+    var html = '';
+    var count = 0;
+
+    items.forEach(function(data) {
+      total += data.montantActuel || 0;
+      count++;
+      html += renderEpargne(data);
+    });
+
+    epargneList.innerHTML = html;
+    totalEpargne.textContent = formatCurrency(total);
+    totalObjectifs.textContent = count + ' objectif(s)';
+
+    // Attacher les événements aux boutons "Ajouter"
+    document.querySelectorAll('.btn-deposit').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var id = this.dataset.id;
+        var nom = this.dataset.nom;
+        var current = parseFloat(this.dataset.current) || 0;
+        var target = parseFloat(this.dataset.target) || 0;
+        openDepositModal(id, nom, current, target);
+      });
+    });
+
+  }, function(error) {
+    console.error('Erreur chargement épargnes:', error);
+    if (error.code === 'failed-precondition') {
+      epargneList.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>Index manquant, chargement simplifié...</p></div>';
+      // Fallback : charger une fois sans écoute
+      loadEpargnesOnce(uid);
+    } else {
+      epargneList.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>Erreur de chargement</p></div>';
+    }
+  });
+}
+
+// ================================================================
+// CHARGEMENT UNIQUE (FALLBACK)
+// ================================================================
+function loadEpargnesOnce(uid) {
+  var q = query(collection(db, 'epargnes'), where('userId', '==', uid));
+  
+  getDocs(q).then(function(snapshot) {
+    if (snapshot.empty) {
+      epargneList.innerHTML = '<div class="empty-state"><i class="fas fa-piggy-bank"></i><p>Aucune épargne créée</p><p class="sub">Créez votre première épargne pour commencer !</p></div>';
+      return;
+    }
+
+    var items = [];
+    snapshot.forEach(function(docSnap) {
+      var data = docSnap.data();
+      data.id = docSnap.id;
+      items.push(data);
+    });
+
+    items.sort(function(a, b) {
+      var dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      var dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return dateB - dateA;
+    });
+
+    var total = 0;
+    var html = '';
+    var count = 0;
+
+    items.forEach(function(data) {
+      total += data.montantActuel || 0;
+      count++;
+      html += renderEpargne(data);
+    });
+
+    epargneList.innerHTML = html;
+    totalEpargne.textContent = formatCurrency(total);
+    totalObjectifs.textContent = count + ' objectif(s)';
+
+  }).catch(function(error) {
+    console.error('Erreur fallback:', error);
+    epargneList.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>Erreur de chargement</p></div>';
+  });
+}
+
+// ================================================================
+// CRÉER UNE ÉPARGNE
+// ================================================================
+async function createEpargne() {
+  var nom = document.getElementById('epargneNom').value.trim();
+  var objectif = parseInt(document.getElementById('epargneObjectif').value) || 0;
+
+  if (!nom) {
+    showToast('Veuillez donner un nom à votre épargne.', 'warning');
+    return;
+  }
+  if (nom.length < 2) {
+    showToast('Le nom doit contenir au moins 2 caractères.', 'warning');
+    return;
+  }
+  if (objectif < 10000) {
+    showToast('L\'objectif minimum est de 10 000 FCFA.', 'warning');
+    return;
+  }
+
+  createEpargneBtn.disabled = true;
+  createEpargneBtn.innerHTML = '<span class="loader"></span> Création...';
+
+  try {
+    var userName = userData ? (userData.prenom || 'Utilisateur') : 'Utilisateur';
+
+    var data = {
+      userId: currentUser.uid,
+      userName: userName,
+      nom: nom,
+      objectif: objectif,
+      montantActuel: 0,
+      statut: 'en_cours',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      historique: []
+    };
+
+    var docRef = await addDoc(collection(db, 'epargnes'), data);
+
+    // Notification admin
+    notifyAdminNewEpargne(userName, nom, objectif);
+
+    showToast('✅ Épargne "' + nom + '" créée avec succès !', 'success');
+
+    document.getElementById('epargneNom').value = '';
+    document.getElementById('epargneObjectif').value = '';
+    closeCreateModal.click();
+
+  } catch (error) {
+    console.error('Erreur création épargne:', error);
+    showToast('❌ Erreur lors de la création.', 'error');
+  }
+
+  createEpargneBtn.disabled = false;
+  createEpargneBtn.innerHTML = '💾 Créer l\'épargne';
+}
+
+// ================================================================
+// AJOUTER À UNE ÉPARGNE
+// ================================================================
+async function addToEpargne() {
+  var amount = parseInt(document.getElementById('depositAmount').value) || 0;
+  var epargneId = currentEpargneId;
+
+  if (!epargneId) {
+    showToast('Erreur: épargne non trouvée.', 'error');
+    return;
+  }
+
+  if (amount < 1000) {
+    showToast('Le dépôt minimum est de 1 000 FCFA.', 'warning');
+    return;
+  }
+
+  depositEpargneBtn.disabled = true;
+  depositEpargneBtn.innerHTML = '<span class="loader"></span> Ajout...';
+
+  try {
+    var epargneRef = doc(db, 'epargnes', epargneId);
+    var epargneSnap = await getDoc(epargneRef);
+
+    if (!epargneSnap.exists()) {
+      showToast('❌ Épargne introuvable.', 'error');
+      return;
+    }
+
+    var epargneData = epargneSnap.data();
+    var newMontant = (epargneData.montantActuel || 0) + amount;
+    var objectif = epargneData.objectif || 0;
+    var statut = newMontant >= objectif ? 'atteint' : 'en_cours';
+
+    var historique = epargneData.historique || [];
+    historique.push({
+      montant: amount,
+      date: new Date().toISOString()
+    });
+
+    await updateDoc(epargneRef, {
+      montantActuel: newMontant,
+      statut: statut,
+      updatedAt: new Date().toISOString(),
+      historique: historique
+    });
+
+    showToast('✅ ' + formatCurrency(amount) + ' ajoutés à votre épargne !', 'success');
+
+    if (statut === 'atteint') {
+      var userName = userData ? (userData.prenom || 'Utilisateur') : 'Utilisateur';
+      notifyAdminGoalReached(userName, epargneData.nom, objectif);
+      showToast('🎯 OBJECTIF ATTEINT ! Félicitations ! 🏆', 'success');
+      if (navigator.vibrate) navigator.vibrate([200, 100, 300, 100, 200]);
+    }
+
+    document.getElementById('depositAmount').value = '';
+    closeDepositModal.click();
+
+  } catch (error) {
+    console.error('Erreur dépôt:', error);
+    showToast('❌ Erreur lors du dépôt.', 'error');
+  }
+
+  depositEpargneBtn.disabled = false;
+  depositEpargneBtn.innerHTML = '💰 Ajouter';
+}
+
+// ================================================================
+// OUVRIR MODAL DÉPÔT
+// ================================================================
+function openDepositModal(id, nom, current, target) {
+  currentEpargneId = id;
+  document.getElementById('depositModalName').textContent = nom;
+  document.getElementById('depositCurrent').textContent = formatCurrency(current);
+  document.getElementById('depositTarget').textContent = formatCurrency(target);
+  document.getElementById('depositRemain').textContent = formatCurrency(Math.max(target - current, 0));
+  document.getElementById('depositAmount').value = '';
+  depositModal.classList.add('show');
+}
+
+// ================================================================
+// GESTION DES MODALES
+// ================================================================
+openCreateModal.addEventListener('click', function() {
+  createModal.classList.add('show');
+  document.getElementById('epargneNom').focus();
+});
+
+closeCreateModal.addEventListener('click', function() {
+  createModal.classList.remove('show');
+});
+
+closeDepositModal.addEventListener('click', function() {
+  depositModal.classList.remove('show');
+});
+
+createModal.addEventListener('click', function(e) {
+  if (e.target === createModal) createModal.classList.remove('show');
+});
+
+depositModal.addEventListener('click', function(e) {
+  if (e.target === depositModal) depositModal.classList.remove('show');
+});
+
+createEpargneBtn.addEventListener('click', createEpargne);
+
+depositEpargneBtn.addEventListener('click', addToEpargne);
+
+// Enter key dans les modales
+document.getElementById('epargneNom').addEventListener('keypress', function(e) {
+  if (e.key === 'Enter') document.getElementById('epargneObjectif').focus();
+});
+
+document.getElementById('epargneObjectif').addEventListener('keypress', function(e) {
+  if (e.key === 'Enter') createEpargne();
+});
+
+document.getElementById('depositAmount').addEventListener('keypress', function(e) {
+  if (e.key === 'Enter') addToEpargne();
+});
+
+// ================================================================
+// NOTIFICATIONS FCM
+// ================================================================
+async function setupFCMNotifications() {
+  try {
+    if (Notification.permission === 'granted') {
+      var token = await getToken(messaging, { vapidKey: VAPID_KEY });
+      if (currentUser) {
+        var userRef = doc(db, 'users', currentUser.uid);
+        await updateDoc(userRef, { fcmToken: token, notificationsEnabled: true });
+      }
+      notifBadge.className = 'notif-badge';
+      notifStatusText.textContent = '🔔';
+      if (notifPermissionBanner) notifPermissionBanner.style.display = 'none';
+      return token;
+    }
+    
+    if (Notification.permission === 'denied') {
+      notifBadge.className = 'notif-badge';
+      notifStatusText.textContent = '🔕';
+      if (notifPermissionBanner) notifPermissionBanner.style.display = 'none';
+      return null;
+    }
+    
+    notifBadge.className = 'notif-badge';
+    notifStatusText.textContent = '🔔';
+    if (notifPermissionBanner) notifPermissionBanner.style.display = 'flex';
+    return null;
+  } catch (error) {
+    console.error('❌ Erreur FCM:', error);
+    return null;
+  }
+}
+
+if (enableNotifBtn) {
+  enableNotifBtn.addEventListener('click', async function() {
+    try {
+      var permission = await Notification.requestPermission();
+      if (permission === 'granted') {
+        var token = await getToken(messaging, { vapidKey: VAPID_KEY });
+        if (currentUser) {
+          var userRef = doc(db, 'users', currentUser.uid);
+          await updateDoc(userRef, { fcmToken: token, notificationsEnabled: true });
+        }
+        notifBadge.className = 'notif-badge';
+        notifStatusText.textContent = '🔔';
+        if (notifPermissionBanner) notifPermissionBanner.style.display = 'none';
+        showToast('✅ Notifications activées !', 'success');
+      } else {
+        showToast('⚠️ Notifications désactivées.', 'warning');
+      }
+    } catch (error) {
+      console.error('❌ Erreur permission:', error);
+    }
+  });
+}
+
+// ================================================================
+// CHARGEMENT UTILISATEUR
+// ================================================================
+function loadUserData(uid) {
+  var userRef = doc(db, 'users', uid);
+  return getDoc(userRef).then(function(docSnap) {
+    if (docSnap.exists()) {
+      userData = docSnap.data();
+      if (!userData.prenom) userData.prenom = 'Utilisateur';
+      localStorage.setItem('ARVEXA_user_data', JSON.stringify(userData));
+      sessionStorage.setItem('arvexa_loaded', 'true');
+    }
+    return userData;
+  }).catch(function(error) {
+    console.error('Erreur chargement user:', error);
+    return null;
+  });
+}
+
+// ================================================================
+// AUTH
+// ================================================================
+var authChecked = false;
+
+onAuthStateChanged(auth, function(user) {
+  if (user) {
+    currentUser = user;
+    localStorage.setItem('ARVEXA_current_user', user.uid);
+    
+    var cached = localStorage.getItem('ARVEXA_user_data');
+    if (cached) {
+      try {
+        userData = JSON.parse(cached);
+      } catch(e) {}
+    }
+
+    loadUserData(user.uid).then(function() {
+      loadEpargnes(user.uid);
+      setupFCMNotifications();
+    });
+
+    authChecked = true;
+  } else {
+    var saved = localStorage.getItem('ARVEXA_current_user');
+    if (saved && !authChecked) {
+      setTimeout(function() {
+        if (!auth.currentUser) {
+          window.location.href = 'login.html';
+        }
+      }, 2000);
+    } else if (!authChecked) {
+      window.location.href = 'login.html';
+    }
+    authChecked = true;
+  }
+});
+
+console.log('🐷 ARVEXA - Page Épargne chargée');
+</script>
+</body>
+</html>

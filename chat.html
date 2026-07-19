@@ -1,0 +1,1557 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes, viewport-fit=cover">
+  <meta name="theme-color" content="#0A0A0A">
+  <meta name="description" content="ARVEXA - Assistant IA">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="/ARVEXA/manifest.json">
+  <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3135/3135715.png">
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <style>
+    /* ===== ROOT ARVEXA ===== */
+    :root {
+      --primary: #1A3A2A;
+      --primary-dark: #0A1A12;
+      --primary-light: #2A5A3A;
+      --accent: #B8860B;
+      --accent-dim: rgba(184, 134, 11, 0.08);
+      --success: #2D7D5A;
+      --danger: #8A3A3A;
+      --bg-dark: #0A0A0A;
+      --bg-surface: #141414;
+      --bg-card: rgba(20, 20, 20, 0.7);
+      --text-light: #F5F0E8;
+      --text-dim: #8A8A7A;
+      --text-muted: #5A5A4A;
+      --card-border: rgba(184, 134, 11, 0.06);
+      --glass-bg: rgba(26, 58, 42, 0.15);
+      --glass-border: rgba(184, 134, 11, 0.04);
+      --transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+      --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      --radius: 16px;
+      --sidebar-width: 300px;
+      --header-height: 60px;
+      --max-content-width: 1000px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    html, body {
+      height: 100%;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-light);
+      font-size: 16px;
+      line-height: 1.5;
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      display: flex;
+      touch-action: pan-y;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ===== BACKGROUND ===== */
+    .gradient-bg {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: -1;
+      background: radial-gradient(ellipse 60% 50% at 15% 15%, rgba(184, 134, 11, 0.06) 0%, transparent 70%),
+                  radial-gradient(ellipse 50% 40% at 85% 85%, rgba(45, 125, 90, 0.04) 0%, transparent 60%),
+                  linear-gradient(180deg, #0A0A0A 0%, #060606 100%);
+    }
+
+    .glow {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: -1;
+      opacity: 0.15;
+      animation: glowMove 10s ease-in-out infinite alternate;
+    }
+    .glow-1 { width: 350px; height: 350px; background: rgba(26,58,42,0.15); top: -80px; right: -80px; }
+    .glow-2 { width: 200px; height: 200px; background: rgba(184,134,11,0.03); bottom: 0; left: 0; animation-delay: -4s; }
+    .glow-3 { width: 250px; height: 250px; background: rgba(26,58,42,0.08); top: 40%; left: 50%; transform: translate(-50%,-50%); animation-delay: -8s; }
+    @keyframes glowMove {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(30px, -20px) scale(1.1); }
+    }
+
+    /* ============================================================
+       SIDEBAR - MENU LATÉRAL
+       ============================================================ */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: var(--sidebar-width);
+      max-width: 85vw;
+      height: 100%;
+      background: rgba(10, 10, 10, 0.98);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-right: 1px solid rgba(184, 134, 11, 0.1);
+      transform: translateX(-100%);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      padding: 12px 12px;
+      overflow-y: auto;
+    }
+    .sidebar.open { transform: translateX(0); }
+    .sidebar::-webkit-scrollbar { width: 3px; }
+    .sidebar::-webkit-scrollbar-track { background: transparent; }
+    .sidebar::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 4px; }
+
+    .sidebar .new-chat-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 14px 16px;
+      background: rgba(184, 134, 11, 0.1);
+      border: 1px solid rgba(184, 134, 11, 0.2);
+      border-radius: 12px;
+      color: var(--accent);
+      font-weight: 600;
+      font-size: 15px;
+      cursor: pointer;
+      transition: var(--transition);
+      font-family: 'Inter', sans-serif;
+      margin-bottom: 8px;
+      width: 100%;
+      min-height: 48px;
+    }
+    .sidebar .new-chat-btn:active { transform: scale(0.96); }
+    .sidebar .new-chat-btn:hover { background: rgba(184, 134, 11, 0.2); }
+    .sidebar .new-chat-btn i { font-size: 16px; }
+
+    .sidebar .history-title {
+      font-size: 11px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin: 12px 0 8px;
+      opacity: 0.5;
+    }
+
+    .sidebar .chat-list {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .sidebar .chat-list::-webkit-scrollbar { width: 2px; }
+    .sidebar .chat-list::-webkit-scrollbar-track { background: transparent; }
+    .sidebar .chat-list::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 4px; }
+
+    .sidebar .chat-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      color: var(--text-dim);
+      cursor: pointer;
+      transition: var(--transition);
+      font-size: 14px;
+      min-height: 40px;
+    }
+    .sidebar .chat-item:active { transform: scale(0.96); }
+    .sidebar .chat-item:hover { background: rgba(255, 255, 255, 0.04); color: var(--text-light); }
+    .sidebar .chat-item.active { background: rgba(184, 134, 11, 0.08); color: var(--accent); }
+
+    .sidebar .chat-item i { font-size: 14px; color: var(--accent); flex-shrink: 0; }
+    .sidebar .chat-item .chat-name { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .sidebar .chat-item .chat-delete { color: var(--text-dim); opacity: 0.3; cursor: pointer; font-size: 12px; transition: var(--transition); padding: 4px 6px; border-radius: 4px; flex-shrink: 0; }
+    .sidebar .chat-item .chat-delete:hover { opacity: 1; color: var(--danger); }
+
+    .sidebar .sidebar-footer {
+      padding-top: 12px;
+      border-top: 1px solid rgba(184, 134, 11, 0.06);
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .sidebar .sidebar-footer a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      color: var(--text-dim);
+      text-decoration: none;
+      font-size: 14px;
+      transition: var(--transition);
+      cursor: pointer;
+      min-height: 40px;
+    }
+    .sidebar .sidebar-footer a:active { transform: scale(0.96); }
+    .sidebar .sidebar-footer a:hover { background: rgba(255, 255, 255, 0.04); color: var(--text-light); }
+    .sidebar .sidebar-footer a i { font-size: 16px; color: var(--accent); }
+    .sidebar .sidebar-footer .logout-btn { color: #7A4A4A; }
+    .sidebar .sidebar-footer .logout-btn i { color: #7A4A4A; }
+    .sidebar .sidebar-footer .logout-btn:hover { background: rgba(122, 74, 74, 0.08); }
+
+    /* ============================================================
+       OVERLAY
+       ============================================================ */
+    .sidebar-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(3, 3, 5, 0.5);
+      backdrop-filter: blur(3px);
+      z-index: 999;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+    .sidebar-overlay.show { opacity: 1; visibility: visible; }
+
+    /* ============================================================
+       HEADER
+       ============================================================ */
+    .ia-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      height: var(--header-height);
+      background: rgba(10, 10, 10, 0.95);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(184, 134, 11, 0.06);
+    }
+    .ia-header .header-left { display: flex; align-items: center; gap: 10px; flex: 0 0 auto; }
+    .ia-header .header-center {
+      flex: 1;
+      text-align: center;
+      font-size: 20px;
+      font-weight: 700;
+      font-family: 'Playfair Display', serif;
+      letter-spacing: 2px;
+      color: var(--text-light);
+      white-space: nowrap;
+    }
+    .ia-header .header-center span { color: var(--accent); }
+    .ia-header .header-right { flex: 0 0 auto; display: flex; align-items: center; gap: 8px; }
+    .ia-header .menu-toggle {
+      width: 40px;
+      height: 40px;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-light);
+      cursor: pointer;
+      transition: var(--transition);
+      font-size: 18px;
+      min-width: 40px;
+    }
+    .ia-header .menu-toggle:active { transform: scale(0.92); }
+    .ia-header .menu-toggle:hover { border-color: rgba(184, 134, 11, 0.3); }
+
+    .notif-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 30px;
+      font-size: 10px;
+      font-weight: 500;
+      background: rgba(45, 125, 90, 0.08);
+      color: var(--success);
+      border: 1px solid rgba(45, 125, 90, 0.10);
+    }
+    .notif-badge i { font-size: 12px; }
+
+    .user-name {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-light);
+      max-width: 100px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* ============================================================
+       MAIN CONTENT
+       ============================================================ */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      max-width: var(--max-content-width);
+      margin: 0 auto;
+      width: 100%;
+      padding: 0 16px;
+      position: relative;
+    }
+
+    /* ============================================================
+       CHAT - NOUVEAU DESIGN
+       ============================================================ */
+    .chat-container {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      padding-top: calc(var(--header-height) + 12px);
+      padding-bottom: 12px;
+      width: 100%;
+      max-width: 800px;
+      margin: 0 auto;
+      overflow: hidden;
+    }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 20px 8px 20px;
+      scroll-behavior: smooth;
+      overscroll-behavior: contain;
+    }
+    .chat-messages::-webkit-scrollbar { width: 3px; }
+    .chat-messages::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); border-radius: 10px; }
+    .chat-messages::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
+
+    /* ===== MESSAGES ===== */
+    .message {
+      max-width: 80%;
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-size: 14px;
+      line-height: 1.5;
+      animation: messageIn 0.3s ease-out;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+    @keyframes messageIn {
+      from { opacity: 0; transform: translateY(10px) scale(0.97); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .message.user {
+      align-self: flex-end;
+      background: linear-gradient(135deg, var(--accent), #9A7209);
+      color: var(--bg-dark);
+      border-bottom-right-radius: 4px;
+    }
+    .message.ia {
+      align-self: flex-start;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(184, 134, 11, 0.12);
+      border-bottom-left-radius: 4px;
+      color: var(--text-light);
+    }
+    .message .msg-time {
+      font-size: 10px;
+      color: var(--text-dim);
+      margin-top: 8px;
+      display: block;
+      opacity: 0.5;
+    }
+    .message.user .msg-time { color: rgba(10, 10, 10, 0.5); }
+    .message .msg-strong {
+      font-weight: 700;
+      color: var(--accent);
+    }
+    .message.ia .msg-strong { color: #D4A017; }
+
+    .message .msg-block {
+      display: block;
+      margin: 8px 0 4px;
+    }
+    .message .msg-list {
+      padding-left: 20px;
+      margin: 6px 0;
+      list-style: none;
+    }
+    .message .msg-list li {
+      position: relative;
+      padding: 3px 0 3px 20px;
+    }
+    .message .msg-list li::before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+    }
+    .message .msg-divider {
+      height: 1px;
+      background: rgba(184, 134, 11, 0.08);
+      margin: 12px 0;
+    }
+    .message .msg-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 8px;
+      padding: 10px 16px;
+      background: rgba(184, 134, 11, 0.12);
+      border: 1px solid rgba(184, 134, 11, 0.15);
+      color: var(--accent);
+      font-weight: 600;
+      font-size: 13px;
+      border-radius: 10px;
+      text-decoration: none;
+      transition: var(--transition);
+    }
+    .message .msg-link:active { transform: scale(0.97); }
+    .message .msg-link:hover { background: rgba(184, 134, 11, 0.18); }
+
+    /* ============================================================
+       TYPING INDICATOR
+       ============================================================ */
+    .typing-indicator {
+      align-self: flex-start;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(184, 134, 11, 0.12);
+      border-radius: 16px;
+      padding: 14px 18px;
+      display: none;
+      gap: 4px;
+      border-bottom-left-radius: 4px;
+    }
+    .typing-indicator.show { display: flex; }
+    .typing-indicator span {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: typingDot 1.4s ease-in-out infinite both;
+    }
+    .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+    .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+    .typing-indicator span:nth-child(3) { animation-delay: 0s; }
+    @keyframes typingDot {
+      0%, 80%, 100% { transform: scale(0.6); opacity: 0.3; }
+      40% { transform: scale(1); opacity: 1; }
+    }
+
+    /* ============================================================
+       INPUT - NOUVEAU DESIGN
+       ============================================================ */
+    .chat-input-wrapper {
+      flex-shrink: 0;
+      padding: 0 0 8px;
+      background: transparent;
+    }
+
+    .chat-input-area {
+      display: flex;
+      align-items: flex-end;
+      gap: 10px;
+      padding: 10px 14px;
+      background: rgba(10, 10, 10, 0.85);
+      border: 1px solid rgba(184, 134, 11, 0.12);
+      border-radius: 20px;
+      transition: var(--transition);
+      backdrop-filter: blur(12px);
+    }
+    .chat-input-area:focus-within {
+      border-color: var(--accent);
+      background: rgba(10, 10, 10, 0.95);
+      box-shadow: 0 0 0 3px rgba(184, 134, 11, 0.06);
+    }
+
+    .chat-input-area .input-wrapper {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .chat-input-area textarea {
+      width: 100%;
+      padding: 6px 0;
+      background: transparent;
+      border: none;
+      color: var(--text-light);
+      font-size: 15px;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      resize: none;
+      min-height: 28px;
+      max-height: 120px;
+      line-height: 1.5;
+    }
+    .chat-input-area textarea::placeholder {
+      color: var(--text-dim);
+      opacity: 0.5;
+    }
+    .chat-input-area textarea::-webkit-scrollbar { width: 2px; }
+    .chat-input-area textarea::-webkit-scrollbar-track { background: transparent; }
+    .chat-input-area textarea::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 4px; }
+
+    .chat-input-area .btn-group {
+      display: flex;
+      gap: 6px;
+      flex-shrink: 0;
+      align-items: center;
+    }
+
+    .chat-input-area .btn-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: var(--transition);
+      font-size: 17px;
+      flex-shrink: 0;
+      touch-action: manipulation;
+    }
+    .chat-input-area .btn-icon:active { transform: scale(0.92); }
+    .chat-input-area .btn-icon:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .chat-input-area .send-btn {
+      background: linear-gradient(135deg, var(--accent), #9A7209);
+      color: var(--bg-dark);
+      width: 48px;
+      height: 48px;
+      font-size: 18px;
+    }
+    .chat-input-area .send-btn:hover { background: #9A7209; transform: scale(1.02); }
+
+    .chat-input-area .mic-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(184, 134, 11, 0.15);
+      color: var(--text-dim);
+    }
+    .chat-input-area .mic-btn:hover { border-color: rgba(184, 134, 11, 0.3); color: var(--text-light); }
+    .chat-input-area .mic-btn.listening {
+      background: rgba(138, 58, 58, 0.2);
+      border-color: var(--danger);
+      color: var(--danger);
+      animation: pulseMic 1.2s ease-in-out infinite;
+    }
+    @keyframes pulseMic {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    /* ============================================================
+       TOAST
+       ============================================================ */
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(120px);
+      max-width: 420px;
+      width: 90%;
+      padding: 14px 20px;
+      border-radius: 14px;
+      font-size: 14px;
+      font-weight: 500;
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      z-index: 9999;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+      pointer-events: none;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); pointer-events: auto; }
+    .toast.success { background: #0D2A1F; border: 1px solid var(--success); color: var(--success); }
+    .toast.error { background: #2A0D0D; border: 1px solid var(--danger); color: var(--danger); }
+    .toast.info { background: #1A1A2E; border: 1px solid var(--accent); color: var(--accent); }
+
+    /* ============================================================
+       RESPONSIVE
+       ============================================================ */
+    @media (max-width: 480px) {
+      :root { --header-height: 56px; --sidebar-width: 280px; }
+      .ia-header .header-center { font-size: 17px; }
+      .user-name { font-size: 12px; max-width: 70px; }
+      .ia-header .menu-toggle { width: 36px; height: 36px; font-size: 16px; min-width: 36px; }
+      .message { max-width: 92%; font-size: 14px; padding: 12px 16px; }
+      .chat-input-area { padding: 8px 12px; border-radius: 16px; gap: 8px; }
+      .chat-input-area textarea { font-size: 14px; min-height: 24px; }
+      .chat-input-area .btn-icon { width: 38px; height: 38px; font-size: 15px; }
+      .chat-input-area .send-btn { width: 42px; height: 42px; font-size: 16px; }
+      .chat-container { padding-top: calc(var(--header-height) + 8px); }
+      .chat-messages { padding: 12px 4px 16px; gap: 10px; }
+    }
+
+    @media (min-width: 769px) {
+      .message { max-width: 75%; font-size: 16px; padding: 18px 24px; }
+      .chat-input-area { padding: 12px 20px; }
+      .chat-input-area textarea { font-size: 16px; }
+      .sidebar { width: 320px; }
+      .sidebar .chat-item { font-size: 15px; padding: 12px 16px; }
+      .sidebar .new-chat-btn { font-size: 16px; padding: 16px 18px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== BACKGROUND ===== -->
+<div class="gradient-bg"></div>
+<div class="glow glow-1"></div>
+<div class="glow glow-2"></div>
+<div class="glow glow-3"></div>
+
+<!-- ============================================================
+     OVERLAY
+     ============================================================ -->
+<div class="sidebar-overlay" id="sidebarOverlay" aria-hidden="true"></div>
+
+<!-- ============================================================
+     SIDEBAR
+     ============================================================ -->
+<div class="sidebar" id="sidebar" role="navigation" aria-label="Menu principal">
+  <button class="new-chat-btn" id="newChatBtn">
+    <i class="fas fa-plus" aria-hidden="true"></i> Nouvelle discussion
+  </button>
+
+  <div class="history-title">📋 Discussions</div>
+  <div class="chat-list" id="chatList" role="list">
+    <div style="text-align:center; padding:20px; color: var(--text-dim); font-size:12px; opacity:0.5;">
+      <i class="fas fa-spinner fa-spin" style="display:block; margin-bottom:8px; font-size:20px;" aria-hidden="true"></i>
+      Chargement...
+    </div>
+  </div>
+
+  <div class="sidebar-footer">
+    <a href="index.html"><i class="fas fa-home" aria-hidden="true"></i> Accueil</a>
+    <a href="ebooks.html"><i class="fas fa-book" aria-hidden="true"></i> E-books</a>
+    <a href="services.html"><i class="fas fa-cogs" aria-hidden="true"></i> Services</a>
+    <a href="#" class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt" aria-hidden="true"></i> Se déconnecter</a>
+  </div>
+</div>
+
+<!-- ============================================================
+     HEADER
+     ============================================================ -->
+<header class="ia-header" role="banner">
+  <div class="header-left">
+    <button class="menu-toggle" id="menuToggle" aria-label="Ouvrir le menu" aria-expanded="false">
+      <i class="fas fa-bars" aria-hidden="true"></i>
+    </button>
+  </div>
+
+  <div class="header-center">
+    ARVE<span>XA</span>
+  </div>
+
+  <div class="header-right">
+    <span class="notif-badge" id="notifBadge">
+      <i class="fas fa-circle"></i> <span id="notifStatusText">🔔</span>
+    </span>
+    <span class="user-name" id="headerUserName">Chargement...</span>
+  </div>
+</header>
+
+<!-- ============================================================
+     CHAT
+     ============================================================ -->
+<div class="main-content" role="main">
+
+  <div class="chat-container">
+
+    <div class="chat-messages" id="chatMessages" role="log" aria-live="polite">
+      <div class="message ia">
+        <strong class="msg-strong">🤖 ARVEXA Assistant</strong><br><br>
+        Bonjour et bienvenue sur ARVEXA.<br>
+        Je suis votre conseiller financier virtuel.<br><br>
+        Je suis à votre disposition pour vous guider sur la plateforme.<br>
+        <span style="color: var(--text-dim); font-size: 14px;">
+          Comment puis-je vous aider aujourd'hui ?
+        </span>
+        <span class="msg-time">Maintenant</span>
+      </div>
+    </div>
+
+    <div class="typing-indicator" id="typingIndicator" aria-label="L'assistant est en train d'écrire">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+
+    <!-- INPUT -->
+    <div class="chat-input-wrapper">
+      <div class="chat-input-area">
+        <div class="input-wrapper">
+          <textarea id="chatInput" rows="1" placeholder="Écrivez votre message..." aria-label="Saisir votre message"></textarea>
+        </div>
+        <div class="btn-group">
+          <button class="btn-icon mic-btn" id="micBtn" title="Note vocale" aria-label="Dictée vocale">
+            <i class="fas fa-microphone" aria-hidden="true"></i>
+          </button>
+          <button class="btn-icon send-btn" id="sendBtn" aria-label="Envoyer le message">
+            <i class="fas fa-paper-plane" aria-hidden="true"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- ===== TOAST ===== -->
+<div class="toast" id="toast" role="alert" aria-live="assertive"></div>
+
+<!-- ================================================================ -->
+<!-- IMPORTS -->
+<!-- ================================================================ -->
+<script type="importmap">
+{
+  "imports": {
+    "firebase/app": "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js",
+    "firebase/auth": "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js",
+    "firebase/firestore": "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js"
+  }
+}
+</script>
+
+<script type="module">
+// ================================================================
+// IMPORTS
+// ================================================================
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+import { 
+  getAuth, 
+  onAuthStateChanged,
+  setPersistence,
+  browserLocalPersistence,
+  signOut 
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+import { 
+  getFirestore, 
+  collection, 
+  doc, 
+  getDoc, 
+  setDoc, 
+  updateDoc, 
+  deleteDoc, 
+  onSnapshot,
+  query,
+  where
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+
+// ================================================================
+// CONFIGURATION FIREBASE ARVEXA
+// ================================================================
+const firebaseConfig = {
+  apiKey: "AIzaSyBEbYuuUlNCLMBUHClv4UnyownNHw2q3_g",
+  authDomain: "nexgen-39043.firebaseapp.com",
+  projectId: "nexgen-39043",
+  storageBucket: "nexgen-39043.firebasestorage.app",
+  messagingSenderId: "619390144325",
+  appId: "1:619390144325:web:35d96b125501e4e8b1782c",
+  measurementId: "G-HC2Q5DNKDR"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+setPersistence(auth, browserLocalPersistence);
+
+// ================================================================
+// MISTRAL AI CONFIG
+// ================================================================
+const MISTRAL_API_KEY = "0YyRAeP2p28zy8Bq2PJSWJZWVNevLMka";
+const MISTRAL_ENDPOINT = "https://api.mistral.ai/v1/chat/completions";
+
+// ================================================================
+// PROMPT SYSTÈME AMÉLIORÉ
+// ================================================================
+const SYSTEM_PROMPT = `
+Tu es ARVEXA Assistant, un agent IA spécialisé de la plateforme ARVEXA.
+
+IDENTITÉ:
+- Nom: ARVEXA Assistant
+- Rôle: Conseiller financier virtuel
+- Expertise: Finance, investissement, épargne, parrainage
+- Localisation: Niger
+
+RÈGLES STRICTES:
+🚫 Ne dis jamais que tu es Mistral AI, OpenAI, ChatGPT ou un autre modèle
+🚫 Ne donne jamais de conseils financiers engageants
+🚫 Ne fais jamais de promesses de gains garantis
+🚫 Ne donne jamais de conseils juridiques ou fiscaux
+✅ Redirige toujours vers l'équipe ARVEXA pour les cas complexes
+
+SERVICES ARVEXA:
+
+💰 RECHARGE:
+- Montant: 3 000 à 1 000 000 FCFA
+- Méthode: WhatsApp (+227 98 06 64 67)
+- Délai: 15-30 minutes
+- Frais: 0%
+
+💸 RETRAIT:
+- Montant: 5 000 à 50 000 FCFA
+- Délai: 24-48h
+- Frais: 0%
+
+👥 PARRAINAGE:
+- Bonus: 500 FCFA par filleul
+- Condition: 1er dépôt du filleul (3 000 FCFA)
+- Illimité
+
+📚 E-BOOKS:
+- Gratuits après activation
+- 10 e-books disponibles
+- Lecture en plein écran
+
+🐷 ÉPARGNE:
+- Objectifs personnalisés
+- Suivi en temps réel
+- Notifications d'objectif atteint
+
+TONS:
+- Professionnel et amical
+- Encourageant pour les débutants
+- Rassurant sur la sécurité
+- Transparent sur les délais
+
+FORMAT DES RÉPONSES:
+- Structure en paragraphes courts
+- Utilise des puces (•) pour les listes
+- Souligne les mots importants avec **gras**
+- Termine par une question ouverte
+- Propose toujours une action concrète
+`;
+
+// ================================================================
+// DOM
+// ================================================================
+const sidebar = document.getElementById('sidebar');
+const sidebarOverlay = document.getElementById('sidebarOverlay');
+const menuToggle = document.getElementById('menuToggle');
+const chatMessages = document.getElementById('chatMessages');
+const chatInput = document.getElementById('chatInput');
+const sendBtn = document.getElementById('sendBtn');
+const micBtn = document.getElementById('micBtn');
+const typingIndicator = document.getElementById('typingIndicator');
+const chatList = document.getElementById('chatList');
+const newChatBtn = document.getElementById('newChatBtn');
+const toast = document.getElementById('toast');
+const headerUserName = document.getElementById('headerUserName');
+const logoutBtn = document.getElementById('logoutBtn');
+const notifBadge = document.getElementById('notifBadge');
+const notifStatusText = document.getElementById('notifStatusText');
+
+let currentUser = null;
+let userData = null;
+let currentChatId = null;
+let allChats = [];
+let touchStartX = 0;
+let touchStartY = 0;
+let conversationHistory = [];
+let toastTimeout = null;
+let recognition = null;
+let isListening = false;
+
+// ============================================================
+// TOAST
+// ============================================================
+function showToast(message, type = 'info') {
+  if (!toast) return;
+  if (toastTimeout) clearTimeout(toastTimeout);
+  toast.classList.remove('show');
+  void toast.offsetWidth;
+  toast.textContent = message;
+  toast.className = `toast ${type}`;
+  toast.classList.add('show');
+  toastTimeout = setTimeout(() => { toast.classList.remove('show'); toastTimeout = null; }, 3000);
+}
+
+// ============================================================
+// ESCAPE HTML
+// ============================================================
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+// ============================================================
+// FORMAT DATE
+// ============================================================
+function formatTime() {
+  return new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+}
+
+// ============================================================
+// RECONNAISSANCE VOCALE
+// ============================================================
+function initSpeechRecognition() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    if (micBtn) micBtn.style.display = 'none';
+    return;
+  }
+  recognition = new SpeechRecognition();
+  recognition.lang = 'fr-FR';
+  recognition.continuous = false;
+  recognition.interimResults = true;
+
+  recognition.onstart = () => {
+    isListening = true;
+    if (micBtn) {
+      micBtn.classList.add('listening');
+      micBtn.innerHTML = '<i class="fas fa-circle" style="color: #8A3A3A; font-size:14px;" aria-hidden="true"></i>';
+    }
+  };
+  recognition.onerror = (event) => { console.error('Erreur reconnaissance:', event.error); stopListening(); showToast('Erreur microphone. Réessayez.', 'error'); };
+  recognition.onend = () => { stopListening(); };
+  recognition.onresult = (event) => {
+    let transcript = '';
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      transcript += event.results[i][0].transcript;
+    }
+    if (chatInput) chatInput.value = transcript.trim();
+    autoResizeTextarea();
+  };
+}
+
+function startListening() {
+  if (!recognition) { showToast('Reconnaissance vocale non supportée.', 'error'); return; }
+  if (isListening) { stopListening(); return; }
+  try { recognition.start(); } catch (error) { console.error('Erreur démarrage:', error); }
+}
+
+function stopListening() {
+  isListening = false;
+  if (micBtn) {
+    micBtn.classList.remove('listening');
+    micBtn.innerHTML = '<i class="fas fa-microphone" aria-hidden="true"></i>';
+  }
+  try { if (recognition) recognition.stop(); } catch (error) {}
+}
+
+if (micBtn) {
+  micBtn.addEventListener('click', startListening);
+  micBtn.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    startListening();
+  });
+}
+
+// ============================================================
+// AUTO-RESIZE TEXTAREA
+// ============================================================
+function autoResizeTextarea() {
+  if (!chatInput) return;
+  chatInput.style.height = 'auto';
+  chatInput.style.height = Math.min(chatInput.scrollHeight, 120) + 'px';
+}
+
+if (chatInput) {
+  chatInput.addEventListener('input', autoResizeTextarea);
+  chatInput.addEventListener('focus', autoResizeTextarea);
+}
+
+// ============================================================
+// AFFICHER UN MESSAGE (avec formatage professionnel)
+// ============================================================
+function addMessage(text, sender, time) {
+  if (!chatMessages) return;
+  const div = document.createElement('div');
+  div.className = `message ${sender}`;
+  
+  let formattedText = text
+    .replace(/\n/g, '<br>')
+    .replace(/\*\*(.*?)\*\*/g, '<strong class="msg-strong">$1</strong>')
+    .replace(/^• /gm, '<span class="msg-block">• </span>')
+    .replace(/^\d+\. /gm, '<span class="msg-block">$&</span>');
+  
+  div.innerHTML = `${formattedText}<span class="msg-time">${time || 'Maintenant'}</span>`;
+  chatMessages.appendChild(div);
+  
+  requestAnimationFrame(() => {
+    if (chatMessages) chatMessages.scrollTop = chatMessages.scrollHeight;
+  });
+}
+
+// ============================================================
+// APPEL MISTRAL AI
+// ============================================================
+async function callMistral(userMessage) {
+  if (!MISTRAL_API_KEY || MISTRAL_API_KEY === 'VOTRE_CLE_API_MISTRAL') {
+    return simulateResponse(userMessage);
+  }
+
+  try {
+    const messages = [
+      { role: 'system', content: SYSTEM_PROMPT },
+      ...conversationHistory.map(msg => ({
+        role: msg.sender === 'user' ? 'user' : 'assistant',
+        content: msg.text
+      })),
+      { role: 'user', content: userMessage }
+    ];
+
+    const response = await fetch(MISTRAL_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${MISTRAL_API_KEY}` },
+      body: JSON.stringify({ model: 'mistral-large-latest', messages, temperature: 0.7, max_tokens: 500 })
+    });
+
+    if (!response.ok) throw new Error(`API Mistral error: ${response.status}`);
+    const data = await response.json();
+    return data.choices[0]?.message?.content || "Je n'ai pas de réponse pour le moment.";
+  } catch (error) {
+    console.error('Erreur Mistral:', error);
+    return simulateResponse(userMessage);
+  }
+}
+
+// ================================================================
+// SIMULATION DE RÉPONSE (Fallback professionnel)
+// ================================================================
+function simulateResponse(text) {
+  const lower = text.toLowerCase();
+  
+  if (lower.includes('bonjour') || lower.includes('salut') || lower.includes('coucou')) {
+    return "Bonjour !\n\nJe suis ARVEXA Assistant, votre conseiller financier virtuel.\n\nJe suis à votre disposition pour vous guider sur la plateforme ARVEXA.\n\nComment puis-je vous aider aujourd'hui ?";
+  }
+  
+  if (lower.includes('recharg') || lower.includes('depot') || lower.includes('dépôt')) {
+    return "**💰 Procédure de recharge ARVEXA**\n\n" +
+           "Pour recharger votre compte, suivez ces étapes :\n\n" +
+           "• Rendez-vous sur la page **Recharger**\n" +
+           "• Saisissez le montant (3 000 à 1 000 000 FCFA)\n" +
+           "• Envoyez le paiement via WhatsApp au **+227 98 06 64 67**\n" +
+           "• Votre compte sera crédité sous **15-30 minutes**\n\n" +
+           "Aucun frais n'est appliqué.\n\n" +
+           "🔗 Lien direct : recharger.html\n\n" +
+           "Souhaitez-vous plus d'informations ?";
+  }
+  
+  if (lower.includes('retrait') || lower.includes('retirer')) {
+    return "**💸 Procédure de retrait ARVEXA**\n\n" +
+           "Pour retirer vos gains, suivez ces étapes :\n\n" +
+           "• Rendez-vous sur la page **Retrait**\n" +
+           "• Saisissez le montant (5 000 à 50 000 FCFA)\n" +
+           "• Envoyez la demande via WhatsApp\n" +
+           "• Délai de traitement : **24-48h**\n\n" +
+           "Aucun frais n'est appliqué.\n\n" +
+           "🔗 Lien direct : retrait.html\n\n" +
+           "Avez-vous d'autres questions ?";
+  }
+  
+  if (lower.includes('parrainage') || lower.includes('filleul') || lower.includes('parrain')) {
+    return "**👥 Programme de parrainage ARVEXA**\n\n" +
+           "Le parrainage vous permet de gagner des revenus supplémentaires :\n\n" +
+           "• **Bonus** : 500 FCFA par filleul\n" +
+           "• **Condition** : Le filleul doit effectuer son 1er dépôt (3 000 FCFA)\n" +
+           "• **Illimité** : Pas de limite de filleuls\n" +
+           "• **Suivi** : En temps réel dans votre espace\n\n" +
+           "🔗 Lien direct : parrainage.html\n\n" +
+           "Souhaitez-vous commencer à parrainer des amis ?";
+  }
+  
+  if (lower.includes('gains') || lower.includes('revenu') || lower.includes('performance') || lower.includes('activité')) {
+    return "**📈 Suivi de vos performances ARVEXA**\n\n" +
+           "La page **Mon Activité** vous permet de suivre :\n\n" +
+           "• Vos gains totaux\n" +
+           "• Vos investissements\n" +
+           "• Vos parrainages\n" +
+           "• L'historique complet des transactions\n\n" +
+           "🔗 Lien direct : activite.html\n\n" +
+           "Souhaitez-vous consulter vos performances ?";
+  }
+  
+  if (lower.includes('ebook') || lower.includes('livre') || lower.includes('bibliothèque')) {
+    return "**📚 Bibliothèque ARVEXA**\n\n" +
+           "Découvrez notre collection d'e-books sur la finance, l'investissement et l'entrepreneuriat :\n\n" +
+           "• **50 idées de business** avec 0 FCFA\n" +
+           "• **100 outils IA** gratuits\n" +
+           "• **Les erreurs** qui empêchent de devenir riche\n" +
+           "• **Comment économiser** intelligemment\n" +
+           "• Et bien d'autres...\n\n" +
+           "🔗 Lien direct : ebooks.html\n\n" +
+           "Souhaitez-vous découvrir un e-book en particulier ?";
+  }
+  
+  if (lower.includes('épargne') || lower.includes('epargne') || lower.includes('objectif')) {
+    return "**🐷 Épargne programmable ARVEXA**\n\n" +
+           "L'épargne programmable vous permet de :\n\n" +
+           "• Définir des **objectifs** personnalisés\n" +
+           "• Suivre votre **progression** en temps réel\n" +
+           "• Recevoir des **notifications** d'objectif atteint\n" +
+           "• Visualiser vos **performances**\n\n" +
+           "🔗 Lien direct : epargne.html\n\n" +
+           "Avez-vous un projet d'épargne en tête ?";
+  }
+  
+  if (lower.includes('qui es-tu') || lower.includes('qui êtes-vous') || lower.includes('présente')) {
+    return "**🤖 ARVEXA Assistant**\n\n" +
+           "Je suis votre conseiller financier virtuel, spécialisé sur la plateforme ARVEXA.\n\n" +
+           "Mes domaines d'expertise :\n\n" +
+           "• Recharge et retrait\n" +
+           "• Parrainage\n" +
+           "• E-books et formations\n" +
+           "• Épargne programmable\n" +
+           "• Forum communautaire\n\n" +
+           "Je suis là pour vous guider et répondre à toutes vos questions.\n\n" +
+           "Comment puis-je vous aider aujourd'hui ?";
+  }
+  
+  if (lower.includes('contact') || lower.includes('support') || lower.includes('aide')) {
+    return "**📞 Contact ARVEXA**\n\n" +
+           "Nous sommes disponibles pour vous assister :\n\n" +
+           "• **WhatsApp** : +227 98 06 64 67\n" +
+           "• **Email** : support@arvexa.com\n" +
+           "• **Forum** : espace communautaire\n\n" +
+           "Notre équipe est réactive et à votre écoute.\n\n" +
+           "Souhaitez-vous nous contacter pour un sujet particulier ?";
+  }
+  
+  if (lower.includes('sécurité') || lower.includes('securite') || lower.includes('protection')) {
+    return "**🔒 Sécurité ARVEXA**\n\n" +
+           "La sécurité de vos données et transactions est notre priorité :\n\n" +
+           "• **Chiffrement** des données personnelles\n" +
+           "• **Authentification** sécurisée\n" +
+           "• **Transactions** protégées\n" +
+           "• **Vérification** des opérations\n\n" +
+           "Vos informations ne sont jamais partagées avec des tiers.\n\n" +
+           "Avez-vous des inquiétudes concernant la sécurité ?";
+  }
+  
+  if (lower.includes('frais') || lower.includes('commission')) {
+    return "**💰 Frais et commissions ARVEXA**\n\n" +
+           "ARVEXA applique une politique transparente :\n\n" +
+           "• **Recharge** : 0% de frais\n" +
+           "• **Retrait** : 0% de frais\n" +
+           "• **Parrainage** : Bonus de 500 FCFA\n" +
+           "• **E-books** : Gratuits\n\n" +
+           "Aucun frais caché. Vous recevez l'intégralité de votre argent.\n\n" +
+           "Souhaitez-vous des précisions sur un service en particulier ?";
+  }
+  
+  return "**🤔 Je comprends votre demande.**\n\n" +
+         "Pour mieux vous aider, je vous invite à consulter les pages dédiées :\n\n" +
+         "• 🏠 Accueil : index.html\n" +
+         "• 💰 Recharge : recharger.html\n" +
+         "• 💸 Retrait : retrait.html\n" +
+         "• 👥 Parrainage : parrainage.html\n" +
+         "• 📊 Activité : activite.html\n" +
+         "• 📚 E-books : ebooks.html\n" +
+         "• 🐷 Épargne : epargne.html\n\n" +
+         "Pouvez-vous reformuler votre question ou préciser votre besoin ?";
+}
+
+// ================================================================
+// RÉPONDRE
+// ================================================================
+async function getResponse(text) {
+  return await callMistral(text);
+}
+
+// ================================================================
+// ENVOYER UN MESSAGE
+// ================================================================
+async function sendMessage() {
+  if (!chatInput) return;
+  const text = chatInput.value.trim();
+  if (!text || !currentUser) return;
+
+  const timeStr = formatTime();
+
+  if (!currentChatId) {
+    const chatId = 'chat_' + Date.now();
+    const newChat = {
+      userId: currentUser.uid,
+      chatId: chatId,
+      name: text.substring(0, 30) + (text.length > 30 ? '...' : ''),
+      messages: [],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    try {
+      await setDoc(doc(db, 'ia_chats', chatId), newChat);
+      currentChatId = chatId;
+    } catch (error) {
+      console.error('Erreur création discussion:', error);
+      showToast('Erreur lors de la création', 'error');
+      return;
+    }
+  }
+
+  addMessage(text, 'user', timeStr);
+  chatInput.value = '';
+  autoResizeTextarea();
+  if (sendBtn) sendBtn.disabled = true;
+
+  try {
+    const chatRef = doc(db, 'ia_chats', currentChatId);
+    const chatSnap = await getDoc(chatRef);
+    if (chatSnap.exists()) {
+      const chat = chatSnap.data();
+      const messages = [...(chat.messages || []), { sender: 'user', text, time: timeStr }];
+      const name = messages.length === 1 ? text.substring(0, 30) + (text.length > 30 ? '...' : '') : chat.name;
+      await updateDoc(chatRef, { messages, name, updatedAt: new Date().toISOString() });
+    }
+  } catch (error) {
+    console.error('Erreur sauvegarde message:', error);
+  }
+
+  conversationHistory.push({ sender: 'user', text });
+
+  if (typingIndicator) typingIndicator.classList.add('show');
+  if (chatMessages) chatMessages.scrollTop = chatMessages.scrollHeight;
+
+  setTimeout(async () => {
+    if (typingIndicator) typingIndicator.classList.remove('show');
+
+    const response = await getResponse(text);
+    const responseTime = formatTime();
+
+    conversationHistory.push({ sender: 'ia', text: response });
+
+    addMessage(response, 'ia', responseTime);
+
+    try {
+      const chatRef2 = doc(db, 'ia_chats', currentChatId);
+      const chatSnap2 = await getDoc(chatRef2);
+      if (chatSnap2.exists()) {
+        const chat = chatSnap2.data();
+        const messages = [...(chat.messages || []), { sender: 'ia', text: response, time: responseTime }];
+        await updateDoc(chatRef2, { messages, updatedAt: new Date().toISOString() });
+      }
+    } catch (error) {
+      console.error('Erreur sauvegarde réponse:', error);
+    }
+
+    if (sendBtn) sendBtn.disabled = false;
+    if (chatMessages) chatMessages.scrollTop = chatMessages.scrollHeight;
+    renderChatList();
+  }, 800 + Math.random() * 400);
+}
+
+// ================================================================
+// GESTION DES DISCUSSIONS
+// ================================================================
+function getChatsCache() {
+  try { return JSON.parse(localStorage.getItem(`arvexa_chats_${currentUser?.uid}`) || '[]'); } catch { return []; }
+}
+
+function saveChatsCache(chats) {
+  try { localStorage.setItem(`arvexa_chats_${currentUser?.uid}`, JSON.stringify(chats)); } catch (e) {}
+}
+
+function listenChats() {
+  if (!currentUser) return;
+  const q = query(collection(db, 'ia_chats'), where('userId', '==', currentUser.uid));
+
+  onSnapshot(q, (snapshot) => {
+    const chats = [];
+    snapshot.forEach(doc => chats.push({ id: doc.id, ...doc.data() }));
+    chats.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+    allChats = chats;
+    saveChatsCache(chats);
+    renderChatList();
+  }, (error) => {
+    console.error('Erreur écoute discussions:', error);
+    const cached = getChatsCache();
+    if (cached.length > 0) { allChats = cached; renderChatList(); }
+  });
+}
+
+function renderChatList() {
+  if (!chatList) return;
+  if (allChats.length === 0) {
+    chatList.innerHTML = `<div style="text-align:center; padding:20px; color: var(--text-dim); font-size:12px; opacity:0.5;">
+      <i class="fas fa-comment" style="display:block; margin-bottom:8px; font-size:20px;"></i>
+      Aucune discussion
+    </div>`;
+    return;
+  }
+
+  let html = '';
+  allChats.forEach(chat => {
+    const isActive = chat.id === currentChatId ? 'active' : '';
+    const name = chat.name || 'Nouvelle discussion';
+    html += `<div class="chat-item ${isActive}" data-chatid="${chat.id}" role="listitem">
+      <i class="fas fa-comment"></i>
+      <span class="chat-name">${escapeHtml(name)}</span>
+      <span class="chat-delete" data-chatid="${chat.id}"><i class="fas fa-times"></i></span>
+    </div>`;
+  });
+  chatList.innerHTML = html;
+
+  chatList.querySelectorAll('.chat-item').forEach(item => {
+    item.addEventListener('click', (e) => {
+      if (e.target.closest('.chat-delete')) return;
+      const chatId = item.dataset.chatid;
+      if (chatId) loadChat(chatId);
+      closeMenu();
+    });
+  });
+
+  chatList.querySelectorAll('.chat-delete').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const chatId = btn.dataset.chatid;
+      if (chatId && confirm('Supprimer cette discussion ?')) {
+        try {
+          await deleteDoc(doc(db, 'ia_chats', chatId));
+          showToast('Discussion supprimée', 'info');
+          if (currentChatId === chatId) {
+            currentChatId = null;
+            conversationHistory = [];
+            if (chatMessages) {
+              chatMessages.innerHTML = `<div class="message ia">
+                <strong class="msg-strong">🤖 ARVEXA Assistant</strong><br><br>
+                Bonjour et bienvenue sur ARVEXA.<br>
+                Je suis votre conseiller financier virtuel.<br><br>
+                Comment puis-je vous aider aujourd'hui ?
+                <span class="msg-time">Maintenant</span>
+              </div>`;
+            }
+          }
+        } catch (error) {
+          console.error('Erreur suppression:', error);
+          showToast('Erreur lors de la suppression', 'error');
+        }
+      }
+    });
+  });
+}
+
+async function createNewChat() {
+  if (!currentUser) { showToast('Veuillez vous connecter', 'error'); return; }
+  try {
+    const chatId = 'chat_' + Date.now();
+    const newChat = {
+      userId: currentUser.uid,
+      chatId: chatId,
+      name: 'Nouvelle discussion',
+      messages: [],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    await setDoc(doc(db, 'ia_chats', chatId), newChat);
+    currentChatId = chatId;
+    conversationHistory = [];
+    if (chatMessages) {
+      chatMessages.innerHTML = `<div class="message ia">
+        <strong class="msg-strong">🤖 ARVEXA Assistant</strong><br><br>
+        Bonjour et bienvenue sur ARVEXA.<br>
+        Je suis votre conseiller financier virtuel.<br><br>
+        Comment puis-je vous aider aujourd'hui ?
+        <span class="msg-time">Maintenant</span>
+      </div>`;
+    }
+    closeMenu();
+    showToast('Nouvelle discussion créée', 'info');
+  } catch (error) {
+    console.error('Erreur création:', error);
+    showToast('Erreur lors de la création', 'error');
+  }
+}
+
+async function loadChat(chatId) {
+  try {
+    const chatRef = doc(db, 'ia_chats', chatId);
+    const chatSnap = await getDoc(chatRef);
+    if (chatSnap.exists()) {
+      const chat = chatSnap.data();
+      currentChatId = chatId;
+      conversationHistory = [];
+      if (chatMessages) {
+        chatMessages.innerHTML = '';
+        (chat.messages || []).forEach(msg => {
+          addMessage(msg.text, msg.sender, msg.time);
+          if (msg.sender === 'user' || msg.sender === 'ia') {
+            conversationHistory.push({ sender: msg.sender, text: msg.text });
+          }
+        });
+      }
+      renderChatList();
+    }
+  } catch (error) {
+    console.error('Erreur chargement:', error);
+  }
+}
+
+// ================================================================
+// GESTION DU MENU
+// ================================================================
+function openMenu() {
+  if (sidebar) sidebar.classList.add('open');
+  if (sidebarOverlay) sidebarOverlay.classList.add('show');
+  if (menuToggle) menuToggle.setAttribute('aria-expanded', 'true');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeMenu() {
+  if (sidebar) sidebar.classList.remove('open');
+  if (sidebarOverlay) sidebarOverlay.classList.remove('show');
+  if (menuToggle) menuToggle.setAttribute('aria-expanded', 'false');
+  document.body.style.overflow = '';
+}
+
+if (menuToggle) {
+  menuToggle.addEventListener('click', openMenu);
+  menuToggle.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    sidebar?.classList.contains('open') ? closeMenu() : openMenu();
+  });
+}
+
+if (sidebarOverlay) {
+  sidebarOverlay.addEventListener('click', closeMenu);
+  sidebarOverlay.addEventListener('touchstart', closeMenu);
+}
+
+document.addEventListener('touchstart', (e) => {
+  touchStartX = e.touches[0].clientX;
+  touchStartY = e.touches[0].clientY;
+}, { passive: true });
+
+document.addEventListener('touchend', (e) => {
+  const deltaX = e.changedTouches[0].clientX - touchStartX;
+  const deltaY = e.changedTouches[0].clientY - touchStartY;
+  if (Math.abs(deltaX) < Math.abs(deltaY)) return;
+  const isOpen = sidebar?.classList.contains('open');
+  if (!isOpen && deltaX > 60) openMenu();
+  else if (isOpen && deltaX < -60) closeMenu();
+}, { passive: true });
+
+// ================================================================
+// ÉVÉNEMENTS
+// ================================================================
+if (chatInput) {
+  chatInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  });
+}
+
+if (sendBtn) {
+  sendBtn.addEventListener('click', sendMessage);
+  sendBtn.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    sendMessage();
+  });
+}
+
+if (newChatBtn) {
+  newChatBtn.addEventListener('click', createNewChat);
+  newChatBtn.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    createNewChat();
+  });
+}
+
+// ================================================================
+// LOGOUT
+// ================================================================
+logoutBtn.addEventListener('click', async (e) => {
+  e.preventDefault();
+  if (confirm('Voulez-vous vous déconnecter ?')) {
+    try {
+      await signOut(auth);
+      localStorage.removeItem('ARVEXA_current_user');
+      localStorage.removeItem('ARVEXA_user_data');
+      sessionStorage.clear();
+      showToast('Déconnexion réussie', 'success');
+      setTimeout(() => { window.location.href = 'login.html'; }, 500);
+    } catch (error) {
+      console.error('Erreur déconnexion:', error);
+      showToast('Erreur lors de la déconnexion', 'error');
+    }
+  }
+});
+
+// ================================================================
+// HEADER
+// ================================================================
+function updateHeader(data) {
+  if (!headerUserName || !data) return;
+  const displayName = data.prenom || data.fullName || data.nom || 'Invité';
+  headerUserName.textContent = displayName;
+}
+
+// ================================================================
+// AUTH
+// ================================================================
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    currentUser = user;
+    localStorage.setItem('ARVEXA_current_user', user.uid);
+
+    try {
+      const userRef = doc(db, 'users', user.uid);
+      const userSnap = await getDoc(userRef);
+      if (userSnap.exists()) {
+        userData = userSnap.data();
+        updateHeader(userData);
+      }
+    } catch (error) {
+      console.error('Erreur récupération utilisateur:', error);
+    }
+
+    listenChats();
+    const cached = getChatsCache();
+    if (cached.length > 0) { loadChat(cached[0].id); }
+
+    if (notifBadge) {
+      notifBadge.className = 'notif-badge';
+      if (notifStatusText) notifStatusText.textContent = '🔔';
+    }
+
+  } else {
+    const savedUid = localStorage.getItem('ARVEXA_current_user');
+    if (savedUid) {
+      setTimeout(() => {
+        if (!auth.currentUser) {
+          localStorage.removeItem('ARVEXA_current_user');
+          window.location.href = 'login.html';
+        }
+      }, 2000);
+    } else {
+      window.location.href = 'login.html';
+    }
+  }
+});
+
+// ================================================================
+// INITIALISATION
+// ================================================================
+initSpeechRecognition();
+
+console.log('🤖 ARVEXA Assistant - Interface professionnelle');
+console.log('🎙️ Note vocale disponible');
+console.log('🔑 Mistral AI: ' + (MISTRAL_API_KEY && MISTRAL_API_KEY !== 'VOTRE_CLE_API_MISTRAL' ? '✅ Configuré' : '❌ Mode simulation'));
+</script>
+
+</body>
+</html>
