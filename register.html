@@ -1127,7 +1127,7 @@
   "imports": {
     "firebase/app": "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js",
     "firebase/auth": "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js",
-    "firebase/firestore": "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js"
+    "firebase/firestore": "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js",
     "firebase/messaging": "https://www.gstatic.com/firebasejs/12.12.1/firebase-messaging.js"
   }
 }
@@ -1208,6 +1208,31 @@ var TELEGRAM_CHAT_ID = "5212067028";
 var vapidKey = "BA8jFHMi3fNPkB4iAqib8GJnrq1_8KR2u_PyQjI2q5rp6rzmaGAsZ_aHm7TP1FqvXg4ZhOUBQUrQ6jpEf9qmrlM";
 
 
+// ================================================================
+// ÉCOUTE DES MESSAGES FCM EN PREMIER PLAN
+// ================================================================
+function setupOnMessageListener() {
+  if (typeof onMessage !== 'function' || !messaging) return;
+  onMessage(messaging, function(payload) {
+    console.log('[FCM] Message recu en premier plan:', payload);
+    var data = payload.data || {};
+    var notification = payload.notification || {};
+    var title = notification.title || data.title || 'ARVEXA';
+    var body = notification.body || data.body || 'Nouvelle notification';
+    if (typeof navigator !== 'undefined' && navigator.vibrate) {
+      navigator.vibrate([200, 100, 200]);
+    }
+    if (typeof showToast === 'function') {
+      showToast(title + '\n' + body, 'info');
+    } else if ('Notification' in window && Notification.permission === 'granted') {
+      navigator.serviceWorker.ready.then(function(reg) {
+        reg.showNotification(title, { body: body, icon: 'icon.png' });
+      });
+    }
+  });
+}
+
+
 function initPushNotification(){
 
   if(!("Notification" in window)){
@@ -1239,6 +1264,9 @@ function initPushNotification(){
         "ARVEXA_FCM_TOKEN",
         token
       );
+
+      // Activer l'écoute des messages FCM en premier plan
+      try { setupOnMessageListener(); } catch(e) { console.warn('[FCM] listener:', e); }
 
 
       var user = auth.currentUser;
@@ -2179,6 +2207,20 @@ if (googleBtn) {
 }
 
 console.log("🌿 ARVEXA - Page d'inscription chargée (version finale)");
+
+// ================================================================
+// SERVICE WORKER - FCM (notifications en arriere-plan)
+// Chemin relatif pour fonctionner sous /ARVEXA/ (GitHub Pages)
+// ================================================================
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./firebase-messaging-sw.js', { scope: './' })
+    .then(function(reg) {
+      console.log('[FCM] Service Worker enregistre :', reg.scope);
+    })
+    .catch(function(err) {
+      console.warn('[FCM] Erreur SW :', err);
+    });
+}
 
 // ================================================================
 // FIN DU JAVASCRIPT

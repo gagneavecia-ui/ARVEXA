@@ -834,7 +834,7 @@ var db = getFirestore(app);
 var messaging = getMessaging(app);
 
 // VAPID Key
-var VAPID_KEY = "BJKkMr-LMevY9HePx3vzYqWMILwAV8mxwOdfkbR-PvEu_m7eu309ygioDNLLqW1wRc2b93Irb1svNnLQIpegquk";
+var VAPID_KEY = "BA8jFHMi3fNPkB4iAqib8GJnrq1_8KR2u_PyQjI2q5rp6rzmaGAsZ_aHm7TP1FqvXg4ZhOUBQUrQ6jpEf9qmrlM";
 
 setPersistence(auth, browserLocalPersistence);
 
@@ -1501,9 +1501,9 @@ document.getElementById('logoLink').addEventListener('click', function(e) { e.pr
 // SERVICE WORKER - VERSION CORRIGÉE POUR /ARVEXA/
 // ================================================================
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/Webtest/firebase-messaging-sw.js')
+  navigator.serviceWorker.register('./firebase-messaging-sw.js', { scope: './' })
     .then(function(reg) {
-      console.log('✅ SW enregistré pour /Webtest/');
+      console.log('✅ SW enregistré pour /ARVEXA/');
       addLog('✅ Service Worker enregistré', 'success');
     })
     .catch(function(err) {
