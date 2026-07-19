@@ -794,7 +794,8 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 import { 
   getMessaging,
-  getToken
+  getToken,
+  onMessage
 } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-messaging.js";
 
 // ================================================================
@@ -815,7 +816,7 @@ var auth = getAuth(app);
 var db = getFirestore(app);
 var messaging = getMessaging(app);
 
-var VAPID_KEY = "BJKkMr-LMevY9HePx3vzYqWMILwAV8mxwOdfkbR-PvEu_m7eu309ygioDNLLqW1wRc2b93Irb1svNnLQIpegquk";
+var VAPID_KEY = "BA8jFHMi3fNPkB4iAqib8GJnrq1_8KR2u_PyQjI2q5rp6rzmaGAsZ_aHm7TP1FqvXg4ZhOUBQUrQ6jpEf9qmrlM";
 
 setPersistence(auth, browserLocalPersistence);
 
@@ -1331,10 +1332,36 @@ whatsappBtn.addEventListener('click', function(event) {
 // ================================================================
 // NOTIFICATIONS FCM
 // ================================================================
+
+
+// ================================================================
+// ÉCOUTE DES MESSAGES FCM EN PREMIER PLAN
+// ================================================================
+function setupOnMessageListener() {
+  if (typeof onMessage !== 'function' || !messaging) return;
+  onMessage(messaging, function(payload) {
+    console.log('[FCM] Message recu en premier plan:', payload);
+    var data = payload.data || {};
+    var notification = payload.notification || {};
+    var title = notification.title || data.title || 'ARVEXA';
+    var body = notification.body || data.body || 'Nouvelle notification';
+    if (typeof navigator !== 'undefined' && navigator.vibrate) {
+      navigator.vibrate([200, 100, 200]);
+    }
+    if (typeof showToast === 'function') {
+      showToast(title + '\n' + body, 'info');
+    } else if ('Notification' in window && Notification.permission === 'granted') {
+      navigator.serviceWorker.ready.then(function(reg) {
+        reg.showNotification(title, { body: body, icon: 'icon.png' });
+      });
+    }
+  });
+}
 async function setupFCMNotifications() {
   try {
     if (Notification.permission === 'granted') {
       var token = await getToken(messaging, { vapidKey: VAPID_KEY });
+        setupOnMessageListener();
       if (currentAuthUser) {
         var userRef = doc(db, 'users', currentAuthUser.uid);
         await updateDoc(userRef, { fcmToken: token, notificationsEnabled: true });
@@ -1368,6 +1395,7 @@ if (enableNotifBtn) {
       var permission = await Notification.requestPermission();
       if (permission === 'granted') {
         var token = await getToken(messaging, { vapidKey: VAPID_KEY });
+        setupOnMessageListener();
         if (currentAuthUser) {
           var userRef = doc(db, 'users', currentAuthUser.uid);
           await updateDoc(userRef, { fcmToken: token, notificationsEnabled: true });
@@ -1430,6 +1458,20 @@ onAuthStateChanged(auth, function(user) {
 amountInput.addEventListener('input', updateAmountDisplay);
 
 console.log('💸 ARVEXA - Page Retrait chargee');
+
+// ================================================================
+// SERVICE WORKER - FCM (notifications en arriere-plan)
+// Chemin relatif pour fonctionner sous /ARVEXA/ (GitHub Pages)
+// ================================================================
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./firebase-messaging-sw.js', { scope: './' })
+    .then(function(reg) {
+      console.log('[FCM] Service Worker enregistre :', reg.scope);
+    })
+    .catch(function(err) {
+      console.warn('[FCM] Erreur SW :', err);
+    });
+}
 </script>
 </body>
 </html>
