@@ -10,7 +10,6 @@
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3135/3135715.png">
   
-  <!-- Favicon pour éviter l'erreur 404 -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>">
   
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -419,6 +418,44 @@
       opacity: 0.5;
     }
 
+    /* ===== PASSWORD STRENGTH ===== */
+    .password-strength {
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .strength-bar {
+      flex: 1;
+      height: 4px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 4px;
+      overflow: hidden;
+      display: flex;
+      gap: 4px;
+    }
+    .strength-bar .segment {
+      flex: 1;
+      height: 100%;
+      border-radius: 4px;
+      background: rgba(255,255,255,0.06);
+      transition: background 0.3s ease;
+    }
+    .strength-bar .segment.active.weak { background: #8A3A3A; }
+    .strength-bar .segment.active.medium { background: #D4A017; }
+    .strength-bar .segment.active.strong { background: var(--success); }
+
+    .strength-text {
+      font-size: 11px;
+      font-weight: 500;
+      min-width: 45px;
+      text-align: right;
+      color: var(--text-muted);
+    }
+    .strength-text.weak { color: #8A3A3A; }
+    .strength-text.medium { color: #D4A017; }
+    .strength-text.strong { color: var(--success); }
+
     /* ===== REFERRAL ===== */
     .referral-wrapper {
       background: rgba(184, 134, 11, 0.03);
@@ -447,7 +484,7 @@
       padding-left: 14px;
     }
     .referral-info {
-      font-size: 11px;
+      font-size: 12px;
       margin-top: 6px;
       display: flex;
       align-items: center;
@@ -456,6 +493,56 @@
     .referral-info.valid { color: var(--success); }
     .referral-info.invalid { color: #D4A017; }
     .referral-info i { font-size: 11px; }
+
+    /* ===== SELECT UNIFORME ===== */
+    .select-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      background: rgba(10, 10, 10, 0.6);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      transition: var(--transition);
+    }
+    .select-wrapper:focus-within {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(184, 134, 11, 0.08);
+    }
+    .select-wrapper .icon-left {
+      position: absolute;
+      left: 14px;
+      color: var(--text-muted);
+      font-size: 14px;
+      pointer-events: none;
+      z-index: 2;
+    }
+    .select-wrapper select {
+      width: 100%;
+      padding: 12px 14px 12px 44px;
+      background: transparent;
+      border: none;
+      color: var(--text-light);
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+      appearance: none;
+      cursor: pointer;
+    }
+    .select-wrapper select option {
+      background: var(--bg-dark);
+      color: var(--text-light);
+    }
+    .select-wrapper .arrow {
+      position: absolute;
+      right: 14px;
+      color: var(--accent);
+      font-size: 12px;
+      pointer-events: none;
+      transition: var(--transition);
+    }
+    .select-wrapper:focus-within .arrow {
+      transform: rotate(180deg);
+    }
 
     /* ===== SOCIAL BUTTONS ===== */
     .social-divider {
@@ -802,28 +889,6 @@
 </head>
 <body>
 
-<!-- ===== DÉTECTION file:// (dev only) - doit s'exécuter AVANT Firebase ===== -->
-<script>
-  (function() {
-    const isFileProtocol = window.location.protocol === 'file:';
-    const isNullOrigin = window.location.origin === 'null' || window.location.origin === '';
-    if (isFileProtocol || isNullOrigin) {
-      console.error('🚫 ERREUR FATALE : Page ouverte en file:// ou origin "null" détectée');
-      console.error('   Firebase Auth, Google Sign-In et les imports ESM ne fonctionneront PAS.');
-      console.error('   Solution : lancez le serveur local avec :');
-      console.error('     python3 /home/z/my-project/scripts/serve.py');
-      console.error('   Puis ouvrez : http://localhost:8000/register-1.html');
-      // Afficher la bannière d'avertissement
-      const banner = document.getElementById('fileProtocolWarning');
-      if (banner) banner.style.display = 'block';
-      // Marquer pour bloquer l'init Firebase plus tard
-      window.__FILE_PROTOCOL_BLOCKED__ = true;
-    } else {
-      console.log('✅ Origine valide :', window.location.origin, '— Firebase peut démarrer');
-    }
-  })();
-</script>
-
 <!-- ===== BACKGROUND ===== -->
 <div class="gradient-bg"></div>
 <div class="glow glow-1"></div>
@@ -843,8 +908,8 @@
 <main class="container">
   <div class="register-card">
     <div class="register-header">
-      <h1>Créer un <span>compte</span></h1>
-      <p>Rejoignez ARVEXA et commencez à investir</p>
+      <h1>Rejoindre <span>ARVEXA</span></h1>
+      <p>Créez votre compte en quelques secondes</p>
     </div>
 
     <!-- MESSAGE BANNER -->
@@ -926,6 +991,15 @@
           <input type="password" id="password" placeholder="Minimum 6 caractères">
           <i class="fas fa-eye toggle-password" id="togglePassword"></i>
         </div>
+        <!-- Barre de force du mot de passe -->
+        <div class="password-strength" id="passwordStrength">
+          <div class="strength-bar">
+            <div class="segment" id="seg1"></div>
+            <div class="segment" id="seg2"></div>
+            <div class="segment" id="seg3"></div>
+          </div>
+          <span class="strength-text" id="strengthText">Faible</span>
+        </div>
       </div>
 
       <!-- Confirmation -->
@@ -951,9 +1025,29 @@
         </div>
       </div>
 
+      <!-- COMMENT CONNU (uniforme) -->
+      <div class="form-group">
+        <label><i class="fas fa-question-circle" style="color:var(--accent);"></i> Comment avez-vous connu ARVEXA ?</label>
+        <div class="select-wrapper">
+          <i class="fas fa-users icon-left"></i>
+          <select id="howKnown">
+            <option value="">Sélectionnez une option</option>
+            <option value="facebook">📘 Facebook</option>
+            <option value="whatsapp">💬 WhatsApp</option>
+            <option value="ami">👥 Un ami</option>
+            <option value="publicite">📢 Publicité</option>
+            <option value="tiktok">🎵 TikTok</option>
+            <option value="instagram">📸 Instagram</option>
+            <option value="youtube">▶️ YouTube</option>
+            <option value="autre">🔗 Autre</option>
+          </select>
+          <i class="fas fa-chevron-down arrow"></i>
+        </div>
+      </div>
+
       <!-- Bouton inscription -->
       <button type="submit" class="submit-btn" id="registerBtn">
-        <i class="fas fa-user-plus"></i> Créer mon compte
+        <i class="fas fa-user-plus"></i> Rejoindre ARVEXA
       </button>
 
       <!-- Divider social -->
@@ -998,675 +1092,852 @@
 <!-- ===== TOAST ===== -->
 <div class="toast" id="toast"></div>
 
-<!-- ============================================================ -->
-<!-- ===== BANNIÈRE AVERTISSEMENT file:// (dev only) ============ -->
-<!-- ============================================================ -->
-<div id="fileProtocolWarning" style="display:none; position:fixed; top:0; left:0; right:0; z-index:99999; background:#B8860B; color:#1A1A1A; padding:14px 20px; font-family:Inter,sans-serif; font-size:14px; font-weight:600; box-shadow:0 2px 8px rgba(0,0,0,0.3);">
-  <div style="display:flex; align-items:center; gap:12px; max-width:1100px; margin:0 auto;">
-    <i class="fas fa-exclamation-triangle" style="font-size:20px;"></i>
-    <div style="flex:1;">
-      <div style="font-size:15px; margin-bottom:2px;">⚠️ Ce fichier est ouvert en mode <code>file://</code> — Firebase ne fonctionnera PAS.</div>
-      <div style="font-size:12px; font-weight:500; opacity:0.9;">
-        Cause des erreurs « origin 'null' », « CORS », « Cannot read properties of undefined (reading 'getContext') ».
-        Lancez le serveur local puis ouvrez <code>http://localhost:8000/register-1.html</code> à la place.
-      </div>
-    </div>
-    <button onclick="document.getElementById('fileProtocolWarning').style.display='none'" style="background:rgba(0,0,0,0.2); border:none; color:#1A1A1A; padding:6px 12px; border-radius:4px; cursor:pointer; font-weight:700;">Fermer</button>
-  </div>
-</div>
-
-<!-- ============================================================ -->
-<!-- ===== IMPORTS ===== -->
-<script type="importmap">
-  {
-    "imports": {
-      "firebase/app": "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js",
-      "firebase/auth": "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js",
-      "firebase/firestore": "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js"
-    }
+<!-- ================================================================ -->
+<!-- ERUDA - Console mobile (développement uniquement) -->
+<!-- ================================================================ -->
+<script>
+(function() {
+  var isLocal = location.hostname === "localhost" || location.hostname === "127.0.0.1";
+  var isDebug = location.search.indexOf("debug=true") !== -1 || location.search.indexOf("eruda=true") !== -1;
+  
+  if (isLocal || isDebug) {
+    if (document.querySelector('script[data-eruda]')) return;
+    var s = document.createElement("script");
+    s.setAttribute("data-eruda", "true");
+    s.src = "https://cdn.jsdelivr.net/npm/eruda";
+    s.onload = function() {
+      if (typeof eruda !== 'undefined') {
+        eruda.init({
+          tool: ['console', 'network', 'elements', 'resources'],
+          defaults: { displaySize: 40 }
+        });
+        console.log("🐞 Eruda active - Inscription");
+      }
+    };
+    document.head.appendChild(s);
   }
+})();
+</script>
+
+<!-- ================================================================ -->
+<!-- IMPORTS -->
+<!-- ================================================================ -->
+<script type="importmap">
+{
+  "imports": {
+    "firebase/app": "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js",
+    "firebase/auth": "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js",
+    "firebase/firestore": "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js"
+    "firebase/messaging": "https://www.gstatic.com/firebasejs/12.12.1/firebase-messaging.js"
+  }
+}
 </script>
 
 <script type="module">
-  // ================================================================
-  // IMPORTS
-  // ================================================================
-  import { initializeApp } from "firebase/app";
-  import { 
-    getAuth, 
-    createUserWithEmailAndPassword,
-    signInWithPopup,
-    GoogleAuthProvider,
-    sendEmailVerification,
-    setPersistence,
-    browserLocalPersistence,
-    onAuthStateChanged
-  } from "firebase/auth";
-  import { 
-    getFirestore,
-    doc,
-    setDoc,
-    addDoc,            // AJOUT : ecriture dans une collection avec ID auto-genere
-    getDoc,
-    getDocs,
-    collection,
-    query,
-    where,
-    updateDoc,
-    deleteDoc,         // AJOUT : suppression d'un document
-    serverTimestamp,   // AJOUT : dates serveur (remplace new Date().toISOString())
-    increment,         // AJOUT : incrementation atomique (balance, compteurs...)
-    arrayUnion,        // AJOUT : ajout atomique a un tableau (investments, achats...)
-    arrayRemove,       // AJOUT : retrait atomique d'un tableau
-    writeBatch         // AJOUT : ecritures atomiques multi-documents
-  } from "firebase/firestore";
+// ================================================================
+// DÉBUT JAVASCRIPT
+// ================================================================
 
-  // ================================================================
-  // FIREBASE CONFIG
-  // ================================================================
-  const firebaseConfig = {
-    apiKey: "AIzaSyBEbYuuUlNCLMBUHClv4UnyownNHw2q3_g",
-    authDomain: "nexgen-39043.firebaseapp.com",
-    projectId: "nexgen-39043",
-    storageBucket: "nexgen-39043.firebasestorage.app",
-    messagingSenderId: "619390144325",
-    appId: "1:619390144325:web:35d96b125501e4e8b1782c",
-    measurementId: "G-HC2Q5DNKDR"
-  };
+// ================================================================
+// IMPORTS FIREBASE v12
+// ================================================================
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+import { 
+  getAuth, 
+  createUserWithEmailAndPassword,
+  signInWithPopup,
+  GoogleAuthProvider,
+  sendEmailVerification,
+  setPersistence,
+  browserLocalPersistence,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+import { 
+  getFirestore,
+  doc,
+  setDoc,
+  addDoc,
+  getDoc,
+  getDocs,
+  collection,
+  query,
+  where,
+  updateDoc,
+  deleteDoc,
+  serverTimestamp,
+  increment,
+  arrayUnion,
+  arrayRemove,
+  writeBatch
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+import { 
+  getMessaging,
+  getToken,
+  onMessage
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-messaging.js";
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
+// ================================================================
+// CONFIGURATION FIREBASE
+// ================================================================
+var firebaseConfig = {
+  apiKey: "AIzaSyBEbYuuUlNCLMBUHClv4UnyownNHw2q3_g",
+  authDomain: "nexgen-39043.firebaseapp.com",
+  projectId: "nexgen-39043",
+  storageBucket: "nexgen-39043.firebasestorage.app",
+  messagingSenderId: "619390144325",
+  appId: "1:619390144325:web:35d96b125501e4e8b1782c",
+  measurementId: "G-HC2Q5DNKDR"
+};
 
-  // ================================================================
-  // GARDE-FOU : si on est en file://, on désactive les boutons
-  // d'inscription pour éviter les erreurs cryptiques de Google.
-  // ================================================================
-  if (window.__FILE_PROTOCOL_BLOCKED__) {
-    console.warn('⛔ Firebase initialisé mais bloqué car page en file://');
-    const btns = document.querySelectorAll('#registerBtn, #googleBtn');
-    btns.forEach(btn => {
-      btn.disabled = true;
-      btn.style.opacity = '0.5';
-      btn.style.cursor = 'not-allowed';
-      btn.title = 'Serveur local requis — voir la bannière en haut de page';
-    });
+ var app = initializeApp(firebaseConfig);
+var auth = getAuth(app);
+var db = getFirestore(app);
+
+var messaging = getMessaging(app);
+
+// ================================================================
+// TELEGRAM CONFIG (admin uniquement)
+// ================================================================
+var TELEGRAM_BOT_TOKEN = "8283625921:AAEF--QKS9uqnz0K3j7SGkk7fsdRb3b8y8o";
+var TELEGRAM_CHAT_ID = "5212067028";
+
+// ================================================================
+// FCM TOKEN UTILISATEUR
+// ================================================================
+
+var vapidKey = "BA8jFHMi3fNPkB4iAqib8GJnrq1_8KR2u_PyQjI2q5rp6rzmaGAsZ_aHm7TP1FqvXg4ZhOUBQUrQ6jpEf9qmrlM";
+
+
+function initPushNotification(){
+
+  if(!("Notification" in window)){
+    console.log("Notifications non supportées");
+    return;
   }
 
-  // Persistance locale (uniquement si pas en file://)
-  if (!window.__FILE_PROTOCOL_BLOCKED__) {
-    setPersistence(auth, browserLocalPersistence);
-  }
 
-  // ================================================================
-  // FLAG ANTI-REDIRECTION PREMATUREE
-  // ⚠️ BUG CRITIQUE CORRIGE :
-  // Avant : onAuthStateChanged redirigeait vers index.html DES QUE
-  // createUserWithEmailAndPassword reussissait -> l'utilisateur etait
-  // redirige AVANT que le document Firestore soit ecrit.
-  // Maintenant : on desactive la redirection pendant l'inscription/Google.
-  // ================================================================
-  let isRegistering = false;
+  Notification.requestPermission()
+  .then(function(permission){
 
-  // ================================================================
-  // DOM
-  // ================================================================
-  const registerForm = document.getElementById('registerForm');
-  const registerBtn = document.getElementById('registerBtn');
-  const googleBtn = document.getElementById('googleBtn');
-  const messageBanner = document.getElementById('messageBanner');
-  const messageIcon = document.getElementById('messageIcon');
-  const messageText = document.getElementById('messageText');
-  const togglePassword = document.getElementById('togglePassword');
-  const passwordInput = document.getElementById('password');
-  const toast = document.getElementById('toast');
+    if(permission === "granted"){
 
-  // Pays
-  const countrySelector = document.getElementById('countrySelector');
-  const selectedCountryFlag = document.getElementById('selectedCountryFlag');
-  const selectedCountryName = document.getElementById('selectedCountryName');
-  const paysInput = document.getElementById('pays');
-  const countryModal = document.getElementById('countryModal');
-  const closeCountryModalBtn = document.getElementById('closeCountryModalBtn');
-  const countrySearch = document.getElementById('countrySearch');
-  const countryList = document.getElementById('countryList');
+      return getToken(messaging,{
+        vapidKey:vapidKey
+      });
 
-  // Référence
-  const referralCodeInput = document.getElementById('referralCode');
-  const referralInfo = document.getElementById('referralInfo');
-  const referralMessage = document.getElementById('referralMessage');
-
-  // ================================================================
-  // TOAST
-  // ================================================================
-  function showToast(message, type = 'info') {
-    toast.textContent = message;
-    toast.className = `toast ${type}`;
-    setTimeout(() => toast.classList.add('show'), 50);
-    setTimeout(() => toast.classList.remove('show'), 4000);
-  }
-
-  // ================================================================
-  // REDIRECTION SI DÉJÀ CONNECTÉ
-  // ⚠️ CORRIGÉ : on ne redirige PAS pendant l'inscription ou la
-  // connexion Google, sinon le document Firestore n'est jamais écrit.
-  // ================================================================
-  onAuthStateChanged(auth, (user) => {
-    if (user && !isRegistering) {
-      console.log("🔄 Utilisateur déjà connecté, redirection vers index.html");
-      localStorage.setItem('ARVEXA_current_user', user.uid);
-      window.location.href = 'index.html';
-    } else if (user && isRegistering) {
-      console.log("⏳ Inscription/connexion Google en cours, redirection suspendue");
     }
-  });
 
-  // ================================================================
-  // TOGGLE PASSWORD
-  // ================================================================
-  togglePassword.addEventListener('click', () => {
-    const type = passwordInput.type === 'password' ? 'text' : 'password';
-    passwordInput.type = type;
-    togglePassword.classList.toggle('fa-eye');
-    togglePassword.classList.toggle('fa-eye-slash');
-  });
+  })
+  .then(function(token){
 
-  // ================================================================
-  // MESSAGE
-  // ================================================================
-  function showMessage(text, type = 'error') {
-    messageBanner.className = `message-banner ${type}`;
-    messageIcon.className = type === 'error' ? 'fas fa-exclamation-circle' : 
-                           (type === 'success' ? 'fas fa-check-circle' : 'fas fa-info-circle');
-    messageText.textContent = text;
-    messageBanner.classList.remove('hidden');
-    if (type === 'success') {
-      setTimeout(() => messageBanner.classList.add('hidden'), 5000);
-    }
-  }
+    if(token){
 
-  function hideMessage() {
-    messageBanner.classList.add('hidden');
-  }
+      console.log("✅ Token FCM :", token);
 
-  // ================================================================
-  // PAYS
-  // ================================================================
-  const countries = [
-    { name: "Niger", flag: "🇳🇪", code: "+227" },
-    { name: "Bénin", flag: "🇧🇯", code: "+229" },
-    { name: "Mali", flag: "🇲🇱", code: "+223" },
-    { name: "Burkina Faso", flag: "🇧🇫", code: "+226" },
-    { name: "Sénégal", flag: "🇸🇳", code: "+221" },
-    { name: "Côte d'Ivoire", flag: "🇨🇮", code: "+225" },
-    { name: "Togo", flag: "🇹🇬", code: "+228" },
-    { name: "Guinée", flag: "🇬🇳", code: "+224" },
-    { name: "Ghana", flag: "🇬🇭", code: "+233" },
-    { name: "Cameroun", flag: "🇨🇲", code: "+237" },
-    { name: "Nigéria", flag: "🇳🇬", code: "+234" },
-    { name: "Tchad", flag: "🇹🇩", code: "+235" },
-    { name: "Maroc", flag: "🇲🇦", code: "+212" }
-  ];
 
-  let selectedCountry = "Niger";
-  let selectedFlag = "🇳🇪";
-  let selectedCode = "+227";
+      localStorage.setItem(
+        "ARVEXA_FCM_TOKEN",
+        token
+      );
 
-  // ================================================================
-  // COUNTRY MODAL
-  // ================================================================
-  function openCountryModal() {
-    countryModal.classList.add('show');
-    countrySearch.value = '';
-    renderCountryList();
-    setTimeout(() => countrySearch.focus(), 200);
-  }
-  function closeCountryModal() {
-    countryModal.classList.remove('show');
-  }
-  function selectCountry(name, flag, code) {
-    selectedCountry = name;
-    selectedFlag = flag;
-    selectedCode = code;
-    selectedCountryFlag.textContent = flag;
-    selectedCountryName.textContent = name;
-    paysInput.value = name;
-    const indicatifSelect = document.getElementById('indicatif');
-    for (let i = 0; i < indicatifSelect.options.length; i++) {
-      if (indicatifSelect.options[i].value === code) {
-        indicatifSelect.selectedIndex = i;
-        break;
+
+      var user = auth.currentUser;
+
+
+      if(user){
+
+        setDocument(
+          "users",
+          user.uid,
+          {
+            fcmToken:token
+          }
+        );
+
       }
+
     }
-    closeCountryModal();
-  }
-  function renderCountryList(filter = "") {
-    const filtered = countries.filter(c => 
-      c.name.toLowerCase().includes(filter.toLowerCase()) ||
-      c.code.includes(filter)
+
+  })
+  .catch(function(error){
+
+    console.error(
+      "Erreur FCM:",
+      error
     );
-    countryList.innerHTML = filtered.map(c => `
-      <div class="country-option ${c.name === selectedCountry ? 'selected' : ''}"
-           data-name="${c.name}" data-flag="${c.flag}" data-code="${c.code}">
-        <span class="country-option-flag">${c.flag}</span>
-        <span class="country-option-name">${c.name}</span>
-        <span class="country-option-code">${c.code}</span>
-      </div>
-    `).join('');
-    document.querySelectorAll('.country-option').forEach(opt => {
-      opt.addEventListener('click', () => {
-        const name = opt.dataset.name;
-        const flag = opt.dataset.flag;
-        const code = opt.dataset.code;
-        selectCountry(name, flag, code);
+
+  });
+
+}
+
+// ================================================================
+// DOM
+// ================================================================
+var registerForm = document.getElementById('registerForm');
+var registerBtn = document.getElementById('registerBtn');
+var googleBtn = document.getElementById('googleBtn');
+var messageBanner = document.getElementById('messageBanner');
+var messageIcon = document.getElementById('messageIcon');
+var messageText = document.getElementById('messageText');
+var togglePassword = document.getElementById('togglePassword');
+var passwordInput = document.getElementById('password');
+var toast = document.getElementById('toast');
+
+// Pays
+var countrySelector = document.getElementById('countrySelector');
+var selectedCountryFlag = document.getElementById('selectedCountryFlag');
+var selectedCountryName = document.getElementById('selectedCountryName');
+var paysInput = document.getElementById('pays');
+var countryModal = document.getElementById('countryModal');
+var closeCountryModalBtn = document.getElementById('closeCountryModalBtn');
+var countrySearch = document.getElementById('countrySearch');
+var countryList = document.getElementById('countryList');
+
+// Référence
+var referralCodeInput = document.getElementById('referralCode');
+var referralInfo = document.getElementById('referralInfo');
+var referralMessage = document.getElementById('referralMessage');
+
+// Force mot de passe
+var passwordStrength = document.getElementById('passwordStrength');
+var seg1 = document.getElementById('seg1');
+var seg2 = document.getElementById('seg2');
+var seg3 = document.getElementById('seg3');
+var strengthText = document.getElementById('strengthText');
+
+var isRegistering = false;
+
+// ================================================================
+// TOAST
+// ================================================================
+function showToast(message, type) {
+  type = type || 'info';
+  toast.textContent = message;
+  toast.className = 'toast ' + type;
+  setTimeout(function() {
+    toast.classList.add('show');
+  }, 50);
+  setTimeout(function() {
+    toast.classList.remove('show');
+  }, 4000);
+}
+
+// ================================================================
+// REDIRECTION SI DÉJÀ CONNECTÉ
+// ================================================================
+onAuthStateChanged(auth, function(user) {
+  if(user){
+
+initPushNotification();
+
+}
+  if (user && !isRegistering) {
+    localStorage.setItem('ARVEXA_current_user', user.uid);
+    window.location.href = 'index.html';
+  } else if (user && isRegistering) {
+    console.log("⏳ Inscription en cours, redirection suspendue");
+  }
+});
+
+// ================================================================
+// TOGGLE PASSWORD
+// ================================================================
+togglePassword.addEventListener('click', function() {
+  var type = passwordInput.type === 'password' ? 'text' : 'password';
+  passwordInput.type = type;
+  togglePassword.classList.toggle('fa-eye');
+  togglePassword.classList.toggle('fa-eye-slash');
+});
+
+// ================================================================
+// FORCE DU MOT DE PASSE
+// ================================================================
+passwordInput.addEventListener('input', function() {
+  var password = this.value;
+  var strength = 0;
+  
+  if (password.length >= 6) strength++;
+  if (password.match(/[a-z]/) && password.match(/[A-Z]/)) strength++;
+  if (password.match(/[0-9]/) || password.match(/[^a-zA-Z0-9]/)) strength++;
+  
+  var segments = [seg1, seg2, seg3];
+  var levels = ['Faible', 'Moyen', 'Fort'];
+  var classes = ['weak', 'medium', 'strong'];
+  
+  segments.forEach(function(seg, index) {
+    seg.className = 'segment';
+    if (index < strength) {
+      seg.classList.add('active', classes[Math.min(index, 2)]);
+    }
+  });
+  
+  strengthText.textContent = strength > 0 ? levels[Math.min(strength - 1, 2)] : 'Faible';
+  strengthText.className = 'strength-text ' + (strength > 0 ? classes[Math.min(strength - 1, 2)] : 'weak');
+});
+
+// ================================================================
+// MESSAGE
+// ================================================================
+function showMessage(text, type) {
+  type = type || 'error';
+  messageBanner.className = 'message-banner ' + type;
+  messageIcon.className = type === 'error' ? 'fas fa-exclamation-circle' : 
+                         (type === 'success' ? 'fas fa-check-circle' : 'fas fa-info-circle');
+  messageText.textContent = text;
+  messageBanner.classList.remove('hidden');
+  if (type === 'success') {
+    setTimeout(function() {
+      messageBanner.classList.add('hidden');
+    }, 5000);
+  }
+}
+
+function hideMessage() {
+  messageBanner.classList.add('hidden');
+}
+
+// ================================================================
+// PAYS
+// ================================================================
+var countries = [
+  { name: "Niger", flag: "🇳🇪", code: "+227" },
+  { name: "Bénin", flag: "🇧🇯", code: "+229" },
+  { name: "Mali", flag: "🇲🇱", code: "+223" },
+  { name: "Burkina Faso", flag: "🇧🇫", code: "+226" },
+  { name: "Sénégal", flag: "🇸🇳", code: "+221" },
+  { name: "Côte d'Ivoire", flag: "🇨🇮", code: "+225" },
+  { name: "Togo", flag: "🇹🇬", code: "+228" },
+  { name: "Guinée", flag: "🇬🇳", code: "+224" },
+  { name: "Ghana", flag: "🇬🇭", code: "+233" },
+  { name: "Cameroun", flag: "🇨🇲", code: "+237" },
+  { name: "Nigéria", flag: "🇳🇬", code: "+234" },
+  { name: "Tchad", flag: "🇹🇩", code: "+235" },
+  { name: "Maroc", flag: "🇲🇦", code: "+212" }
+];
+
+var selectedCountry = "Niger";
+var selectedFlag = "🇳🇪";
+var selectedCode = "+227";
+
+function openCountryModal() {
+  countryModal.classList.add('show');
+  countrySearch.value = '';
+  renderCountryList();
+  setTimeout(function() {
+    countrySearch.focus();
+  }, 200);
+}
+function closeCountryModal() {
+  countryModal.classList.remove('show');
+}
+function selectCountry(name, flag, code) {
+  selectedCountry = name;
+  selectedFlag = flag;
+  selectedCode = code;
+  selectedCountryFlag.textContent = flag;
+  selectedCountryName.textContent = name;
+  paysInput.value = name;
+  var indicatifSelect = document.getElementById('indicatif');
+  for (var i = 0; i < indicatifSelect.options.length; i++) {
+    if (indicatifSelect.options[i].value === code) {
+      indicatifSelect.selectedIndex = i;
+      break;
+    }
+  }
+  closeCountryModal();
+}
+function renderCountryList(filter) {
+  filter = filter || '';
+  var filtered = countries.filter(function(c) {
+    return c.name.toLowerCase().includes(filter.toLowerCase()) || c.code.includes(filter);
+  });
+  countryList.innerHTML = filtered.map(function(c) {
+    return '<div class="country-option ' + (c.name === selectedCountry ? 'selected' : '') + '" data-name="' + c.name + '" data-flag="' + c.flag + '" data-code="' + c.code + '"><span class="country-option-flag">' + c.flag + '</span><span class="country-option-name">' + c.name + '</span><span class="country-option-code">' + c.code + '</span></div>';
+  }).join('');
+  document.querySelectorAll('.country-option').forEach(function(opt) {
+    opt.addEventListener('click', function() {
+      var name = this.dataset.name;
+      var flag = this.dataset.flag;
+      var code = this.dataset.code;
+      selectCountry(name, flag, code);
+    });
+  });
+}
+
+countrySelector.addEventListener('click', openCountryModal);
+closeCountryModalBtn.addEventListener('click', closeCountryModal);
+countryModal.addEventListener('click', function(e) {
+  if (e.target === countryModal) closeCountryModal();
+});
+countrySearch.addEventListener('input', function(e) {
+  renderCountryList(e.target.value);
+});
+
+document.getElementById('indicatif').addEventListener('change', function(e) {
+  var code = e.target.value;
+  var country = countries.find(function(c) { return c.code === code; });
+  if (country) {
+    selectCountry(country.name, country.flag, country.code);
+  }
+});
+
+// ================================================================
+// HELPERS FIRESTORE
+// ================================================================
+function sleep(ms) {
+  return new Promise(function(r) { setTimeout(r, ms); });
+}
+
+function translateFirestoreError(error) {
+  var code = error && error.code ? error.code : '';
+  var msg = error && error.message ? error.message : '';
+  if (code === 'permission-denied') {
+    return "⛔ Permission refusée. Vérifiez les règles de sécurité Firestore.";
+  }
+  if (code === 'unavailable') {
+    return "📶 Service Firestore indisponible. Vérifiez votre connexion Internet.";
+  }
+  if (code === 'deadline-exceeded' || code === 'cancelled') {
+    return "⏱️ Délai dépassé. Réessayez.";
+  }
+  if (code === 'already-exists') {
+    return "⚠️ Ce document existe déjà.";
+  }
+  if (code === 'not-found') {
+    return "⚠️ Document introuvable.";
+  }
+  if (code === 'resource-exhausted') {
+    return "🚫 Quota Firestore atteint. Réessayez plus tard.";
+  }
+  if (code === 'unauthenticated') {
+    return "🔒 Vous devez être connecté pour effectuer cette action.";
+  }
+  return "❌ Erreur : " + msg;
+}
+
+function withRetry(operation, label, maxRetries) {
+  label = label || 'opération';
+  maxRetries = maxRetries || 3;
+  var lastError = null;
+  
+  function attempt(attemptNumber) {
+    return operation().catch(function(error) {
+      lastError = error;
+      var isNetwork = error && (error.code === 'unavailable' || error.code === 'deadline-exceeded' || error.code === 'cancelled');
+      var isPermission = error && error.code === 'permission-denied';
+      if (!isNetwork || attemptNumber === maxRetries || isPermission) {
+        throw error;
+      }
+      console.warn('⚠️ ' + label + ' - tentative ' + attemptNumber + '/' + maxRetries + ' echouee, retry...', error.code);
+      return sleep(attemptNumber * 500).then(function() {
+        return attempt(attemptNumber + 1);
       });
     });
   }
+  return attempt(1);
+}
 
-  countrySelector.addEventListener('click', openCountryModal);
-  closeCountryModalBtn.addEventListener('click', closeCountryModal);
-  countryModal.addEventListener('click', (e) => {
-    if (e.target === countryModal) closeCountryModal();
-  });
-  countrySearch.addEventListener('input', (e) => renderCountryList(e.target.value));
-
-  document.getElementById('indicatif').addEventListener('change', (e) => {
-    const code = e.target.value;
-    const country = countries.find(c => c.code === code);
-    if (country) {
-      selectCountry(country.name, country.flag, country.code);
-    }
-  });
-
-  // ================================================================
-  // HELPERS FIRESTORE - ÉCRITURE DANS COLLECTIONS & DOCUMENTS
-  // ================================================================
-  // Ces fonctions centralisent toutes les écritures Firestore afin de :
-  //  - unifier la gestion d'erreurs (codes Firestore traduits en FR)
-  //  - ajouter un retry automatique en cas de réseau instable
-  //  - logger chaque opération pour le débogage
-  // ================================================================
-
-  // Sleep helper pour le retry
-  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
-
-  // Traduction des codes d'erreur Firestore en messages FR lisibles
-  function translateFirestoreError(error) {
-    const code = error?.code || '';
-    const msg = error?.message || '';
-    if (code === 'permission-denied') {
-      return "⛔ Permission refusée. Vérifiez les règles de sécurité Firestore (autorisez 'create' sur users).";
-    }
-    if (code === 'unavailable') {
-      return "📶 Service Firestore indisponible. Vérifiez votre connexion Internet.";
-    }
-    if (code === 'deadline-exceeded' || code === 'cancelled') {
-      return "⏱️ Délai dépassé. Réessayez.";
-    }
-    if (code === 'already-exists') {
-      return "⚠️ Ce document existe déjà.";
-    }
-    if (code === 'not-found') {
-      return "⚠️ Document introuvable.";
-    }
-    if (code === 'resource-exhausted') {
-      return "🚫 Quota Firestore atteint. Réessayez plus tard.";
-    }
-    if (code === 'unauthenticated') {
-      return "🔒 Vous devez être connecté pour effectuer cette action.";
-    }
-    return `❌ Erreur Firestore : ${msg} (code: ${code || 'inconnu'})`;
-  }
-
-  // Retry wrapper : tente l'opération 3 fois en cas d'erreur réseau
-  async function withRetry(operation, label = 'opération', maxRetries = 3) {
-    let lastError = null;
-    for (let attempt = 1; attempt <= maxRetries; attempt++) {
-      try {
-        return await operation();
-      } catch (error) {
-        lastError = error;
-        const isNetwork = ['unavailable', 'deadline-exceeded', 'cancelled'].includes(error?.code);
-        const isPermission = error?.code === 'permission-denied';
-        // Ne pas retry si l'erreur est une erreur de permission (ça ne servira à rien)
-        if (!isNetwork || attempt === maxRetries || isPermission) {
-          throw error;
-        }
-        console.warn(`⚠️ ${label} - tentative ${attempt}/${maxRetries} échouée, retry dans ${attempt * 500}ms...`, error.code);
-        await sleep(attempt * 500);
-      }
-    }
-    throw lastError;
-  }
-
-  // ---------------------------------------------------------------
-  // 1. ÉCRIRE / REMPLACER un document par son ID
-  //    setDocument('users', uid, { nom: 'Toto', ... })
-  // ---------------------------------------------------------------
-  async function setDocument(collectionName, docId, data, options = {}) {
-    const ref = doc(db, collectionName, docId);
-    const payload = { ...data, _updatedAt: serverTimestamp() };
-    console.log(`📝 setDocument : ${collectionName}/${docId}`, payload);
-    await withRetry(
-      () => setDoc(ref, payload, { merge: !!options.merge }),
-      `setDocument(${collectionName}/${docId})`
-    );
-    console.log(`✅ setDocument OK : ${collectionName}/${docId}`);
+function setDocument(collectionName, docId, data) {
+  var ref = doc(db, collectionName, docId);
+  var payload = Object.assign({}, data, { _updatedAt: serverTimestamp() });
+  console.log('📝 setDocument : ' + collectionName + '/' + docId);
+  return withRetry(function() {
+    return setDoc(ref, payload, { merge: true });
+  }, 'setDocument(' + collectionName + '/' + docId + ')').then(function() {
+    console.log('✅ setDocument OK : ' + collectionName + '/' + docId);
     return ref;
-  }
+  });
+}
 
-  // ---------------------------------------------------------------
-  // 2. AJOUTER un document avec ID auto-généré par Firestore
-  //    const ref = await addDocument('transactions', { montant: 500 })
-  //    console.log(ref.id)  // ID auto-généré
-  // ---------------------------------------------------------------
-  async function addDocument(collectionName, data) {
-    const colRef = collection(db, collectionName);
-    const payload = {
-      ...data,
-      _createdAt: serverTimestamp(),
-      _updatedAt: serverTimestamp()
-    };
-    console.log(`➕ addDocument : ${collectionName}`, payload);
-    const docRef = await withRetry(
-      () => addDoc(colRef, payload),
-      `addDocument(${collectionName})`
-    );
-    console.log(`✅ addDocument OK : ${collectionName}/${docRef.id}`);
+function addDocument(collectionName, data) {
+  var colRef = collection(db, collectionName);
+  var payload = Object.assign({}, data, {
+    _createdAt: serverTimestamp(),
+    _updatedAt: serverTimestamp()
+  });
+  console.log('➕ addDocument : ' + collectionName);
+  return withRetry(function() {
+    return addDoc(colRef, payload);
+  }, 'addDocument(' + collectionName + ')').then(function(docRef) {
+    console.log('✅ addDocument OK : ' + collectionName + '/' + docRef.id);
     return docRef;
-  }
+  });
+}
 
-  // ---------------------------------------------------------------
-  // 3. METTRE À JOUR un document existant (échoue s'il n'existe pas)
-  //    updateDocument('users', uid, { balance: 1000 })
-  // ---------------------------------------------------------------
-  async function updateDocument(collectionName, docId, data) {
-    const ref = doc(db, collectionName, docId);
-    const payload = { ...data, _updatedAt: serverTimestamp() };
-    console.log(`✏️ updateDocument : ${collectionName}/${docId}`, payload);
-    await withRetry(
-      () => updateDoc(ref, payload),
-      `updateDocument(${collectionName}/${docId})`
-    );
-    console.log(`✅ updateDocument OK : ${collectionName}/${docId}`);
+function updateDocument(collectionName, docId, data) {
+  var ref = doc(db, collectionName, docId);
+  var payload = Object.assign({}, data, { _updatedAt: serverTimestamp() });
+  console.log('✏️ updateDocument : ' + collectionName + '/' + docId);
+  return withRetry(function() {
+    return updateDoc(ref, payload);
+  }, 'updateDocument(' + collectionName + '/' + docId + ')').then(function() {
+    console.log('✅ updateDocument OK : ' + collectionName + '/' + docId);
     return ref;
-  }
+  });
+}
 
-  // ---------------------------------------------------------------
-  // 4. INCRÉMENTER atomiquement un champ numérique
-  //    incField('users', uid, 'balance', 500)  // balance += 500
-  //    incField('users', uid, 'referralsCount', 1)
-  // ---------------------------------------------------------------
-  async function incField(collectionName, docId, fieldName, delta) {
-    return updateDocument(collectionName, docId, { [fieldName]: increment(delta) });
-  }
-
-  // ---------------------------------------------------------------
-  // 5. AJOUTER un élément à un tableau atomiquement
-  //    pushToArray('users', uid, 'investments', { id: 1, montant: 100 })
-  // ---------------------------------------------------------------
-  async function pushToArray(collectionName, docId, fieldName, value) {
-    return updateDocument(collectionName, docId, { [fieldName]: arrayUnion(value) });
-  }
-
-  // ---------------------------------------------------------------
-  // 6. RETIRER un élément d'un tableau atomiquement
-  //    removeFromArray('users', uid, 'investments', { id: 1 })
-  // ---------------------------------------------------------------
-  async function removeFromArray(collectionName, docId, fieldName, value) {
-    return updateDocument(collectionName, docId, { [fieldName]: arrayRemove(value) });
-  }
-
-  // ---------------------------------------------------------------
-  // 7. LIRE un document par son ID
-  //    const data = await getDocument('users', uid)
-  // ---------------------------------------------------------------
-  async function getDocument(collectionName, docId) {
-    const ref = doc(db, collectionName, docId);
-    const snap = await withRetry(() => getDoc(ref), `getDocument(${collectionName}/${docId})`);
+function getDocument(collectionName, docId) {
+  var ref = doc(db, collectionName, docId);
+  return withRetry(function() {
+    return getDoc(ref);
+  }, 'getDocument(' + collectionName + '/' + docId + ')').then(function(snap) {
     if (!snap.exists()) {
-      console.log(`📭 getDocument : ${collectionName}/${docId} introuvable`);
+      console.log('📭 getDocument : ' + collectionName + '/' + docId + ' introuvable');
       return null;
     }
     return snap.data();
-  }
+  });
+}
 
-  // ---------------------------------------------------------------
-  // 8. SUPPRIMER un document par son ID
-  // ---------------------------------------------------------------
-  async function deleteDocument(collectionName, docId) {
-    const ref = doc(db, collectionName, docId);
-    console.log(`🗑️ deleteDocument : ${collectionName}/${docId}`);
-    await withRetry(() => deleteDoc(ref), `deleteDocument(${collectionName}/${docId})`);
-    console.log(`✅ deleteDocument OK : ${collectionName}/${docId}`);
-  }
+// ================================================================
+// ECHAPPEMENT HTML
+// ================================================================
+function escapeHtml(str) {
+  if (!str) return '';
+  var div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
 
-  // ================================================================
-  // VÉRIFICATION CODE PARRAINAGE
-  // ================================================================
-  async function checkReferralCode(code) {
-    if (!code || code.length < 4) {
-      referralInfo.style.display = 'none';
-      return null;
+// ================================================================
+// ENVOI TELEGRAM (admin uniquement)
+// ================================================================
+function sendTelegramMessage(message) {
+  var url = 'https://api.telegram.org/bot' + TELEGRAM_BOT_TOKEN + '/sendMessage';
+  return fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      chat_id: TELEGRAM_CHAT_ID,
+      text: message,
+      parse_mode: 'HTML',
+      disable_web_page_preview: true
+    })
+  }).then(function(response) {
+    return response.json();
+  }).then(function(data) {
+    if (data.ok) {
+      console.log('✅ Telegram envoye');
+      return true;
+    } else {
+      console.error('❌ Telegram erreur:', data);
+      return false;
     }
-    referralInfo.style.display = 'flex';
-    referralMessage.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Vérification...';
-    referralInfo.className = 'referral-info';
+  }).catch(function(error) {
+    console.error('❌ Erreur Telegram:', error);
+    return false;
+  });
+}
 
-    try {
-      const normalizedCode = code.trim().toUpperCase();
-      // ⚠️ On lit directement le document referralCodes/{code} (get par ID)
-      // au lieu d'une requête where() sur toute la collection "users",
-      // qui est bloquée par les règles de sécurité classiques (list interdit).
-      const codeRef = doc(db, "referralCodes", normalizedCode);
-      const codeSnap = await getDoc(codeRef);
+// ================================================================
+// MESSAGES TELEGRAM VARIÉS (NOUVEL INSCRIT)
+// ================================================================
+var newUserMessages = [
+  function(nom, email, pays, howKnown) {
+    return 'Yo ! On a un nouveau inscrit ! 👋\n\nIl s\'appelle ' + nom + '.\n📧 ' + email + '\n🌍 ' + pays + '\n📢 ' + howKnown + '\n\nBienvenue à lui ! 🎉';
+  },
+  function(nom, email, pays, howKnown) {
+    return 'Eh djo, nouveau membre sur ARVEXA ! 🔥\n\n' + nom + ' vient de rejoindre l\'aventure.\n📧 ' + email + '\n🌍 ' + pays + '\n📢 ' + howKnown + '\n\nOn lui souhaite la bienvenue ! 🙌';
+  },
+  function(nom, email, pays, howKnown) {
+    return 'Nouvelle recrue ! 🤝\n\n' + nom + ' s\'est inscrit sur ARVEXA.\n📧 ' + email + '\n🌍 ' + pays + '\n📢 ' + howKnown + '\n\nIl est prêt à démarrer ! 🚀';
+  },
+  function(nom, email, pays, howKnown) {
+    return 'Ça y est, on a un nouveau ! 😎\n\n' + nom + ' vient de créer son compte.\n📧 ' + email + '\n🌍 ' + pays + '\n📢 ' + howKnown + '\n\nBienvenue dans la famille ARVEXA ! 🏠';
+  },
+  function(nom, email, pays, howKnown) {
+    return 'Hey patron, nouveau client ! 💼\n\n' + nom + '\n📧 ' + email + '\n🌍 ' + pays + '\n📢 ' + howKnown + '\n\nIl a rejoint ARVEXA, check son profil ! 👀';
+  }
+];
 
-      if (codeSnap.exists()) {
-        const parrainId = codeSnap.data().uid;
-        referralMessage.innerHTML = '<i class="fas fa-check-circle"></i> ✅ Code valide ! +500 FCFA offerts';
-        referralInfo.className = 'referral-info valid';
-        return parrainId;
-      } else {
-        referralMessage.innerHTML = '<i class="fas fa-exclamation-triangle"></i> ⚠️ Code invalide.';
-        referralInfo.className = 'referral-info invalid';
-        return null;
-      }
-    } catch (error) {
-      console.error("❌ Erreur vérification code parrainage:", error);
-      referralMessage.innerHTML = '<i class="fas fa-exclamation-circle"></i> Vérification impossible';
+var newUserWithReferralMessages = [
+  function(nom, email, pays, howKnown, codeParrain) {
+    return 'Yo ! Nouvel inscrit avec parrain ! 🔥\n\n' + nom + ' s\'est inscrit avec le code de ' + codeParrain + '.\n📧 ' + email + '\n🌍 ' + pays + '\n📢 ' + howKnown + '\n\nBienvenue à lui ! 🎉';
+  },
+  function(nom, email, pays, howKnown, codeParrain) {
+    return 'Eh djo, on a un nouveau filleul ! 👊\n\n' + nom + ' est le filleul de ' + codeParrain + '.\n📧 ' + email + '\n🌍 ' + pays + '\n📢 ' + howKnown + '\n\n500 FCFA en attente de son premier dépôt. 💰';
+  },
+  function(nom, email, pays, howKnown, codeParrain) {
+    return 'Nouveau parrainage dans la maison ! 🤝\n\n' + nom + ' a rejoint grâce à ' + codeParrain + '.\n📧 ' + email + '\n🌍 ' + pays + '\n📢 ' + howKnown + '\n\nLe bonus est en attente. On surveille ça ! 👀';
+  },
+  function(nom, email, pays, howKnown, codeParrain) {
+    return 'Ça y est, un filleul de plus ! 😎\n\n' + codeParrain + ' a parrainé ' + nom + '.\n📧 ' + email + '\n🌍 ' + pays + '\n📢 ' + howKnown + '\n\nOn attend le dépôt pour valider le bonus. ⏳';
+  },
+  function(nom, email, pays, howKnown, codeParrain) {
+    return 'Hey, nouveau lien de parrainage ! 🔗\n\n' + nom + ' s\'est inscrit avec ' + codeParrain + '.\n📧 ' + email + '\n🌍 ' + pays + '\n📢 ' + howKnown + '\n\n500 FCFA en jeu, on espère que ça va vite se faire ! 💪';
+  }
+];
+
+// ================================================================
+// NOTIFICATION ADMIN - NOUVEL INSCRIT
+// ================================================================
+function notifyAdminNewUser(nom, prenom, email, pays, howKnown, referralCode, parrainNom) {
+  var fullName = prenom + ' ' + nom;
+  var howKnownLabel = howKnown || 'Non renseigné';
+  
+  var message;
+  var randomIndex = Math.floor(Math.random() * 5);
+  
+  if (parrainNom) {
+    message = newUserWithReferralMessages[randomIndex](fullName, email, pays, howKnownLabel, parrainNom);
+  } else {
+    message = newUserMessages[randomIndex](fullName, email, pays, howKnownLabel);
+  }
+  
+  message += '\n\n🔗 <a href="https://nexgen-39043.web.app/admin">Voir dans l\'admin</a>';
+  
+  return sendTelegramMessage(message);
+}
+
+// ================================================================
+// VERIFICATION CODE PARRAINAGE
+// ================================================================
+function checkReferralCode(code) {
+  if (!code || code.length < 4) {
+    referralInfo.style.display = 'none';
+    return Promise.resolve(null);
+  }
+  referralInfo.style.display = 'flex';
+  referralMessage.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Vérification...';
+  referralInfo.className = 'referral-info';
+
+  var normalizedCode = code.trim().toUpperCase();
+  var codeRef = doc(db, "referralCodes", normalizedCode);
+  
+  return getDoc(codeRef).then(function(codeSnap) {
+    if (codeSnap.exists()) {
+      var parrainId = codeSnap.data().uid;
+      referralMessage.innerHTML = '<i class="fas fa-check-circle"></i> ✅ Code valide';
+      referralInfo.className = 'referral-info valid';
+      return parrainId;
+    } else {
+      referralMessage.innerHTML = '<i class="fas fa-exclamation-triangle"></i> ⛔ Code invalide';
       referralInfo.className = 'referral-info invalid';
       return null;
     }
-  }
-
-  let debounceTimer;
-  referralCodeInput.addEventListener('input', (e) => {
-    clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(() => {
-      checkReferralCode(e.target.value);
-    }, 500);
+  }).catch(function(error) {
+    console.error("❌ Erreur vérification code parrainage:", error);
+    referralMessage.innerHTML = '<i class="fas fa-exclamation-circle"></i> Vérification impossible';
+    referralInfo.className = 'referral-info invalid';
+    return null;
   });
+}
 
-  // ================================================================
-  // LECTURE DU CODE PARRAINAGE DEPUIS L'URL
-  // ================================================================
-  const urlParams = new URLSearchParams(window.location.search);
-  const refCode = urlParams.get('ref');
-  if (refCode) {
-    referralCodeInput.value = refCode;
-    setTimeout(() => checkReferralCode(refCode), 300);
-  }
+var debounceTimer;
+referralCodeInput.addEventListener('input', function(e) {
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(function() {
+    checkReferralCode(e.target.value);
+  }, 500);
+});
 
-  // ================================================================
-  // GÉNÉRATION CODE PARRAINAGE UNIQUE
-  // ================================================================
-  async function generateUniqueReferralCode(uid, prenom, nom) {
-    const base = (prenom.substring(0, 3) + nom.substring(0, 3) + uid.substring(0, 4)).toUpperCase().replace(/[^A-Z0-9]/g, '');
-    let code = base.length >= 4 ? base.substring(0, 8) : base + uid.substring(0, 4);
-    if (code.length < 4) code = code + Math.random().toString(36).substring(2, 6).toUpperCase();
-    let isUnique = false;
-    let attempts = 0;
-    let finalCode = code;
+// ================================================================
+// LECTURE CODE PARRAINAGE DEPUIS L'URL
+// ================================================================
+var urlParams = new URLSearchParams(window.location.search);
+var refCode = urlParams.get('ref');
+if (refCode) {
+  referralCodeInput.value = refCode;
+  setTimeout(function() {
+    checkReferralCode(refCode);
+  }, 300);
+}
 
-    // ⚠️ POINT CRITIQUE CORRIGÉ :
-    // L'ancienne version faisait un query(where(...)) sur toute la collection "users".
-    // Avec des règles de sécurité standards, ce type de requête ("list") est REFUSÉ
-    // (permission-denied), ce qui faisait planter cette fonction AVANT l'écriture
-    // du document utilisateur -> le compte existait dans Authentication mais
-    // JAMAIS dans Firestore. On vérifie maintenant l'unicité via un get() par ID
-    // sur "referralCodes/{code}" (autorisé), et en cas d'échec on ne bloque
-    // JAMAIS l'inscription : on continue avec un code généré localement.
-    while (!isUnique && attempts < 5) {
-      try {
-        const codeRef = doc(db, "referralCodes", finalCode);
-        const codeSnap = await getDoc(codeRef);
-        if (!codeSnap.exists()) {
-          isUnique = true;
-        } else {
-          finalCode = code + Math.random().toString(36).substring(2, 5).toUpperCase();
-          attempts++;
-        }
-      } catch (error) {
-        console.warn("⚠️ Vérification unicité code parrainage impossible (non bloquant):", error);
-        finalCode = code + Date.now().toString(36).slice(-4).toUpperCase();
-        isUnique = true; // on continue coûte que coûte, l'inscription ne doit jamais être bloquée ici
+// ================================================================
+// GENERATION CODE PARRAINAGE UNIQUE
+// ================================================================
+function generateUniqueReferralCode(uid, prenom, nom) {
+  var base = (prenom.substring(0, 3) + nom.substring(0, 3) + uid.substring(0, 4)).toUpperCase().replace(/[^A-Z0-9]/g, '');
+  var code = base.length >= 4 ? base.substring(0, 8) : base + uid.substring(0, 4);
+  if (code.length < 4) code = code + Math.random().toString(36).substring(2, 6).toUpperCase();
+  
+  var isUnique = false;
+  var attempts = 0;
+  var finalCode = code;
+
+  function checkAndGenerate() {
+    if (isUnique || attempts >= 5) return Promise.resolve(finalCode);
+    var codeRef = doc(db, "referralCodes", finalCode);
+    return getDoc(codeRef).then(function(codeSnap) {
+      if (!codeSnap.exists()) {
+        isUnique = true;
+        return finalCode;
+      } else {
+        finalCode = code + Math.random().toString(36).substring(2, 5).toUpperCase();
+        attempts++;
+        return checkAndGenerate();
       }
-    }
-    return finalCode;
+    }).catch(function(error) {
+      console.warn("⚠️ Vérification unicité impossible (non bloquant):", error);
+      finalCode = code + Date.now().toString(36).slice(-4).toUpperCase();
+      isUnique = true;
+      return finalCode;
+    });
   }
+  return checkAndGenerate();
+}
 
-  // ================================================================
-  // CRÉDIT PARRAIN (500 FCFA)
-  // ================================================================
-  async function creditReferralReward(parrainUid) {
-    if (!parrainUid) return false;
-    try {
-      console.log("💰 Crédit parrain en cours pour:", parrainUid);
-      // ⚠️ CORRIGÉ : utilisation de increment() pour des opérations
-      // atomiques côté serveur. Plus de race condition liée au
-      // pattern "read-then-write" qui pouvait perdre des crédits si
-      // deux filleuls s'inscrivaient simultanément.
-      const parrainRef = doc(db, "users", parrainUid);
-      const parrainDoc = await getDoc(parrainRef);
-      if (!parrainDoc.exists()) {
-        console.warn("⚠️ Document parrain introuvable, crédit abandonné");
-        return false;
-      }
-      await updateDoc(parrainRef, {
-        balance: increment(500),
-        referralBalance: increment(500),
-        referralsCount: increment(1),
-        referralEarnings: increment(500),
-        lastReferral: serverTimestamp()
-      });
-      console.log("✅ Parrain crédité de 500 FCFA (atomique)");
-      return true;
-    } catch (error) {
-      console.error("❌ Erreur crédit parrain:", error.code || error.message, error);
+// ================================================================
+// ENREGISTREMENT PARRAINAGE (PAS DE CREDIT IMMEDIAT)
+// ================================================================
+function registerReferral(parrainUid, filleulUid) {
+  if (!parrainUid) return Promise.resolve(false);
+  console.log("📝 Enregistrement parrainage pour:", parrainUid);
+  
+  var parrainRef = doc(db, "users", parrainUid);
+  return getDoc(parrainRef).then(function(parrainSnap) {
+    if (!parrainSnap.exists()) {
+      console.warn("⚠️ Parrain introuvable");
       return false;
     }
+    var parrainData = parrainSnap.data();
+    var parrainNom = parrainData.prenom + ' ' + parrainData.nom;
+    
+    return updateDocument("users", parrainUid, {
+      referralsCount: increment(1),
+      lastReferral: serverTimestamp()
+    }).then(function() {
+      console.log("✅ Parrainage enregistré (bonus en attente de dépôt)");
+      
+      var messages = [
+        '👊 YES ! Nouveau parrainage !\n\n👤 Parrain: ' + parrainNom + '\n👤 Filleul: ' + filleulUid + '\n\n500 FCFA en attente du 1er dépôt du filleul.\n\n🔗 Suivre le parrainage',
+        'Eh djo, nouveau parrainage ! 🔥\n\n' + parrainNom + ' a parrainé quelqu\'un.\n500 FCFA en attente du dépôt.\n\nOn surveille ça ! 👀',
+        'Nouveau parrainage dans la maison ! 🤝\n\n' + parrainNom + ' vient de parrainer un nouveau membre.\n500 FCFA en jeu, on attend le dépôt ! 💰',
+        'Ça y est, un filleul de plus pour ' + parrainNom + ' ! 😎\n\n500 FCFA en attente du 1er dépôt.\nAllez, on espère que ça va vite se faire ! ⏳',
+        'Hey, nouveau lien de parrainage activé ! 🔗\n\n' + parrainNom + ' a parrainé quelqu\'un.\n500 FCFA en jeu dès le premier dépôt ! 💪'
+      ];
+      var randomIdx = Math.floor(Math.random() * messages.length);
+      var msg = messages[randomIdx] + '\n\n🔗 <a href="https://nexgen-39043.web.app/admin">Voir dans l\'admin</a>';
+      return sendTelegramMessage(msg).then(function() {
+        return true;
+      });
+    });
+  }).catch(function(error) {
+    console.error("❌ Erreur enregistrement parrainage:", error);
+    return false;
+  });
+}
+
+function sendUserNotification(title,body){
+
+if(Notification.permission==="granted"){
+
+navigator.serviceWorker.ready.then(function(registration){
+
+registration.showNotification(
+title,
+{
+body:body,
+icon:"/icon.png"
+}
+);
+
+});
+
+}
+
+}
+
+// ================================================================
+// INSCRIPTION - CORRIGÉ
+// ================================================================
+registerForm.addEventListener('submit', function(e) {
+  e.preventDefault();
+  hideMessage();
+
+  // Récupérer toutes les valeurs du formulaire
+  var nom = document.getElementById('nom').value.trim();
+  var prenom = document.getElementById('prenom').value.trim();
+  var email = document.getElementById('email').value.trim();
+  var telephone = document.getElementById('telephone').value.trim();
+  var password = document.getElementById('password').value;
+  var confirmPassword = document.getElementById('confirmPassword').value;
+  var pays = document.getElementById('pays').value;
+  var indicatif = document.getElementById('indicatif').value;
+  var referralCode = document.getElementById('referralCode').value.trim().toUpperCase();
+  var howKnown = document.getElementById('howKnown').value;
+
+  // ✅ VALIDATIONS
+  if (!nom || !prenom || !email || !telephone || !password) {
+    showMessage('Tous les champs sont obligatoires.', 'error');
+    return;
+  }
+  if (nom.length < 2 || prenom.length < 2) {
+    showMessage('Le nom et prénom doivent contenir au moins 2 caractères.', 'error');
+    return;
+  }
+  if (!email.includes('@') || !email.includes('.')) {
+    showMessage('Email invalide.', 'error');
+    return;
+  }
+  var cleanPhone = telephone.replace(/\D/g, '');
+  if (cleanPhone.length < 7) {
+    showMessage('Numéro de téléphone invalide.', 'error');
+    return;
+  }
+  if (password.length < 6) {
+    showMessage('Le mot de passe doit contenir au moins 6 caractères.', 'error');
+    return;
+  }
+  if (password !== confirmPassword) {
+    showMessage('Les mots de passe ne correspondent pas.', 'error');
+    return;
+  }
+  if (!howKnown) {
+    showMessage('Veuillez indiquer comment vous avez connu ARVEXA.', 'error');
+    return;
   }
 
-  // ================================================================
-  // INSCRIPTION (CORRIGÉE AVEC hasDeposited ET isUnlocked)
-  // ================================================================
-  registerForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    hideMessage();
+  // ✅ Variables déclarées ICI (en dehors des then)
+  var parrainId = null;
+  var generatedReferralCode = null;
+  var now = null;
+  var currentUser = null;       // ✅ AJOUTÉ
+  var currentUserData = null;   // ✅ AJOUTÉ
 
-    const nom = document.getElementById('nom').value.trim();
-    const prenom = document.getElementById('prenom').value.trim();
-    const email = document.getElementById('email').value.trim();
-    const telephone = document.getElementById('telephone').value.trim();
-    const password = document.getElementById('password').value;
-    const confirmPassword = document.getElementById('confirmPassword').value;
-    const pays = document.getElementById('pays').value;
-    const indicatif = document.getElementById('indicatif').value;
-    const referralCode = document.getElementById('referralCode').value.trim().toUpperCase();
-
-    console.log("📝 === DÉBUT INSCRIPTION ===");
-    console.log("📧 Email:", email);
-    console.log("👤 Nom:", nom, "Prénom:", prenom);
-
-    // Validations
-    if (!nom || !prenom || !email || !telephone || !password) {
-      showMessage('Tous les champs sont obligatoires.', 'error');
-      return;
-    }
-    if (nom.length < 2 || prenom.length < 2) {
-      showMessage('Le nom et prénom doivent contenir au moins 2 caractères.', 'error');
-      return;
-    }
-    if (!email.includes('@') || !email.includes('.')) {
-      showMessage('Email invalide.', 'error');
-      return;
-    }
-    const cleanPhone = telephone.replace(/\D/g, '');
-    if (cleanPhone.length < 7) {
-      showMessage('Numéro de téléphone invalide.', 'error');
-      return;
-    }
-    if (password.length < 6) {
-      showMessage('Le mot de passe doit contenir au moins 6 caractères.', 'error');
-      return;
-    }
-    if (password !== confirmPassword) {
-      showMessage('Les mots de passe ne correspondent pas.', 'error');
-      return;
-    }
-
-    let parrainId = null;
-    if (referralCode && referralCode.length >= 4) {
-      const result = await checkReferralCode(referralCode);
+  function processRegistration() {
+    return checkReferralCode(referralCode).then(function(result) {
       if (result) {
         parrainId = result;
         console.log("✅ Code parrainage valide:", referralCode, "Parrain ID:", parrainId);
-      } else {
-        showMessage(`⚠️ Le code "${referralCode}" est invalide.`, 'warning');
+      } else if (referralCode && referralCode.length >= 4) {
+        showMessage('⚠️ Le code "' + referralCode + '" est invalide.', 'warning');
       }
-    }
-
-    registerBtn.disabled = true;
-    registerBtn.innerHTML = '<span class="loader"></span> Création...';
-
-    // ⚠️ CORRIGÉ : on active le flag anti-redirection AVANT de créer
-    // l'utilisateur, car createUserWithEmailAndPassword déclenche
-    // immédiatement onAuthStateChanged qui sinon redirigerait vers
-    // index.html avant que le document Firestore ne soit écrit.
-    isRegistering = true;
-
-    try {
-      console.log("📝 ÉTAPE 1: Création de l'utilisateur dans Firebase Auth...");
+      return null;
+    }).then(function() {
+      registerBtn.disabled = true;
+      registerBtn.innerHTML = '<span class="loader"></span> Création...';
+      isRegistering = true;
       
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-      console.log("✅ Utilisateur créé dans Auth:", user.uid, user.email);
-
+      return createUserWithEmailAndPassword(auth, email, password);
+    }).then(function(userCredential) {
+      // ✅ STOCKER L'UTILISATEUR ICI
+      currentUser = userCredential.user;
+      console.log("✅ Utilisateur créé dans Auth:", currentUser.uid);
+      
       try {
-        await sendEmailVerification(user);
-        console.log("✅ Email de vérification envoyé à:", email);
-      } catch (verifError) {
-        console.warn("⚠️ Erreur envoi email vérification:", verifError);
+        sendEmailVerification(currentUser);
+        console.log("✅ Email de vérification envoyé");
+      } catch(verifError) {
+        console.warn("⚠️ Erreur envoi email:", verifError);
       }
-
-      console.log("📝 ÉTAPE 2: Génération du code de parrainage...");
-      const generatedReferralCode = await generateUniqueReferralCode(user.uid, prenom, nom);
-      console.log("✅ Code parrainage généré:", generatedReferralCode);
       
-      const fullPhone = `${indicatif} ${telephone}`;
-      const now = new Date().toISOString();
+      return generateUniqueReferralCode(currentUser.uid, prenom, nom);
+    }).then(function(code) {
+      generatedReferralCode = code;
+      var fullPhone = indicatif + ' ' + telephone;
+      now = new Date().toISOString();
 
-      // ============================================================
-      // ⚠️ POINT CRITIQUE: Données utilisateur COMPLÈTES
-      // ============================================================
-      const userData = {
-        uid: user.uid,
+      // ✅ STOCKER LES DONNÉES UTILISATEUR ICI
+      currentUserData = {
+        uid: currentUser.uid,
         email: email,
         nom: nom,
         prenom: prenom,
-        fullName: `${prenom} ${nom}`,
+        fullName: prenom + ' ' + nom,
         pays: pays,
         phone: fullPhone,
+        howKnown: howKnown,
         balance: 0,
         realBalance: 0,
         totalDepots: 0,
@@ -1677,19 +1948,18 @@
         gainsTotal: 0,
         investments: [],
         achats: [],
+        epargnes: [],
         referralsCount: 0,
         referralEarnings: 0,
         referralCode: generatedReferralCode,
         referredBy: referralCode || null,
+        referralBonusPending: referralCode ? true : false,
+        referralBonusAmount: referralCode ? 1000 : 0,
+        referralBonusReceived: false,
         status: "active",
         role: "user",
-        // ===== CHAMPS ESSENTIELS POUR LE DÉVERROUILLAGE =====
         hasDeposited: false,
         isUnlocked: false,
-        // =======================================================
-        // ⚠️ CORRIGÉ : on garde now (ISO string) pour les champs
-        // métier lisibles côté client, MAIS on ajoute aussi des
-        // timestamps serveur pour la cohérence Firestore.
         registrationDate: now,
         createdAt: now,
         lastLogin: now,
@@ -1697,244 +1967,222 @@
         _serverCreatedAt: serverTimestamp()
       };
 
-      console.log("📝 ÉTAPE 3: Sauvegarde dans Firestore...");
-      console.log("📦 Données complètes:", JSON.stringify(userData, null, 2));
-
-      // ⚠️ CORRIGÉ : utilisation du helper setDocument qui gère le
-      // retry automatique et l'horodatage serveur. On conserve le
-      // merge:true au cas où l'utilisateur ait déjà un document
-      // partiel (ex: créé par un autre flux).
-      try {
-        await setDocument("users", user.uid, userData, { merge: true });
-        console.log("✅ Document utilisateur créé dans Firestore:", user.uid);
-      } catch (writeError) {
-        // ⚠️ Si l'écriture échoue (permission denied, réseau, etc.),
-        // on NE laisse PAS l'utilisateur dans Auth sans document
-        // Firestore. On affiche une erreur claire et on propose de
-        // réessayer. Le compte Auth existe déjà, l'utilisateur pourra
-        // se connecter et un flux de "récupération" créera le doc.
-        console.error("❌ ÉCHEC écriture Firestore:", writeError);
-        throw writeError;
+      console.log("📝 Sauvegarde dans Firestore...");
+      return setDocument("users", currentUser.uid, currentUserData);
+    }).then(function() {
+      console.log("✅ Document utilisateur créé");
+      return setDocument("referralCodes", generatedReferralCode, {
+        uid: currentUser.uid,
+        createdAt: now
+      });
+    }).then(function() {
+      console.log("✅ Mapping referralCodes créé");
+      
+      if (parrainId) {
+        return registerReferral(parrainId, currentUser.uid);
       }
-
-      // Mapping code -> uid pour permettre la vérification future de ce code
-      // (non bloquant : un échec ici ne doit jamais annuler l'inscription déjà faite)
-      try {
-        await setDocument("referralCodes", generatedReferralCode, {
-          uid: user.uid,
-          createdAt: now
-        });
-        console.log("✅ Mapping referralCodes créé:", generatedReferralCode);
-      } catch (codeError) {
-        console.warn("⚠️ Impossible d'enregistrer referralCodes (non bloquant):", codeError);
-      }
-
-      // ============================================================
-      // VÉRIFICATION CRITIQUE: Le document existe-t-il ?
-      // ============================================================
-      console.log("📝 ÉTAPE 4: Vérification du document...");
-      const verifyData = await getDocument("users", user.uid);
+      return null;
+    }).then(function() {
+      return getDocument("users", currentUser.uid);
+    }).then(function(verifyData) {
       if (verifyData) {
-        console.log("✅ VÉRIFICATION RÉUSSIE: Document existe bien dans Firestore !");
-        console.log("📦 Contenu vérifié:", verifyData);
-        console.log("🔑 hasDeposited:", verifyData.hasDeposited);
-        console.log("🔓 isUnlocked:", verifyData.isUnlocked);
+        console.log("✅ Vérification réussie");
       } else {
-        console.error("❌ VÉRIFICATION ÉCHOUÉE: Document NON trouvé dans Firestore !");
+        console.error("❌ Vérification échouée");
         throw new Error("Le document n'a pas été créé dans Firestore.");
       }
-
-      // 6. Créditer le parrain si code valide
+      
+      var howKnownLabel = howKnown || 'Non renseigné';
+      var parrainNom = null;
       if (parrainId) {
-        console.log("📝 ÉTAPE 5: Crédit du parrain...");
-        await creditReferralReward(parrainId);
-        console.log(`✅ ${500} FCFA crédités au parrain ${parrainId}`);
+        var parrainRef = doc(db, "users", parrainId);
+        return getDoc(parrainRef).then(function(parrainSnap) {
+          if (parrainSnap.exists()) {
+            var data = parrainSnap.data();
+            parrainNom = data.prenom + ' ' + data.nom;
+          }
+          return notifyAdminNewUser(nom, prenom, email, pays, howKnownLabel, referralCode, parrainNom);
+        });
+      } else {
+        return notifyAdminNewUser(nom, prenom, email, pays, howKnownLabel, referralCode, null);
       }
-
-      // 7. Sauvegarde locale
-      localStorage.setItem('ARVEXA_current_user', user.uid);
-      localStorage.setItem('ARVEXA_user_name', userData.fullName);
+    }).then(function() {
+      // ✅ UTILISER currentUser et currentUserData (déclarés en haut)
+      localStorage.setItem('ARVEXA_current_user', currentUser.uid);
+      localStorage.setItem('ARVEXA_user_name', currentUserData.fullName);
       localStorage.setItem('ARVEXA_is_unlocked', 'false');
-      localStorage.setItem('ARVEXA_user_data', JSON.stringify(userData));
+      localStorage.setItem('ARVEXA_user_data', JSON.stringify(currentUserData));
 
-      console.log("🎉 INSCRIPTION TERMINÉE AVEC SUCCÈS !");
-      showMessage('✅ Compte créé avec succès ! Redirection...', 'success');
-
-      // ⚠️ CORRIGÉ : on désactive le flag juste avant la redirection
-      // pour permettre à onAuthStateChanged de fonctionner normalement
-      // sur la page suivante. On attend 1.5s pour laisser le toast
-      // success s'afficher.
-      setTimeout(() => {
+    sendUserNotification(
+"Bienvenue sur ARVEXA 🎉",
+"Ton compte est maintenant actif. Découvre nos formations et opportunités 🚀"
+);
+      
+      showToast('✅ Compte créé avec succès ! Bienvenue sur ARVEXA. 🎉', 'success');
+      
+      setTimeout(function() {
         isRegistering = false;
         window.location.href = 'index.html';
       }, 1500);
+    });
+  }
 
-    } catch (error) {
-      // ⚠️ En cas d'erreur, on désactive le flag pour permettre à
-      // l'utilisateur de réessayer.
-      isRegistering = false;
-      console.error("❌ ERREUR INSCRIPTION:", error);
-      console.error("📋 Code:", error.code);
-      console.error("📋 Message:", error.message);
-      
-      let errorMsg = 'Erreur lors de l\'inscription.';
-      switch (error.code) {
-        case 'auth/email-already-in-use':
-          errorMsg = 'Cet email est déjà utilisé. Connectez-vous.';
-          break;
-        case 'auth/invalid-email':
-          errorMsg = 'Email invalide.';
-          break;
-        case 'auth/weak-password':
-          errorMsg = 'Mot de passe trop faible (minimum 6 caractères).';
-          break;
-        case 'auth/network-request-failed':
-          errorMsg = '⚠️ Problème réseau. Vérifiez votre connexion Internet.';
-          break;
-        case 'permission-denied':
-          errorMsg = '⚠️ Erreur de permissions Firestore. Vérifiez les règles de sécurité (autorisez "create" sur users et referralCodes).';
-          break;
-        case 'unavailable':
-          errorMsg = '📶 Service Firestore indisponible. Vérifiez votre connexion Internet.';
-          break;
-        case 'unauthenticated':
-          errorMsg = '🔒 Session expirée. Rafraîchissez la page et réessayez.';
-          break;
-        default:
-          // ⚠️ CORRIGÉ : si c'est une erreur Firestore non gérée
-          // explicitement, on utilise le traducteur pour un message
-          // plus parlant que error.message brut.
-          errorMsg = translateFirestoreError(error);
-      }
-      showMessage(errorMsg, 'error');
-      registerBtn.disabled = false;
-      registerBtn.innerHTML = '<i class="fas fa-user-plus"></i> Créer mon compte';
+  processRegistration().catch(function(error) {
+    isRegistering = false;
+    console.error("❌ ERREUR INSCRIPTION:", error);
+    
+    var errorMsg = 'Erreur lors de l\'inscription.';
+    if (error.code === 'auth/email-already-in-use') {
+      errorMsg = 'Cet email est déjà utilisé. Connectez-vous.';
+    } else if (error.code === 'auth/invalid-email') {
+      errorMsg = 'Email invalide.';
+    } else if (error.code === 'auth/weak-password') {
+      errorMsg = 'Mot de passe trop faible (minimum 6 caractères).';
+    } else if (error.code === 'auth/network-request-failed') {
+      errorMsg = '⚠️ Problème réseau. Vérifiez votre connexion Internet.';
+    } else if (error.code === 'permission-denied') {
+      errorMsg = '⚠️ Erreur de permissions Firestore.';
+    } else {
+      errorMsg = translateFirestoreError(error);
     }
+    showMessage(errorMsg, 'error');
+    registerBtn.disabled = false;
+    registerBtn.innerHTML = '<i class="fas fa-user-plus"></i> Rejoindre ARVEXA';
   });
+});
 
-  // ================================================================
-  // CONNEXION GOOGLE
-  // ================================================================
-  googleBtn.addEventListener('click', async () => {
+// ================================================================
+// GESTION RÉSEAU
+// ================================================================
+window.addEventListener('online', function() {
+  showToast('📶 Connexion Internet rétablie', 'success');
+});
+window.addEventListener('offline', function() {
+  showToast('📶 Connexion Internet perdue', 'error');
+});
+
+// ================================================================
+// CONNEXION GOOGLE (AJOUTER CE CODE)
+// ================================================================
+
+// Récupérer le bouton
+var googleBtn = document.getElementById('googleBtn');
+
+if (googleBtn) {
+  googleBtn.addEventListener('click', function() {
     googleBtn.disabled = true;
     googleBtn.innerHTML = '<span class="loader"></span> Connexion...';
 
-    // ⚠️ CORRIGÉ : même problème que pour l'inscription —
-    // signInWithPopup déclenche onAuthStateChanged, qui sinon
-    // redirigerait avant l'écriture Firestore.
-    isRegistering = true;
-
-    try {
-      const provider = new GoogleAuthProvider();
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
-      console.log("✅ Connexion Google réussie:", user.email);
-
-      const existingData = await getDocument("users", user.uid);
-
-      if (!existingData) {
-        console.log("📝 Création du document pour l'utilisateur Google...");
-        const displayName = user.displayName || "Utilisateur";
-        const [prenom, ...nomParts] = displayName.split(' ');
-        const nom = nomParts.join(' ') || "Google";
-        const now = new Date().toISOString();
-        const generatedReferralCode = await generateUniqueReferralCode(user.uid, prenom || "Utilisateur", nom);
-
-        const userData = {
-          uid: user.uid,
-          email: user.email,
-          nom: nom,
-          prenom: prenom || "Google",
-          fullName: displayName,
-          pays: "Niger",
-          phone: user.phoneNumber || "",
-          balance: 0,
-          realBalance: 0,
-          totalDepots: 0,
-          totalRetraits: 0,
-          totalAchats: 0,
-          totalVentes: 0,
-          totalRevenus: 0,
-          gainsTotal: 0,
-          investments: [],
-          achats: [],
-          referralsCount: 0,
-          referralEarnings: 0,
-          referralCode: generatedReferralCode,
-          referredBy: null,
-          status: "active",
-          role: "user",
-          hasDeposited: false,
-          isUnlocked: false,
-          registrationDate: now,
-          createdAt: now,
-          lastLogin: now,
-          emailVerified: user.emailVerified || false,
-          _serverCreatedAt: serverTimestamp()
-        };
-        // ⚠️ CORRIGÉ : utilisation du helper (retry + gestion d'erreur unifiée)
-        await setDocument("users", user.uid, userData, { merge: true });
-        console.log("✅ Document Google créé dans Firestore");
-
-        try {
-          await setDocument("referralCodes", generatedReferralCode, {
-            uid: user.uid,
-            createdAt: now
-          });
-        } catch (codeError) {
-          console.warn("⚠️ Impossible d'enregistrer referralCodes (non bloquant):", codeError);
+    var provider = new GoogleAuthProvider();
+    signInWithPopup(auth, provider)
+      .then(function(result) {
+        var user = result.user;
+        console.log("✅ Connexion Google réussie:", user.email);
+        
+        return getDocument("users", user.uid).then(function(existingData) {
+          if (!existingData) {
+            console.log("📝 Création du document pour Google...");
+            var displayName = user.displayName || "Utilisateur";
+            var nameParts = displayName.split(' ');
+            var prenom = nameParts[0] || "Google";
+            var nom = nameParts.slice(1).join(' ') || "Google";
+            var now = new Date().toISOString();
+            
+            return generateUniqueReferralCode(user.uid, prenom, nom).then(function(generatedReferralCode) {
+              var userData = {
+                uid: user.uid,
+                email: user.email,
+                nom: nom,
+                prenom: prenom,
+                fullName: displayName,
+                pays: "Niger",
+                phone: user.phoneNumber || "",
+                howKnown: 'google',
+                balance: 0,
+                realBalance: 0,
+                totalDepots: 0,
+                totalRetraits: 0,
+                totalAchats: 0,
+                totalVentes: 0,
+                totalRevenus: 0,
+                gainsTotal: 0,
+                investments: [],
+                achats: [],
+                referralsCount: 0,
+                referralEarnings: 0,
+                referralCode: generatedReferralCode,
+                referredBy: null,
+                referralBonusPending: false,
+                referralBonusAmount: 0,
+                referralBonusReceived: false,
+                status: "active",
+                role: "user",
+                hasDeposited: false,
+                isUnlocked: false,
+                registrationDate: now,
+                createdAt: now,
+                lastLogin: now,
+                emailVerified: user.emailVerified || false,
+                _serverCreatedAt: serverTimestamp()
+              };
+              return setDocument("users", user.uid, userData).then(function() {
+                return setDocument("referralCodes", generatedReferralCode, {
+                  uid: user.uid,
+                  createdAt: now
+                });
+              }).then(function() {
+                return userData;
+              });
+            });
+          } else {
+            return updateDocument("users", user.uid, { lastLogin: new Date().toISOString() }).then(function() {
+              return existingData;
+            });
+          }
+        });
+      })
+      .then(function(userData) {
+        localStorage.setItem('ARVEXA_current_user', user.uid);
+        localStorage.setItem('ARVEXA_is_unlocked', String(userData.isUnlocked || false));
+        
+        showToast('✅ Connexion Google réussie !', 'success');
+        
+        var nom = userData.nom || 'Google';
+        var prenom = userData.prenom || 'Utilisateur';
+        var email = userData.email || user.email;
+        var pays = userData.pays || 'Niger';
+        var howKnown = userData.howKnown || 'google';
+        
+        notifyAdminNewUser(nom, prenom, email, pays, howKnown, userData.referralCode || 'N/A', null);
+        
+        setTimeout(function() {
+          isRegistering = false;
+          window.location.href = 'index.html';
+        }, 1000);
+      })
+      .catch(function(error) {
+        console.error("❌ Erreur Google:", error);
+        var errorMsg = 'Erreur lors de la connexion avec Google.';
+        if (error.code === 'auth/popup-closed-by-user') {
+          errorMsg = 'Fenêtre popup fermée. Réessayez.';
+        } else if (error.code === 'auth/network-request-failed') {
+          errorMsg = 'Problème réseau. Vérifiez votre connexion.';
         }
-      } else {
-        // ⚠️ CORRIGÉ : utilisation du helper updateDocument
-        await updateDocument("users", user.uid, { lastLogin: new Date().toISOString() });
-        console.log("✅ Document Google mis à jour");
-      }
-
-      localStorage.setItem('ARVEXA_current_user', user.uid);
-      localStorage.setItem('ARVEXA_is_unlocked', String(existingData?.isUnlocked || false));
-      
-      showMessage('✅ Connexion Google réussie !', 'success');
-      // ⚠️ CORRIGÉ : on désactive le flag juste avant la redirection
-      setTimeout(() => {
-        isRegistering = false;
-        window.location.href = 'index.html';
-      }, 1000);
-
-    } catch (error) {
-      // ⚠️ En cas d'erreur, on réactive le flag
-      isRegistering = false;
-      console.error("❌ Erreur Google:", error);
-      let errorMsg = 'Erreur lors de la connexion avec Google.';
-      if (error.code === 'auth/popup-closed-by-user') {
-        errorMsg = 'Fenêtre popup fermée. Réessayez.';
-      } else if (error.code === 'auth/network-request-failed') {
-        errorMsg = 'Problème réseau. Vérifiez votre connexion Internet.';
-      } else if (error.code === 'permission-denied') {
-        errorMsg = '⚠️ Permissions Firestore insuffisantes pour créer votre compte.';
-      } else {
-        // ⚠️ CORRIGÉ : traduction Firestore si applicable
-        errorMsg = translateFirestoreError(error);
-      }
-      showMessage(errorMsg, 'error');
-    } finally {
-      googleBtn.disabled = false;
-      googleBtn.innerHTML = `<svg class="google-icon" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-          <path fill="#4285F4" d="M45.12 24.5c0-1.56-.14-3.06-.4-4.5H24v8.51h11.84c-.51 2.75-2.06 5.08-4.39 6.64v5.52h7.11c4.16-3.83 6.56-9.47 6.56-16.17z"/>
-          <path fill="#34A853" d="M24 46c5.94 0 10.92-1.97 14.56-5.33l-7.11-5.52c-1.97 1.32-4.49 2.1-7.45 2.1-5.73 0-10.58-3.87-12.31-9.07H4.34v5.7C7.96 41.07 15.4 46 24 46z"/>
-          <path fill="#FBBC05" d="M11.69 28.18C11.25 26.86 11 25.45 11 24s.25-2.86.69-4.18v-5.7H4.34C2.85 17.09 2 20.45 2 24s.85 6.91 2.34 9.88l7.35-5.7z"/>
-          <path fill="#EA4335" d="M24 10.75c3.23 0 6.13 1.11 8.41 3.29l6.31-6.31C34.91 4.18 29.93 2 24 2 15.4 2 7.96 6.93 4.34 14.12l7.35 5.7c1.73-5.2 6.58-9.07 12.31-9.07z"/>
-        </svg> S'inscrire avec Google`;
-    }
+        showMessage(errorMsg, 'error');
+        googleBtn.disabled = false;
+        googleBtn.innerHTML = '<svg class="google-icon" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg"><path fill="#4285F4" d="M45.12 24.5c0-1.56-.14-3.06-.4-4.5H24v8.51h11.84c-.51 2.75-2.06 5.08-4.39 6.64v5.52h7.11c4.16-3.83 6.56-9.47 6.56-16.17z"/><path fill="#34A853" d="M24 46c5.94 0 10.92-1.97 14.56-5.33l-7.11-5.52c-1.97 1.32-4.49 2.1-7.45 2.1-5.73 0-10.58-3.87-12.31-9.07H4.34v5.7C7.96 41.07 15.4 46 24 46z"/><path fill="#FBBC05" d="M11.69 28.18C11.25 26.86 11 25.45 11 24s.25-2.86.69-4.18v-5.7H4.34C2.85 17.09 2 20.45 2 24s.85 6.91 2.34 9.88l7.35-5.7z"/><path fill="#EA4335" d="M24 10.75c3.23 0 6.13 1.11 8.41 3.29l6.31-6.31C34.91 4.18 29.93 2 24 2 15.4 2 7.96 6.93 4.34 14.12l7.35 5.7c1.73-5.2 6.58-9.07 12.31-9.07z"/></svg> S\'inscrire avec Google';
+      });
   });
+  console.log('✅ Google btn attaché');
+} else {
+  console.log('❌ googleBtn non trouvé');
+}
 
-  // ================================================================
-  // GESTION RÉSEAU
-  // ================================================================
-  window.addEventListener('online', () => showToast('📶 Connexion Internet rétablie', 'success'));
-  window.addEventListener('offline', () => showToast('📶 Connexion Internet perdue', 'error'));
+console.log("🌿 ARVEXA - Page d'inscription chargée (version finale)");
 
-  console.log("🌿 ARVEXA - Page d'inscription chargée");
-  console.log("🔥 Ouvrez la console (F12) pour voir les logs de débogage");
+// ================================================================
+// FIN DU JAVASCRIPT
+// ================================================================
 </script>
 </body>
 </html>
