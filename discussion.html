@@ -1,0 +1,1265 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+  <meta name="theme-color" content="#0A0A0A">
+  <meta name="description" content="ARVEXA - Discussion privée">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon.png">
+  <link rel="icon" href="icon.png" type="image/png">
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <style>
+    /* ===== ROOT ===== */
+    :root {
+      --primary: #1A3A2A;
+      --primary-dark: #0A1A12;
+      --primary-light: #2A5A3A;
+      --accent: #B8860B;
+      --accent-dim: rgba(184, 134, 11, 0.08);
+      --success: #2D7D5A;
+      --danger: #8A3A3A;
+      --bg-dark: #0A0A0A;
+      --bg-surface: #141414;
+      --bg-card: rgba(20, 20, 20, 0.7);
+      --text-light: #F5F0E8;
+      --text-dim: #8A8A7A;
+      --text-muted: #5A5A4A;
+      --card-border: rgba(184, 134, 11, 0.06);
+      --glass-bg: rgba(26, 58, 42, 0.15);
+      --glass-border: rgba(184, 134, 11, 0.04);
+      --transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+      --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      --radius: 16px;
+      --whatsapp-green: #25D366;
+      --whatsapp-bubble-other: rgba(255, 255, 255, 0.05);
+      --whatsapp-bubble-me: rgba(184, 134, 11, 0.15);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      font-family: 'Inter', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-light);
+      font-size: 14px;
+      line-height: 1.6;
+      min-height: 100vh;
+      overflow: hidden;
+      -webkit-overflow-scrolling: touch;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      height: 100dvh;
+    }
+
+    .gradient-bg {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: -2;
+      background: radial-gradient(ellipse 40% 30% at 30% 20%, rgba(26, 58, 42, 0.08) 0%, transparent 70%),
+                  linear-gradient(180deg, #0A0A0A 0%, #060606 100%);
+      pointer-events: none;
+    }
+
+    /* ============================================================
+       HEADER (STYLE WHATSAPP)
+       ============================================================ */
+    .chat-header {
+      display: flex;
+      align-items: center;
+      padding: 8px 12px;
+      background: rgba(10, 10, 10, 0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(184, 134, 11, 0.04);
+      flex-shrink: 0;
+      gap: 10px;
+      min-height: 60px;
+      position: relative;
+      z-index: 10;
+    }
+
+    .chat-header .back-btn {
+      width: 36px;
+      height: 36px;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-light);
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+    .chat-header .back-btn:active {
+      transform: scale(0.92);
+      background: rgba(184, 134, 11, 0.08);
+    }
+    .chat-header .back-btn i {
+      font-size: 16px;
+    }
+
+    .chat-header .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--bg-dark);
+      flex-shrink: 0;
+      font-family: 'Playfair Display', serif;
+      background-size: cover;
+      background-position: center;
+      border: 2px solid rgba(184, 134, 11, 0.15);
+    }
+
+    .chat-header .user-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .chat-header .user-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-light);
+      line-height: 1.2;
+    }
+    .chat-header .user-status {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+    .chat-header .user-status .dot {
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      margin-right: 4px;
+    }
+    .chat-header .user-status .dot.online {
+      background: var(--success);
+    }
+    .chat-header .user-status .dot.offline {
+      background: var(--text-muted);
+      opacity: 0.3;
+    }
+
+    .chat-header .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+
+    .chat-header .header-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+    .chat-header .header-btn:active {
+      transform: scale(0.92);
+    }
+    .chat-header .header-btn:hover {
+      color: var(--text-light);
+    }
+
+    /* ============================================================
+       ZONE DES MESSAGES
+       ============================================================ */
+    .messages-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px 16px 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      -webkit-overflow-scrolling: touch;
+      scroll-behavior: smooth;
+    }
+    .messages-container::-webkit-scrollbar {
+      width: 3px;
+    }
+    .messages-container::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .messages-container::-webkit-scrollbar-thumb {
+      background: rgba(184, 134, 11, 0.2);
+      border-radius: 4px;
+    }
+
+    /* ===== MESSAGE ===== */
+    .message-wrapper {
+      display: flex;
+      flex-direction: column;
+      max-width: 82%;
+      animation: messageSlideIn 0.25s ease-out;
+    }
+    .message-wrapper.other {
+      align-self: flex-start;
+    }
+    .message-wrapper.me {
+      align-self: flex-end;
+    }
+
+    @keyframes messageSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px) scale(0.97);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .message-wrapper .message-sender {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--text-dim);
+      margin: 0 4px 2px 4px;
+    }
+    .message-wrapper .message-sender .avatar-small {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 8px;
+      font-weight: 600;
+      color: var(--bg-dark);
+      background-size: cover;
+      background-position: center;
+      flex-shrink: 0;
+    }
+    .message-wrapper.me .message-sender {
+      display: none;
+    }
+
+    .message-bubble {
+      padding: 8px 14px;
+      border-radius: 16px;
+      font-size: 14px;
+      line-height: 1.5;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      position: relative;
+      border: 1px solid transparent;
+    }
+    .message-wrapper.other .message-bubble {
+      background: var(--whatsapp-bubble-other);
+      border-color: rgba(255, 255, 255, 0.04);
+      border-bottom-left-radius: 4px;
+    }
+    .message-wrapper.me .message-bubble {
+      background: var(--whatsapp-bubble-me);
+      border-color: rgba(184, 134, 11, 0.10);
+      border-bottom-right-radius: 4px;
+    }
+
+    .message-bubble .msg-time {
+      font-size: 9px;
+      color: var(--text-muted);
+      margin-top: 4px;
+      display: block;
+      text-align: right;
+      opacity: 0.6;
+    }
+    .message-wrapper.me .message-bubble .msg-time {
+      color: var(--accent);
+    }
+
+    /* ===== MESSAGE IMAGE ===== */
+    .message-bubble .msg-image {
+      max-width: 220px;
+      max-height: 300px;
+      border-radius: 12px;
+      display: block;
+      margin-bottom: 4px;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+    .message-bubble .msg-image:active {
+      transform: scale(0.97);
+    }
+
+    /* ===== MESSAGE EMPTY ===== */
+    .messages-empty {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      text-align: center;
+      padding: 40px 20px;
+    }
+    .messages-empty i {
+      font-size: 48px;
+      opacity: 0.15;
+      margin-bottom: 12px;
+      color: var(--accent);
+    }
+    .messages-empty .empty-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-dim);
+    }
+    .messages-empty .empty-sub {
+      font-size: 13px;
+      opacity: 0.6;
+      margin-top: 4px;
+    }
+
+    /* ============================================================
+       INPUT ZONE (STYLE WHATSAPP)
+       ============================================================ */
+    .chat-input-wrapper {
+      flex-shrink: 0;
+      padding: 6px 12px 10px;
+      background: rgba(10, 10, 10, 0.95);
+      backdrop-filter: blur(12px);
+      border-top: 1px solid rgba(184, 134, 11, 0.04);
+    }
+
+    .chat-input-area {
+      display: flex;
+      align-items: flex-end;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(184, 134, 11, 0.06);
+      border-radius: 24px;
+      padding: 4px 4px 4px 12px;
+      transition: border-color 0.2s;
+    }
+    .chat-input-area:focus-within {
+      border-color: var(--accent);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .chat-input-area textarea {
+      flex: 1;
+      padding: 8px 0;
+      background: transparent;
+      border: none;
+      color: var(--text-light);
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+      resize: none;
+      min-height: 20px;
+      max-height: 100px;
+      line-height: 1.5;
+      overflow-y: auto;
+    }
+    .chat-input-area textarea::placeholder {
+      color: var(--text-muted);
+      opacity: 0.5;
+    }
+    .chat-input-area textarea::-webkit-scrollbar {
+      width: 2px;
+    }
+    .chat-input-area textarea::-webkit-scrollbar-thumb {
+      background: var(--accent);
+      border-radius: 4px;
+    }
+
+    .chat-input-area .input-actions {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      flex-shrink: 0;
+    }
+
+    .chat-input-area .btn-attach {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    .chat-input-area .btn-attach:active {
+      transform: scale(0.92);
+    }
+    .chat-input-area .btn-attach:hover {
+      color: var(--text-light);
+    }
+
+    .chat-input-area .btn-send {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: none;
+      background: var(--accent);
+      color: var(--bg-dark);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+    .chat-input-area .btn-send:active {
+      transform: scale(0.92);
+    }
+    .chat-input-area .btn-send:hover {
+      background: #9A7209;
+      box-shadow: 0 0 20px rgba(184, 134, 11, 0.15);
+    }
+    .chat-input-area .btn-send:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    /* ============================================================
+       TOAST
+       ============================================================ */
+    .toast {
+      position: fixed;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%) translateY(120px);
+      max-width: 90%;
+      width: 400px;
+      padding: 12px 18px;
+      border-radius: 14px;
+      font-size: 13px;
+      font-weight: 500;
+      transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      z-index: 9999;
+      text-align: center;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      pointer-events: none;
+    }
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+    }
+    .toast.success {
+      background: #0D2A1F;
+      border: 1px solid #2D7D5A;
+      color: #2D7D5A;
+    }
+    .toast.error {
+      background: #2A0D0D;
+      border: 1px solid #8A3A3A;
+      color: #8A3A3A;
+    }
+    .toast.warning {
+      background: #2A1A0D;
+      border: 1px solid #B8860B;
+      color: #B8860B;
+    }
+    .toast.info {
+      background: #0D1A2A;
+      border: 1px solid #4A7A8A;
+      color: #4A7A8A;
+    }
+
+    /* ============================================================
+       RESPONSIVE
+       ============================================================ */
+    @media (max-width: 480px) {
+      .chat-header { padding: 6px 10px; min-height: 54px; }
+      .chat-header .user-avatar { width: 34px; height: 34px; font-size: 14px; }
+      .chat-header .user-name { font-size: 14px; }
+      .chat-header .user-status { font-size: 10px; }
+      .chat-header .header-btn { width: 32px; height: 32px; font-size: 16px; }
+      .chat-header .back-btn { width: 32px; height: 32px; }
+      .message-bubble { font-size: 13px; padding: 6px 12px; }
+      .message-bubble .msg-image { max-width: 160px; max-height: 220px; }
+      .messages-container { padding: 8px 10px 4px; }
+      .chat-input-wrapper { padding: 4px 8px 8px; }
+      .chat-input-area { padding: 2px 2px 2px 10px; border-radius: 20px; }
+      .chat-input-area textarea { font-size: 13px; padding: 6px 0; min-height: 18px; }
+      .chat-input-area .btn-send { width: 32px; height: 32px; font-size: 14px; }
+      .chat-input-area .btn-attach { width: 28px; height: 28px; font-size: 16px; }
+    }
+
+    @media (min-width: 768px) {
+      .messages-container { max-width: 700px; margin: 0 auto; width: 100%; }
+      .chat-input-wrapper { max-width: 700px; margin: 0 auto; width: 100%; }
+      .chat-header { padding: 10px 5%; }
+    }
+
+    @media (min-width: 1024px) {
+      .messages-container { max-width: 800px; }
+      .chat-input-wrapper { max-width: 800px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="gradient-bg"></div>
+
+<!-- ============================================================
+   HEADER (STYLE WHATSAPP)
+   ============================================================ -->
+<header class="chat-header">
+  <button class="back-btn" id="backBtn"><i class="fas fa-arrow-left"></i></button>
+  
+  <div class="user-avatar" id="userAvatar">U</div>
+  
+  <div class="user-info">
+    <div class="user-name" id="userName">Utilisateur</div>
+    <div class="user-status" id="userStatus">
+      <span class="dot offline"></span> Hors ligne
+    </div>
+  </div>
+  
+  <div class="header-actions">
+    <button class="header-btn" id="refreshBtn" title="Actualiser">
+      <i class="fas fa-sync-alt"></i>
+    </button>
+  </div>
+</header>
+
+<!-- ============================================================
+   MESSAGES
+   ============================================================ -->
+<div class="messages-container" id="messagesContainer">
+  <!-- Messages générés par JS -->
+</div>
+
+<!-- ============================================================
+   INPUT
+   ============================================================ -->
+<div class="chat-input-wrapper">
+  <div class="chat-input-area">
+    <textarea id="messageInput" rows="1" placeholder="Écrire un message..." maxlength="1000"></textarea>
+    <div class="input-actions">
+      <!-- Bouton pièce jointe -->
+      <button class="btn-attach" id="attachBtn" title="Joindre une image">
+        <i class="fas fa-paperclip"></i>
+      </button>
+      <input type="file" id="imageInput" accept="image/*" style="display:none;">
+      <!-- Bouton envoi -->
+      <button class="btn-send" id="sendBtn">
+        <i class="fas fa-paper-plane"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== TOAST ===== -->
+<div class="toast" id="toast"></div>
+
+<!-- ================================================================ -->
+<!-- CONFIGURATION CENTRALISÉE -->
+<!-- ================================================================ -->
+<script src="config.js"></script>
+
+<!-- ================================================================ -->
+<!-- IMPORTS -->
+<!-- ================================================================ -->
+<script type="importmap">
+{
+  "imports": {
+    "firebase/app": "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js",
+    "firebase/auth": "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js",
+    "firebase/firestore": "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js"
+  }
+}
+</script>
+
+<script type="module">
+// ================================================================
+// IMPORTS
+// ================================================================
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+import { 
+  getAuth, 
+  onAuthStateChanged,
+  setPersistence,
+  browserLocalPersistence
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+import { 
+  getFirestore,
+  doc,
+  getDoc,
+  collection,
+  query,
+  orderBy,
+  where,
+  onSnapshot,
+  addDoc,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+
+// ================================================================
+// CONFIGURATION FIREBASE
+// ================================================================
+const firebaseConfig = {
+  apiKey: "AIzaSyBEbYuuUlNCLMBUHClv4UnyownNHw2q3_g",
+  authDomain: "nexgen-39043.firebaseapp.com",
+  projectId: "nexgen-39043",
+  storageBucket: "nexgen-39043.firebasestorage.app",
+  messagingSenderId: "619390144325",
+  appId: "1:619390144325:web:35d96b125501e4e8b1782c",
+  measurementId: "G-HC2Q5DNKDR"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+setPersistence(auth, browserLocalPersistence);
+
+// ================================================================
+// DOM
+// ================================================================
+const messagesContainer = document.getElementById('messagesContainer');
+const messageInput = document.getElementById('messageInput');
+const sendBtn = document.getElementById('sendBtn');
+const attachBtn = document.getElementById('attachBtn');
+const imageInput = document.getElementById('imageInput');
+const userAvatar = document.getElementById('userAvatar');
+const userName = document.getElementById('userName');
+const userStatus = document.getElementById('userStatus');
+const backBtn = document.getElementById('backBtn');
+const refreshBtn = document.getElementById('refreshBtn');
+const toast = document.getElementById('toast');
+
+let currentUser = null;
+let userData = null;
+let targetUser = null;
+let targetUid = null;
+let conversationId = null;
+let unsubscribeMessages = null;
+let isPageLoading = true;
+let notificationTimeout = null;
+let isSending = false;
+
+
+// ================================================================
+// GESTION DU CACHE
+// ================================================================
+function getCachedUserData() {
+  try {
+    const cached = localStorage.getItem('ARVEXA_user_data');
+    const timestamp = localStorage.getItem('ARVEXA_user_data_timestamp');
+    if (!cached) return null;
+    if (timestamp) {
+      const age = Date.now() - parseInt(timestamp);
+      if (age > 300000) return null;
+    }
+    return JSON.parse(cached);
+  } catch(e) { return null; }
+}
+
+function setCachedUserData(data) {
+  localStorage.setItem('ARVEXA_user_data', JSON.stringify(data));
+  localStorage.setItem('ARVEXA_user_data_timestamp', String(Date.now()));
+}
+
+function loadFromCache() {
+  const cached = getCachedUserData();
+  if (cached) {
+    userData = cached;
+    return true;
+  }
+  return false;
+}
+
+// ================================================================
+// TOAST
+// ================================================================
+function showToast(message, type = 'info') {
+  toast.textContent = message;
+  toast.className = 'toast ' + type;
+  clearTimeout(notificationTimeout);
+  requestAnimationFrame(() => toast.classList.add('show'));
+  notificationTimeout = setTimeout(() => toast.classList.remove('show'), 3500);
+}
+
+// ================================================================
+// HELPERS
+// ================================================================
+function formatTime(dateStr) {
+  if (!dateStr) return '';
+  try {
+    const d = new Date(dateStr);
+    return d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+  } catch { return ''; }
+}
+
+function formatDate(dateStr) {
+  if (!dateStr) return '';
+  try {
+    const d = new Date(dateStr);
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const msgDate = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    
+    const diff = Math.floor((today - msgDate) / (1000 * 60 * 60 * 24));
+    
+    if (diff === 0) return "Aujourd'hui";
+    if (diff === 1) return "Hier";
+    if (diff < 7) return ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'][d.getDay()];
+    return d.toLocaleDateString('fr-FR');
+  } catch { return ''; }
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function getInitials(name) {
+  if (!name) return '?';
+  return name.charAt(0).toUpperCase();
+}
+
+function getAvatarUrl(data) {
+  if (data && data.avatarBase64) {
+    return data.avatarBase64;
+  }
+  return null;
+}
+
+// ================================================================
+// GÉNÉRER L'ID DE CONVERSATION
+// ================================================================
+function generateConversationId(uid1, uid2) {
+  const sorted = [uid1, uid2].sort();
+  return 'priv_' + sorted.join('_');
+}
+
+// ================================================================
+// COMPRESSER L'IMAGE
+// ================================================================
+function compressImage(file) {
+  return new Promise((resolve, reject) => {
+    if (!file.type.startsWith('image/')) {
+      reject('Le fichier n\'est pas une image');
+      return;
+    }
+    
+    if (file.size > 10 * 1024 * 1024) {
+      reject('L\'image est trop lourde (max 10MB)');
+      return;
+    }
+    
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const maxSize = 800;
+        let width = img.width;
+        let height = img.height;
+        
+        if (width > maxSize || height > maxSize) {
+          if (width > height) {
+            height = Math.round((height * maxSize) / width);
+            width = maxSize;
+          } else {
+            width = Math.round((width * maxSize) / height);
+            height = maxSize;
+          }
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        const quality = 0.7;
+        const base64 = canvas.toDataURL('image/jpeg', quality);
+        
+        const sizeInKB = Math.round((base64.length * 3) / 4 / 1024);
+        console.debug('📊 Taille image compressée:', sizeInKB, 'KB');
+        
+        resolve(base64);
+      };
+      img.onerror = () => reject('Erreur de chargement de l\'image');
+      img.src = event.target.result;
+    };
+    reader.onerror = () => reject('Erreur de lecture du fichier');
+    reader.readAsDataURL(file);
+  });
+}
+
+// ================================================================
+// CHARGER LES INFORMATIONS DE LA CIBLE
+// ================================================================
+async function loadTargetUser(uid) {
+  try {
+    const userRef = doc(db, 'users', uid);
+    const docSnap = await getDoc(userRef);
+    if (docSnap.exists()) {
+      targetUser = docSnap.data();
+      targetUser.uid = uid;
+      updateHeader(targetUser);
+      return targetUser;
+    } else {
+      showToast('❌ Utilisateur introuvable', 'error');
+      setTimeout(() => {
+        window.location.href = 'membres.html';
+      }, 1500);
+      return null;
+    }
+  } catch (error) {
+    console.error('Erreur chargement cible:', error);
+    showToast('❌ Erreur de chargement', 'error');
+    return null;
+  }
+}
+
+// ================================================================
+// METTRE À JOUR L'EN-TÊTE
+// ================================================================
+function updateHeader(user) {
+  if (!user) return;
+  
+  const name = user.prenom || user.fullName || user.nom || 'Utilisateur';
+  const initial = getInitials(name);
+  const avatarUrl = user.avatarBase64 || '';
+  
+  userName.textContent = name;
+  
+  if (avatarUrl) {
+    userAvatar.style.backgroundImage = `url('${avatarUrl}')`;
+    userAvatar.style.backgroundSize = 'cover';
+    userAvatar.textContent = '';
+  } else {
+    userAvatar.style.backgroundImage = 'none';
+    userAvatar.textContent = initial;
+  }
+  
+  // Statut en ligne (simulé)
+  const isOnline = false;
+  const dotClass = isOnline ? 'online' : 'offline';
+  const statusText = isOnline ? 'En ligne' : 'Hors ligne';
+  userStatus.innerHTML = `<span class="dot ${dotClass}"></span> ${statusText}`;
+}
+
+// ================================================================
+// ÉCOUTER LES MESSAGES PRIVÉS
+// ================================================================
+function listenPrivateMessages(convId) {
+  if (unsubscribeMessages) {
+    unsubscribeMessages();
+    unsubscribeMessages = null;
+  }
+  
+  if (!convId) return;
+  
+  const q = query(
+    collection(db, 'messages_prives'),
+    where('conversationId', '==', convId),
+    orderBy('timestamp', 'asc')
+  );
+  
+  let isFirstLoad = true;
+  
+  unsubscribeMessages = onSnapshot(q, (snapshot) => {
+    const messages = [];
+    snapshot.forEach((doc) => {
+      messages.push({ id: doc.id, ...doc.data() });
+    });
+    
+    renderMessages(messages);
+    
+    if (isFirstLoad) {
+      isFirstLoad = false;
+      scrollToBottom();
+    } else {
+      const isNearBottom = messagesContainer.scrollHeight - messagesContainer.scrollTop - messagesContainer.clientHeight < 100;
+      if (isNearBottom) {
+        scrollToBottom();
+      }
+    }
+    
+  }, (error) => {
+    console.error('Erreur écoute messages privés:', error);
+    showToast('❌ Erreur de chargement des messages', 'error');
+  });
+}
+
+// ================================================================
+// AFFICHER LES MESSAGES
+// ================================================================
+function renderMessages(messages) {
+  if (!messages || messages.length === 0) {
+    messagesContainer.innerHTML = `
+      <div class="messages-empty">
+        <i class="fas fa-comment-dots"></i>
+        <div class="empty-title">Aucun message</div>
+        <div class="empty-sub">Commencez la discussion !</div>
+      </div>
+    `;
+    return;
+  }
+  
+  let html = '';
+  let lastDate = '';
+  
+  messages.forEach((msg, index) => {
+    const isMe = currentUser && msg.userId === currentUser.uid;
+    const msgDate = formatDate(msg.timestamp);
+    const msgTime = formatTime(msg.timestamp);
+    const senderName = msg.userName || 'Utilisateur';
+    const avatarUrl = msg.userAvatar || '';
+    const initial = getInitials(senderName);
+    
+    if (msgDate && msgDate !== lastDate) {
+      html += `
+        <div style="text-align:center;padding:12px 0 8px;font-size:11px;color:var(--text-muted);">
+          <span style="background:rgba(255,255,255,0.04);padding:2px 14px;border-radius:12px;">${msgDate}</span>
+        </div>
+      `;
+      lastDate = msgDate;
+    }
+    
+    const avatarStyle = avatarUrl ? `background-image:url('${avatarUrl}');background-size:cover;` : '';
+    
+    // Vérifier si c'est une image
+    const isImage = msg.type === 'image' || (msg.message && msg.message.startsWith('data:image'));
+    
+    let contentHtml = '';
+    if (isImage) {
+      contentHtml = `
+        <img src="${escapeHtml(msg.message)}" class="msg-image" loading="lazy" 
+             onclick="window.open('${escapeHtml(msg.message)}', '_blank')"
+             alt="Image partagée">
+      `;
+    } else {
+      contentHtml = escapeHtml(msg.message);
+    }
+    
+    html += `
+      <div class="message-wrapper ${isMe ? 'me' : 'other'}" style="animation-delay: ${Math.min(index * 0.03, 0.5)}s;">
+        ${!isMe ? `
+        <div class="message-sender">
+          <div class="avatar-small" style="${avatarStyle}">${avatarStyle ? '' : initial}</div>
+          <span>${escapeHtml(senderName)}</span>
+        </div>
+        ` : ''}
+        <div class="message-bubble">
+          ${contentHtml}
+          <span class="msg-time">${msgTime}</span>
+        </div>
+      </div>
+    `;
+  });
+  
+  messagesContainer.innerHTML = html;
+  scrollToBottom();
+}
+
+// ================================================================
+// AUTO-SCROLL VERS LE BAS
+// ================================================================
+function scrollToBottom() {
+  requestAnimationFrame(() => {
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+  });
+}
+
+// ================================================================
+// ENVOYER UN MESSAGE PRIVÉ (TEXTE)
+// ================================================================
+async function sendPrivateMessage(text) {
+  if (!text || !currentUser || !targetUid || !conversationId || isSending) return;
+  
+  isSending = true;
+  sendBtn.disabled = true;
+  
+  const userName = userData?.prenom || userData?.fullName || 'Utilisateur';
+  const avatarBase64 = userData?.avatarBase64 || '';
+  
+  try {
+    const messageData = {
+      conversationId: conversationId,
+      userId: currentUser.uid,
+      userName: userName,
+      userAvatar: avatarBase64,
+      targetId: targetUid,
+      message: text,
+      type: 'text',
+      timestamp: new Date().toISOString()
+    };
+    
+    await addDoc(collection(db, 'messages_prives'), messageData);
+    
+  } catch (error) {
+    console.error('Erreur envoi message:', error);
+    showToast('❌ Erreur lors de l\'envoi', 'error');
+  }
+  
+  isSending = false;
+  sendBtn.disabled = false;
+}
+
+// ================================================================
+// ENVOYER UNE IMAGE
+// ================================================================
+async function sendImage(base64Image) {
+  if (!base64Image || !currentUser || !targetUid || !conversationId || isSending) return;
+  
+  isSending = true;
+  sendBtn.disabled = true;
+  
+  const userName = userData?.prenom || userData?.fullName || 'Utilisateur';
+  const avatarBase64 = userData?.avatarBase64 || '';
+  
+  try {
+    const messageData = {
+      conversationId: conversationId,
+      userId: currentUser.uid,
+      userName: userName,
+      userAvatar: avatarBase64,
+      targetId: targetUid,
+      message: base64Image,
+      type: 'image',
+      timestamp: new Date().toISOString()
+    };
+    
+    await addDoc(collection(db, 'messages_prives'), messageData);
+    showToast('✅ Image envoyée', 'success');
+    
+  } catch (error) {
+    console.error('Erreur envoi image:', error);
+    showToast('❌ Erreur lors de l\'envoi de l\'image', 'error');
+  }
+  
+  isSending = false;
+  sendBtn.disabled = false;
+}
+
+// ================================================================
+// GESTION DU TEXTE
+// ================================================================
+messageInput.addEventListener('input', function() {
+  this.style.height = 'auto';
+  this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+});
+
+messageInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    const text = messageInput.value.trim();
+    if (text) {
+      sendPrivateMessage(text);
+      messageInput.value = '';
+      messageInput.style.height = 'auto';
+    }
+  }
+});
+
+sendBtn.addEventListener('click', () => {
+  const text = messageInput.value.trim();
+  if (text) {
+    sendPrivateMessage(text);
+    messageInput.value = '';
+    messageInput.style.height = 'auto';
+  }
+});
+
+// ================================================================
+// GESTION DES IMAGES
+// ================================================================
+attachBtn.addEventListener('click', () => {
+  imageInput.click();
+});
+
+imageInput.addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  
+  showToast('📤 Compression de l\'image...', 'info');
+  
+  try {
+    const base64 = await compressImage(file);
+    await sendImage(base64);
+  } catch (error) {
+    showToast('❌ ' + error, 'error');
+  }
+  
+  imageInput.value = '';
+});
+
+// ================================================================
+// BOUTON RETOUR
+// ================================================================
+backBtn.addEventListener('click', () => {
+  window.location.href = 'membres.html';
+});
+
+// ================================================================
+// BOUTON ACTUALISER
+// ================================================================
+refreshBtn.addEventListener('click', () => {
+  showToast('🔄 Actualisation...', 'info');
+  if (conversationId) {
+    listenPrivateMessages(conversationId);
+  }
+});
+
+// ================================================================
+// INITIALISER LA PAGE
+// ================================================================
+function initPage() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const uid = urlParams.get('uid');
+  const name = decodeURIComponent(urlParams.get('name') || '');
+  const avatar = decodeURIComponent(urlParams.get('avatar') || '');
+  
+  if (!uid) {
+    showToast('❌ Aucun utilisateur sélectionné', 'error');
+    setTimeout(() => {
+      window.location.href = 'membres.html';
+    }, 1500);
+    return;
+  }
+  
+  targetUid = uid;
+  
+  if (name) {
+    userName.textContent = name;
+  }
+  if (avatar) {
+    userAvatar.style.backgroundImage = `url('${avatar}')`;
+    userAvatar.style.backgroundSize = 'cover';
+    userAvatar.textContent = '';
+  }
+  
+  if (currentUser) {
+    loadTargetUser(uid).then(() => {
+      if (currentUser && targetUid) {
+        conversationId = generateConversationId(currentUser.uid, targetUid);
+        listenPrivateMessages(conversationId);
+      }
+    });
+  }
+}
+
+// ================================================================
+// CHARGER UTILISATEUR
+// ================================================================
+async function loadUserData(uid) {
+  try {
+    const userRef = doc(db, 'users', uid);
+    const docSnap = await getDoc(userRef);
+    if (docSnap.exists()) {
+      userData = docSnap.data();
+      setCachedUserData(userData);
+      return userData;
+    }
+    return null;
+  } catch (error) {
+    console.error('Erreur chargement user:', error);
+    return null;
+  }
+}
+
+// ================================================================
+// CACHE POUR RETOUR ARRIÈRE INSTANTANÉ
+// ================================================================
+window.addEventListener('pageshow', (event) => {
+  if (event.persisted) {
+    console.debug('📱 Page discussion chargée depuis le cache');
+    loadFromCache();
+    if (currentUser && targetUid) {
+      conversationId = generateConversationId(currentUser.uid, targetUid);
+      listenPrivateMessages(conversationId);
+    }
+  }
+});
+
+// ================================================================
+// AUTH
+// ================================================================
+const sessionUid = sessionStorage.getItem('session_uid');
+
+loadFromCache();
+
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    currentUser = user;
+    localStorage.setItem('ARVEXA_current_user', user.uid);
+    
+    if (sessionUid === user.uid) {
+      console.debug("✅ Session déjà validée, chargement rapide");
+      loadUserData(user.uid).then(() => {
+        initPage();
+      });
+      isPageLoading = false;
+      return;
+    }
+
+    loadUserData(user.uid).then(() => {
+      initPage();
+    });
+    isPageLoading = false;
+  } else {
+    if (isPageLoading) {
+      setTimeout(() => {
+        if (!auth.currentUser) {
+          const savedUid = localStorage.getItem('ARVEXA_current_user');
+          if (savedUid) {
+            if (!auth.currentUser) {
+              window.location.href = 'login.html';
+            }
+          } else {
+            window.location.href = 'login.html';
+          }
+        }
+      }, 3000);
+    } else {
+      const savedUid = localStorage.getItem('ARVEXA_current_user');
+      if (savedUid) {
+        setTimeout(() => {
+          if (!auth.currentUser) {
+            window.location.href = 'login.html';
+          }
+        }, 2000);
+      } else {
+        window.location.href = 'login.html';
+      }
+    }
+  }
+});
+
+console.debug('💬 ARVEXA - Discussion privée (v2.0)');
+console.debug('✅ Messages privés en temps réel');
+console.debug('✅ Envoi d\'images avec compression');
+console.debug('✅ Notification ne bloque plus le chargement');
+console.debug('✅ Style WhatsApp');
+</script>
+</body>
+</html>
