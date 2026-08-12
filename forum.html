@@ -38,9 +38,13 @@
       --radius: 16px;
       --whatsapp-bubble-other: rgba(255, 255, 255, 0.05);
       --whatsapp-bubble-me: rgba(184, 134, 11, 0.15);
+      --header-height: 60px;
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    /* ✅ SOLUTION CHAT.HTML */
+    html, body { height: 100%; }
 
     body {
       font-family: 'Inter', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
@@ -48,26 +52,36 @@
       color: var(--text-light);
       font-size: 14px;
       line-height: 1.6;
-      min-height: 100vh;
+      position: fixed;
+      inset: 0;
       overflow: hidden;
-      -webkit-overflow-scrolling: touch;
       display: flex;
-      flex-direction: column;
-      height: 100vh;
-      height: 100dvh;
-      /* ✅ Supprimer le padding/margin par défaut */
-      margin: 0;
-      padding: 0;
+      touch-action: pan-y;
+      -webkit-font-smoothing: antialiased;
     }
 
     .gradient-bg {
       position: fixed;
       top: 0; left: 0;
       width: 100%; height: 100%;
-      z-index: -2;
+      z-index: -1;
       background: radial-gradient(ellipse 40% 30% at 30% 20%, rgba(26, 58, 42, 0.08) 0%, transparent 70%),
                   linear-gradient(180deg, #0A0A0A 0%, #060606 100%);
       pointer-events: none;
+    }
+
+    /* ============================================================
+       MAIN CONTENT - FLEXIBLE
+       ============================================================ */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      max-width: 800px;
+      margin: 0 auto;
+      width: 100%;
+      position: relative;
     }
 
     /* ============================================================
@@ -82,7 +96,7 @@
       border-bottom: 1px solid rgba(184, 134, 11, 0.04);
       flex-shrink: 0;
       gap: 10px;
-      min-height: 60px;
+      min-height: var(--header-height);
       position: relative;
       z-index: 10;
     }
@@ -169,7 +183,20 @@
     .chat-header .header-btn:hover { color: var(--text-light); }
 
     /* ============================================================
-       ✅ ZONE DES MESSAGES - PREND TOUT L'ESPACE
+       CHAT CONTAINER - COMME CHAT.HTML
+       ============================================================ */
+    .chat-container {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      padding: 8px 0 0;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    /* ============================================================
+       MESSAGES - SCROLL
        ============================================================ */
     .messages-container {
       flex: 1;
@@ -178,10 +205,8 @@
       display: flex;
       flex-direction: column;
       gap: 4px;
-      -webkit-overflow-scrolling: touch;
       scroll-behavior: smooth;
-      /* ✅ Éviter les débordements */
-      min-height: 0;
+      -webkit-overflow-scrolling: touch;
     }
     .messages-container::-webkit-scrollbar {
       width: 3px;
@@ -307,7 +332,7 @@
     }
 
     /* ============================================================
-       ✅ INPUT ZONE - COLLÉ EN BAS
+       INPUT WRAPPER - FIXE EN BAS (COMME CHAT.HTML)
        ============================================================ */
     .chat-input-wrapper {
       flex-shrink: 0;
@@ -315,8 +340,6 @@
       background: rgba(10, 10, 10, 0.95);
       backdrop-filter: blur(12px);
       border-top: 1px solid rgba(184, 134, 11, 0.04);
-      /* ✅ S'assurer qu'il est bien en bas */
-      margin-top: auto;
     }
 
     .chat-input-area {
@@ -328,8 +351,6 @@
       border-radius: 24px;
       padding: 4px 4px 4px 16px;
       transition: border-color 0.2s;
-      max-width: 700px;
-      margin: 0 auto;
     }
     .chat-input-area:focus-within {
       border-color: var(--accent);
@@ -469,7 +490,8 @@
        RESPONSIVE
        ============================================================ */
     @media (max-width: 480px) {
-      .chat-header { padding: 6px 10px; min-height: 54px; }
+      :root { --header-height: 54px; }
+      .chat-header { padding: 6px 10px; min-height: var(--header-height); }
       .chat-header .group-avatar { width: 34px; height: 34px; font-size: 14px; }
       .chat-header .group-name { font-size: 14px; }
       .chat-header .group-members { font-size: 10px; }
@@ -489,7 +511,6 @@
     @media (min-width: 768px) {
       .messages-container { max-width: 700px; margin: 0 auto; width: 100%; }
       .chat-input-wrapper { max-width: 700px; margin: 0 auto; width: 100%; }
-      .chat-header { padding: 10px 5%; }
     }
   </style>
 </head>
@@ -497,43 +518,54 @@
 
 <div class="gradient-bg"></div>
 
-<!-- ===== HEADER ===== -->
-<header class="chat-header">
-  <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i></a>
-  <div class="group-avatar">AR</div>
-  <div class="group-info">
-    <div class="group-name">Groupe <span>ARVEXA</span></div>
-    <div class="group-members" id="groupMembersCount">Chargement...</div>
-  </div>
-  <div class="header-actions">
-    <button class="header-btn" id="privateChatBtn" title="Discussions privées">
-      <i class="fas fa-comment-dots"></i>
-    </button>
-  </div>
-</header>
+<!-- ============================================================
+   MAIN CONTENT
+   ============================================================ -->
+<div class="main-content">
 
-<!-- ===== MESSAGES ===== -->
-<div class="messages-container" id="messagesContainer">
-  <div class="messages-empty">
-    <i class="fas fa-comments"></i>
-    <div class="empty-title">Chargement...</div>
-    <div class="empty-sub">Veuillez patienter</div>
-  </div>
-</div>
-
-<!-- ===== INPUT ===== -->
-<div class="chat-input-wrapper">
-  <div class="chat-input-area">
-    <textarea id="messageInput" rows="1" placeholder="Écrire un message..." maxlength="1000"></textarea>
-    <div class="input-actions">
-      <button class="btn-attach" id="attachBtn" title="Joindre une image">
-        <i class="fas fa-paperclip"></i>
-      </button>
-      <input type="file" id="imageInput" accept="image/*" style="display:none;">
-      <button class="btn-send" id="sendBtn">
-        <i class="fas fa-paper-plane"></i>
+  <!-- HEADER -->
+  <header class="chat-header">
+    <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i></a>
+    <div class="group-avatar">AR</div>
+    <div class="group-info">
+      <div class="group-name">Groupe <span>ARVEXA</span></div>
+      <div class="group-members" id="groupMembersCount">Chargement...</div>
+    </div>
+    <div class="header-actions">
+      <button class="header-btn" id="privateChatBtn" title="Discussions privées">
+        <i class="fas fa-comment-dots"></i>
       </button>
     </div>
+  </header>
+
+  <!-- CHAT CONTAINER -->
+  <div class="chat-container">
+
+    <!-- MESSAGES -->
+    <div class="messages-container" id="messagesContainer">
+      <div class="messages-empty">
+        <i class="fas fa-comments"></i>
+        <div class="empty-title">Chargement...</div>
+        <div class="empty-sub">Veuillez patienter</div>
+      </div>
+    </div>
+
+    <!-- INPUT -->
+    <div class="chat-input-wrapper">
+      <div class="chat-input-area">
+        <textarea id="messageInput" rows="1" placeholder="Écrire un message..." maxlength="1000"></textarea>
+        <div class="input-actions">
+          <button class="btn-attach" id="attachBtn" title="Joindre une image">
+            <i class="fas fa-paperclip"></i>
+          </button>
+          <input type="file" id="imageInput" accept="image/*" style="display:none;">
+          <button class="btn-send" id="sendBtn">
+            <i class="fas fa-paper-plane"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -617,6 +649,7 @@ let unsubscribeMessages = null;
 let isPageLoading = true;
 let isSending = false;
 let toastTimer = null;
+
 
 // ================================================================
 // TOAST
@@ -1029,11 +1062,10 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
-console.debug('💬 ARVEXA - Forum (version stable)');
+console.debug('💬 ARVEXA - Forum (structure chat.html)');
+console.debug('✅ Barre de saisie fixée en bas');
 console.debug('✅ Messages en temps réel');
-console.debug('✅ Envoi d\'images avec compression');
-console.debug('✅ Barre de saisie corrigée');
-console.debug('✅ Toast avec disparition automatique');
+console.debug('✅ Envoi d\'images');
 </script>
 </body>
 </html>
