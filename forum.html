@@ -36,7 +36,6 @@
       --transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
       --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
       --radius: 16px;
-      --whatsapp-green: #25D366;
       --whatsapp-bubble-other: rgba(255, 255, 255, 0.05);
       --whatsapp-bubble-me: rgba(184, 134, 11, 0.15);
     }
@@ -56,6 +55,9 @@
       flex-direction: column;
       height: 100vh;
       height: 100dvh;
+      /* ✅ Supprimer le padding/margin par défaut */
+      margin: 0;
+      padding: 0;
     }
 
     .gradient-bg {
@@ -104,9 +106,7 @@
       transform: scale(0.92);
       background: rgba(184, 134, 11, 0.08);
     }
-    .chat-header .back-btn i {
-      font-size: 16px;
-    }
+    .chat-header .back-btn i { font-size: 16px; }
 
     .chat-header .group-avatar {
       width: 40px;
@@ -164,20 +164,12 @@
       align-items: center;
       justify-content: center;
       font-size: 18px;
-      position: relative;
     }
-    .chat-header .header-btn:active {
-      transform: scale(0.92);
-    }
-    .chat-header .header-btn:hover {
-      color: var(--text-light);
-    }
-    .chat-header .header-btn.active {
-      color: var(--accent);
-    }
+    .chat-header .header-btn:active { transform: scale(0.92); }
+    .chat-header .header-btn:hover { color: var(--text-light); }
 
     /* ============================================================
-       MESSAGES
+       ✅ ZONE DES MESSAGES - PREND TOUT L'ESPACE
        ============================================================ */
     .messages-container {
       flex: 1;
@@ -188,6 +180,8 @@
       gap: 4px;
       -webkit-overflow-scrolling: touch;
       scroll-behavior: smooth;
+      /* ✅ Éviter les débordements */
+      min-height: 0;
     }
     .messages-container::-webkit-scrollbar {
       width: 3px;
@@ -200,6 +194,7 @@
       border-radius: 4px;
     }
 
+    /* ===== MESSAGES ===== */
     .message-wrapper {
       display: flex;
       flex-direction: column;
@@ -312,7 +307,7 @@
     }
 
     /* ============================================================
-       INPUT
+       ✅ INPUT ZONE - COLLÉ EN BAS
        ============================================================ */
     .chat-input-wrapper {
       flex-shrink: 0;
@@ -320,6 +315,8 @@
       background: rgba(10, 10, 10, 0.95);
       backdrop-filter: blur(12px);
       border-top: 1px solid rgba(184, 134, 11, 0.04);
+      /* ✅ S'assurer qu'il est bien en bas */
+      margin-top: auto;
     }
 
     .chat-input-area {
@@ -331,6 +328,8 @@
       border-radius: 24px;
       padding: 4px 4px 4px 16px;
       transition: border-color 0.2s;
+      max-width: 700px;
+      margin: 0 auto;
     }
     .chat-input-area:focus-within {
       border-color: var(--accent);
@@ -507,9 +506,6 @@
     <div class="group-members" id="groupMembersCount">Chargement...</div>
   </div>
   <div class="header-actions">
-    <button class="header-btn" id="notifBtn" title="Notifications">
-      <i class="fas fa-bell" id="notifIcon"></i>
-    </button>
     <button class="header-btn" id="privateChatBtn" title="Discussions privées">
       <i class="fas fa-comment-dots"></i>
     </button>
@@ -554,8 +550,7 @@
   "imports": {
     "firebase/app": "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js",
     "firebase/auth": "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js",
-    "firebase/firestore": "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js",
-    "firebase/messaging": "https://www.gstatic.com/firebasejs/12.12.1/firebase-messaging.js"
+    "firebase/firestore": "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js"
   }
 }
 </script>
@@ -564,13 +559,13 @@
 // ================================================================
 // IMPORTS
 // ================================================================
-import { initializeApp } from "firebase/app";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
 import { 
   getAuth, 
   onAuthStateChanged,
   setPersistence,
   browserLocalPersistence
-} from "firebase/auth";
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
 import { 
   getFirestore,
   doc,
@@ -583,13 +578,7 @@ import {
   addDoc,
   updateDoc,
   serverTimestamp
-} from "firebase/firestore";
-import { 
-  getMessaging,
-  getToken,
-  onMessage,
-  deleteToken
-} from "firebase/messaging";
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
 // ================================================================
 // CONFIGURATION FIREBASE
@@ -604,12 +593,9 @@ const firebaseConfig = {
   measurementId: "G-HC2Q5DNKDR"
 };
 
-const VAPID_KEY = "BA8jFHMi3fNPkB4iAqib8GJnrq1_8KR2u_PyQjI2q5rp6rzmaGAsZ_aHm7TP1FqvXg4ZhOUBQUrQ6jpEf9qmrlM";
-
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-const messaging = getMessaging(app);
 
 setPersistence(auth, browserLocalPersistence);
 
@@ -622,22 +608,18 @@ const sendBtn = document.getElementById('sendBtn');
 const attachBtn = document.getElementById('attachBtn');
 const imageInput = document.getElementById('imageInput');
 const groupMembersCount = document.getElementById('groupMembersCount');
-const notifBtn = document.getElementById('notifBtn');
-const notifIcon = document.getElementById('notifIcon');
 const privateChatBtn = document.getElementById('privateChatBtn');
 const toast = document.getElementById('toast');
 
 let currentUser = null;
 let userData = null;
-let notificationsEnabled = true;
-let fcmToken = null;
 let unsubscribeMessages = null;
 let isPageLoading = true;
 let isSending = false;
 let toastTimer = null;
 
 // ================================================================
-// TOAST CORRIGÉ
+// TOAST
 // ================================================================
 function showToast(message, type = 'info') {
   if (toastTimer) {
@@ -663,7 +645,6 @@ function showToast(message, type = 'info') {
     toast.classList.add('hide');
   };
 }
-
 
 // ================================================================
 // HELPERS
@@ -734,118 +715,6 @@ function compressImage(file) {
   });
 }
 
-// ================================================================
-// GESTION DES NOTIFICATIONS FCM
-// ================================================================
-
-// ✅ Déclarer updateNotifIcon AVANT de l'utiliser
-function updateNotifIcon() {
-  if (!notifIcon || !notifBtn) return;
-  if (notificationsEnabled) {
-    notifIcon.className = 'fas fa-bell';
-    notifBtn.classList.add('active');
-  } else {
-    notifIcon.className = 'fas fa-bell-slash';
-    notifBtn.classList.remove('active');
-  }
-}
-
-async function setupNotifications() {
-  if (!currentUser) return;
-
-  try {
-    // Vérifier si Notification existe
-    if (typeof Notification === 'undefined') {
-      console.warn('⚠️ Notification API non disponible');
-      notificationsEnabled = false;
-      updateNotifIcon();
-      return;
-    }
-
-    // Demander la permission
-    const permission = await Notification.requestPermission();
-    if (permission !== 'granted') {
-      notificationsEnabled = false;
-      updateNotifIcon();
-      showToast('⚠️ Permissions de notification refusées', 'warning');
-      return;
-    }
-
-    // Générer le token
-    const token = await getToken(messaging, { vapidKey: VAPID_KEY });
-    fcmToken = token;
-    
-    // Stocker dans Firestore
-    const userRef = doc(db, 'users', currentUser.uid);
-    await updateDoc(userRef, { 
-      fcmToken: token,
-      notificationsEnabled: true
-    });
-    
-    notificationsEnabled = true;
-    updateNotifIcon();
-    console.debug('✅ FCM Token:', token.substring(0, 20) + '...');
-
-    // Écouter les messages en avant-plan
-    onMessage(messaging, (payload) => {
-      console.debug('📩 Message reçu en avant-plan:', payload);
-      const title = payload.notification?.title || 'ARVEXA';
-      const body = payload.notification?.body || 'Nouveau message';
-      showToast(`🔔 ${title}: ${body}`, 'info');
-      
-      // Recharger les messages
-      if (unsubscribeMessages) {
-        unsubscribeMessages();
-        unsubscribeMessages = null;
-        listenMessages();
-      }
-    });
-
-  } catch (error) {
-    console.error('❌ Erreur setup notifications:', error);
-    notificationsEnabled = false;
-    updateNotifIcon();
-    if (error.code === 'messaging/permission-blocked') {
-      showToast('⚠️ Les notifications sont bloquées par votre navigateur', 'warning');
-    }
-  }
-}
-
-async function disableNotifications() {
-  if (!currentUser) return;
-
-  try {
-    if (fcmToken) {
-      await deleteToken(messaging);
-    }
-    
-    const userRef = doc(db, 'users', currentUser.uid);
-    await updateDoc(userRef, { 
-      fcmToken: null,
-      notificationsEnabled: false
-    });
-    
-    notificationsEnabled = false;
-    fcmToken = null;
-    updateNotifIcon();
-    showToast('🔕 Notifications désactivées', 'warning');
-    
-  } catch (error) {
-    console.error('❌ Erreur désactivation notifications:', error);
-    showToast('❌ Erreur lors de la désactivation', 'error');
-  }
-}
-
-async function toggleNotifications() {
-  if (notificationsEnabled) {
-    await disableNotifications();
-  } else {
-    await setupNotifications();
-  }
-}
-
-// ✅ Attacher l'événement APRÈS la déclaration des fonctions
-notifBtn.addEventListener('click', toggleNotifications);
 // ================================================================
 // CHARGER LES MEMBRES
 // ================================================================
@@ -1080,8 +949,6 @@ async function loadUserData(uid) {
     const docSnap = await getDoc(userRef);
     if (docSnap.exists()) {
       userData = docSnap.data();
-      notificationsEnabled = userData.notificationsEnabled !== false;
-      updateNotifIcon();
       localStorage.setItem('ARVEXA_user_data', JSON.stringify(userData));
       return userData;
     }
@@ -1100,8 +967,6 @@ function loadFromCache() {
     const cached = localStorage.getItem('ARVEXA_user_data');
     if (cached) {
       userData = JSON.parse(cached);
-      notificationsEnabled = userData.notificationsEnabled !== false;
-      updateNotifIcon();
       return true;
     }
   } catch(e) {}
@@ -1117,15 +982,6 @@ async function initForum() {
   await loadUserData(currentUser.uid);
   loadGroupMembers();
   listenMessages();
-  
-  // Setup notifications automatiquement
-  if (notificationsEnabled) {
-    try {
-      await setupNotifications();
-    } catch (error) {
-      console.warn('⚠️ Erreur setup notifications:', error);
-    }
-  }
 }
 
 // ================================================================
@@ -1173,12 +1029,11 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
-console.debug('💬 ARVEXA - Forum complet (v3.0)');
-console.debug('✅ Notifications FCM push');
-console.debug('✅ Envoi d\'images avec compression');
-console.debug('✅ Toast corrigé (disparition auto + clic)');
+console.debug('💬 ARVEXA - Forum (version stable)');
 console.debug('✅ Messages en temps réel');
+console.debug('✅ Envoi d\'images avec compression');
+console.debug('✅ Barre de saisie corrigée');
+console.debug('✅ Toast avec disparition automatique');
 </script>
 </body>
 </html>
-```
