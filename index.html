@@ -8,19 +8,18 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="ARVEXA">
-  <link rel="apple-touch-icon" href="icon.png">
   <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon.png">
+  <link rel="icon" href="icon.png" type="image/png">
   
-  <!-- ===== PRELOAD FONTS ===== -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
   
-  <!-- ===== FONT AWESOME ===== -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <style>
-    /* ===== TOUT LE CSS EST ICI - PAS DE CHARGEMENT EXTERNE ===== */
+    /* ===== ROOT ===== */
     :root {
       --primary: #1A3A2A;
       --primary-dark: #0A1A12;
@@ -28,6 +27,7 @@
       --accent: #B8860B;
       --accent-dim: rgba(184, 134, 11, 0.08);
       --success: #2D7D5A;
+      --danger: #8A3A3A;
       --bg-dark: #0A0A0A;
       --bg-surface: #141414;
       --bg-card: rgba(20, 20, 20, 0.7);
@@ -44,6 +44,8 @@
 
     * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
+    html { scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
+
     body {
       font-family: 'Inter', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
       background: var(--bg-dark);
@@ -54,17 +56,16 @@
       min-height: 100vh;
       touch-action: pan-y;
       user-select: none;
-      opacity: 0;
-      animation: pageFadeIn 0.4s ease forwards;
+      opacity: 1;
+      -webkit-overflow-scrolling: touch;
     }
-    @keyframes pageFadeIn { 0% { opacity: 0; } 100% { opacity: 1; } }
 
     /* ===== ÉCRAN DE CHARGEMENT ===== */
     #loadingScreen {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: var(--bg-dark); z-index: 9999;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
-      transition: opacity 0.4s ease, visibility 0.4s ease;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
     }
     #loadingScreen.hide { opacity: 0; visibility: hidden; pointer-events: none; }
     .loader-logo { font-size: 32px; font-weight: 700; font-family: 'Playfair Display', serif; letter-spacing: 3px; color: var(--text-light); margin-bottom: 20px; }
@@ -89,7 +90,9 @@
     .glow-3 { width: 250px; height: 250px; background: rgba(26,58,42,0.08); top: 40%; left: 50%; transform: translate(-50%,-50%); animation-delay: -8s; }
     @keyframes glowMove { 0% { transform: translate(0,0) scale(1); } 100% { transform: translate(30px,-20px) scale(1.1); } }
 
-    /* ===== HEADER ===== */
+    /* ============================================================
+       HEADER
+       ============================================================ */
     .header {
       display: flex; justify-content: space-between; align-items: center;
       padding: 10px 5%; background: rgba(10,10,10,0.95); backdrop-filter: blur(12px);
@@ -101,31 +104,6 @@
 
     .header-actions { display: flex; align-items: center; gap: 8px; }
 
-    /* ===== BADGE NOTIFICATION ===== */
-    .notif-badge {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 4px 10px;
-      border-radius: 30px;
-      font-size: 10px;
-      font-weight: 500;
-      transition: var(--transition);
-    }
-    .notif-badge.active {
-      background: rgba(45, 125, 90, 0.12);
-      color: var(--success);
-      border: 1px solid rgba(45, 125, 90, 0.15);
-    }
-    .notif-badge.inactive {
-      background: rgba(138, 58, 58, 0.12);
-      color: #8A3A3A;
-      border: 1px solid rgba(138, 58, 58, 0.15);
-    }
-    .notif-badge i {
-      font-size: 12px;
-    }
-
     .user-profile {
       display: flex; align-items: center; gap: 8px; padding: 4px 10px 4px 4px;
       background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 40px;
@@ -135,6 +113,7 @@
     .user-avatar {
       width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
       font-weight: 600; font-size: 10px; background: var(--accent); color: var(--bg-dark); flex-shrink: 0;
+      background-size: cover; background-position: center;
     }
     .user-name { font-size: 11px; font-weight: 400; color: var(--text-dim); max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .menu-btn {
@@ -144,12 +123,13 @@
     }
     .menu-btn:active { transform: scale(0.94); }
     .menu-btn:hover { border-color: rgba(184,134,11,0.12); color: var(--text-light); }
+    .menu-btn svg { width: 18px; height: 18px; stroke: currentColor; }
 
     /* ===== CONTAINER ===== */
     .container { max-width: 500px; margin: 0 auto; padding: 16px 16px 80px; touch-action: pan-y; }
 
     /* ===== HERO ===== */
-    .hero-section { margin-bottom: 24px; animation: fadeInUp 0.5s ease-out; }
+    .hero-section { margin-bottom: 24px; animation: fadeInUp 0.4s ease-out; }
     @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     .hero-badge {
       display: inline-flex; align-items: center; gap: 6px;
@@ -163,7 +143,7 @@
     .hero-description { font-size: 13px; color: var(--text-dim); font-weight: 300; }
 
     /* ===== DASHBOARD ===== */
-    .dashboard-stats-container { margin-bottom: 28px; animation: fadeInUp 0.5s ease-out; }
+    .dashboard-stats-container { margin-bottom: 28px; animation: fadeInUp 0.4s ease-out; }
     .main-stat-card {
       background: linear-gradient(135deg, rgba(20,20,20,0.95), rgba(10,10,10,0.98));
       border: 1px solid rgba(184,134,11,0.04); border-radius: 16px; padding: 18px 20px;
@@ -173,12 +153,6 @@
       content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
       background: linear-gradient(135deg, rgba(184,134,11,0.02), transparent); border-radius: 16px; pointer-events: none;
     }
-    .main-stat-card::after {
-      content: ''; position: absolute; top: -50%; right: -30%; width: 80%; height: 80%;
-      background: radial-gradient(circle, rgba(184,134,11,0.02), transparent 70%); pointer-events: none;
-      animation: cardGlow 8s ease-in-out infinite alternate;
-    }
-    @keyframes cardGlow { 0% { transform: translate(0,0) scale(1); opacity: 0.3; } 100% { transform: translate(-20px,-20px) scale(1.2); opacity: 0.6; } }
     .main-stat-card:hover { border-color: rgba(184,134,11,0.08); transform: translateY(-2px); }
     .main-stat-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; position: relative; z-index: 1; }
     .main-stat-label { font-size: 10px; font-weight: 400; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; }
@@ -188,15 +162,34 @@
       display: flex; align-items: center; gap: 5px; transition: var(--transition); text-decoration: none; position: relative; z-index: 1;
     }
     .btn-recharge:active { transform: scale(0.95); }
-    .btn-recharge:hover { background: #9A7209; box-shadow: 0 0 30px rgba(184,134,11,0.1); }
     .main-stat-value { font-family: 'Playfair Display', serif; font-size: 30px; font-weight: 700; margin-bottom: 6px; position: relative; z-index: 1; color: var(--text-light); letter-spacing: 1px; }
     .main-stat-footer { font-size: 10px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; position: relative; z-index: 1; }
     .main-stat-footer i { color: var(--success); }
+    .main-stat-footer .daily-perf { margin-left: auto; font-size: 9px; font-weight: 400; }
+    .main-stat-footer .daily-perf.positive { color: var(--success); }
+    .main-stat-footer .daily-perf.neutral { color: var(--text-muted); }
+
+    /* ===== SKELETON ===== */
+    .skeleton {
+      background: rgba(255,255,255,0.03);
+      border-radius: 12px;
+      animation: skeletonPulse 1.2s ease-in-out infinite;
+    }
+    @keyframes skeletonPulse {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 0.6; }
+    }
+    .skeleton-text { height: 14px; width: 100%; margin-bottom: 6px; }
+    .skeleton-text.w60 { width: 60%; }
+    .skeleton-text.w40 { width: 40%; }
+    .skeleton-text.w30 { width: 30%; }
+    .skeleton-value { height: 32px; width: 70%; margin: 4px 0; }
+    .skeleton-badge { height: 20px; width: 80px; border-radius: 20px; }
 
     /* ===== QUICK STATS ===== */
     .quick-stats {
       display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 28px;
-      animation: fadeInUp 0.6s ease-out;
+      animation: fadeInUp 0.5s ease-out;
     }
     .quick-stat-item {
       background: rgba(20,20,20,0.4); border: 1px solid rgba(255,255,255,0.02);
@@ -227,11 +220,11 @@
       display: flex; background: var(--bg-card); backdrop-filter: blur(10px);
       border: 1px solid var(--card-border); border-radius: 14px; overflow: hidden;
       text-decoration: none; color: inherit; transition: var(--transition); height: 130px;
-      cursor: pointer; animation: fadeInUp 0.6s ease-out;
+      cursor: pointer; animation: fadeInUp 0.5s ease-out;
     }
     .formation-card-horizontal:active { transform: scale(0.98); }
     .formation-card-horizontal:hover { border-color: rgba(184,134,11,0.08); transform: translateY(-2px); background: rgba(20,20,20,0.8); }
-    .formation-horiz-img-wrap { position: relative; width: 100px; min-width: 100px; height: 100%; overflow: hidden; }
+    .formation-horiz-img-wrap { position: relative; width: 100px; min-width: 100px; height: 100%; overflow: hidden; background: var(--bg-dark); }
     .formation-horiz-img { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.6) saturate(0.8); transition: var(--transition); }
     .formation-card-horizontal:hover .formation-horiz-img { filter: brightness(0.75) saturate(0.9); transform: scale(1.05); }
     .formation-horiz-badge {
@@ -278,6 +271,8 @@
       border: 1px solid rgba(184,134,11,0.03); border-radius: 16px;
       padding: 18px 20px; transition: var(--transition); min-height: 120px;
       display: flex; flex-direction: column; justify-content: space-between;
+      overflow: hidden;
+      position: relative;
     }
     .actu-card:hover { border-color: rgba(184,134,11,0.06); background: rgba(20,20,20,0.6); }
     .actu-card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
@@ -290,7 +285,34 @@
     .actu-badge.astuce { background: rgba(184,134,11,0.05); color: #D4A017; }
     .actu-badge.update { background: rgba(26,58,42,0.15); color: #4A7A6A; }
     .actu-date { font-size: 9px; color: var(--text-muted); opacity: 0.5; margin-left: auto; flex-shrink: 0; }
-    .actu-text { font-size: 13px; color: var(--text-light); line-height: 1.6; font-weight: 400; flex: 1; }
+    
+    /* Container pour l'animation des actualités */
+    .actu-content-wrapper {
+      overflow: hidden;
+      position: relative;
+      flex: 1;
+    }
+    .actu-text {
+      font-size: 13px; color: var(--text-light); line-height: 1.6; font-weight: 400;
+      animation: fadeSlideIn 0.4s ease forwards;
+    }
+    
+    /* Animations des actualités */
+    @keyframes fadeSlideIn {
+      0% { opacity: 0; transform: translateX(20px); }
+      100% { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes fadeSlideOut {
+      0% { opacity: 1; transform: translateX(0); }
+      100% { opacity: 0; transform: translateX(-20px); }
+    }
+    .actu-text.slide-out {
+      animation: fadeSlideOut 0.3s ease forwards;
+    }
+    .actu-text.slide-in {
+      animation: fadeSlideIn 0.4s ease forwards;
+    }
+    
     .actu-card-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.03); }
     .actu-counter { font-size: 10px; color: var(--text-muted); opacity: 0.4; }
     .actu-nav-buttons { display: flex; gap: 6px; }
@@ -303,7 +325,9 @@
     .actu-nav-btn:hover { border-color: rgba(184,134,11,0.12); color: var(--text-light); background: rgba(10,10,10,0.5); }
     .actu-nav-btn:disabled { opacity: 0.2; cursor: not-allowed; transform: none; }
 
-    /* ===== FOOTER ===== */
+        /* ============================================================
+       FOOTER
+       ============================================================ */
     .footer { border-top: 1px solid rgba(184,134,11,0.03); padding: 28px 0 16px; text-align: center; margin-top: 20px; }
     .footer-logo { font-size: 16px; font-weight: 700; font-family: 'Playfair Display', serif; letter-spacing: 2px; margin-bottom: 8px; color: var(--text-light); }
     .footer-logo span { color: var(--accent); font-style: italic; }
@@ -326,47 +350,97 @@
     .footer-bottom { font-size: 9px; color: var(--text-muted); opacity: 0.4; font-weight: 300; }
 
     /* ============================================================
-       MENU
+       MENU - ANIMATION FLUIDE AMÉLIORÉE
        ============================================================ */
     .menu-overlay {
       position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 2000;
-      visibility: hidden; opacity: 0; transition: opacity 0.2s ease, visibility 0.2s ease;
+      visibility: hidden; opacity: 0; transition: opacity 0.3s ease, visibility 0.3s ease;
       display: flex; touch-action: none;
     }
     .menu-overlay.active { visibility: visible; opacity: 1; }
     .menu-backdrop {
       position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(3,3,3,0.5); backdrop-filter: blur(4px); cursor: default; touch-action: none;
+      background: rgba(3,3,3,0.5); backdrop-filter: blur(6px);
+      cursor: default; touch-action: none;
+      transition: backdrop-filter 0.3s ease;
     }
     .menu-sidebar {
       margin-left: auto; width: 75%; max-width: 320px; height: 100%;
       background: linear-gradient(180deg, #0A0A0A 0%, #141414 50%, #0A0A0A 100%);
       border-left: 1px solid rgba(184,134,11,0.03); padding: 20px 0;
-      transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
-      display: flex; flex-direction: column; overflow-y: auto; touch-action: pan-y; will-change: transform;
+      transform: translateX(100%); 
+      transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+      display: flex; flex-direction: column; overflow-y: auto; 
+      touch-action: pan-y; will-change: transform;
+      box-shadow: -10px 0 40px rgba(0,0,0,0.3);
     }
     .menu-overlay.active .menu-sidebar { transform: translateX(0); }
     .menu-sidebar::-webkit-scrollbar { width: 2px; }
     .menu-sidebar::-webkit-scrollbar-track { background: transparent; }
     .menu-sidebar::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 4px; opacity: 0.2; }
 
-    .menu-header { display: flex; justify-content: space-between; align-items: flex-start; padding: 0 20px 20px; border-bottom: 1px solid rgba(184,134,11,0.03); }
+    .menu-header { 
+      display: flex; justify-content: space-between; align-items: flex-start; 
+      padding: 0 20px 20px; border-bottom: 1px solid rgba(184,134,11,0.03);
+      opacity: 0; transform: translateY(10px);
+      transition: opacity 0.4s ease 0.1s, transform 0.4s ease 0.1s;
+    }
+    .menu-overlay.active .menu-header {
+      opacity: 1; transform: translateY(0);
+    }
+    
     .menu-user { display: flex; align-items: center; gap: 12px; }
-    .menu-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 600; color: var(--bg-dark); flex-shrink: 0; }
+    .menu-avatar { 
+      width: 40px; height: 40px; border-radius: 50%; 
+      background: var(--accent); display: flex; align-items: center; justify-content: center; 
+      font-size: 16px; font-weight: 600; color: var(--bg-dark); flex-shrink: 0; 
+      background-size: cover; background-position: center;
+      transition: transform 0.3s ease;
+    }
+    .menu-overlay.active .menu-avatar { transform: scale(1); }
     .menu-username { font-size: 14px; font-weight: 700; font-family: 'Playfair Display', serif; color: var(--text-light); }
     .menu-useremail { font-size: 10px; color: var(--text-muted); margin-top: 1px; font-weight: 300; }
     .menu-close-btn {
       width: 32px; height: 32px; background: rgba(184,134,11,0.03); border: 1px solid rgba(184,134,11,0.04);
-      border-radius: 8px; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: var(--transition); flex-shrink: 0;
+      border-radius: 8px; color: var(--text-muted); cursor: pointer; 
+      display: flex; align-items: center; justify-content: center; transition: var(--transition); flex-shrink: 0;
     }
     .menu-close-btn:hover { background: rgba(184,134,11,0.04); color: var(--text-light); }
     .menu-close-btn:active { transform: scale(0.92); }
 
-    .menu-nav { flex: 1; padding: 14px 12px 20px; display: flex; flex-direction: column; gap: 2px; }
+    .menu-nav { 
+      flex: 1; padding: 14px 12px 20px; display: flex; flex-direction: column; gap: 2px;
+    }
+    
+    .menu-nav .menu-link {
+      opacity: 0; transform: translateX(20px);
+      transition: opacity 0.3s ease, transform 0.3s ease, background 0.2s ease, color 0.2s ease;
+    }
+    .menu-overlay.active .menu-nav .menu-link {
+      opacity: 1; transform: translateX(0);
+    }
+    
+    /* Délais d'animation pour chaque lien */
+    .menu-nav .menu-link:nth-child(1) { transition-delay: 0.05s; }
+    .menu-nav .menu-link:nth-child(2) { transition-delay: 0.08s; }
+    .menu-nav .menu-link:nth-child(3) { transition-delay: 0.11s; }
+    .menu-nav .menu-link:nth-child(4) { transition-delay: 0.14s; }
+    .menu-nav .menu-link:nth-child(5) { transition-delay: 0.17s; }
+    .menu-nav .menu-link:nth-child(6) { transition-delay: 0.20s; }
+    .menu-nav .menu-link:nth-child(7) { transition-delay: 0.23s; }
+    .menu-nav .menu-link:nth-child(8) { transition-delay: 0.26s; }
+    .menu-nav .menu-link:nth-child(9) { transition-delay: 0.29s; }
+    .menu-nav .menu-link:nth-child(10) { transition-delay: 0.32s; }
+    .menu-nav .menu-link:nth-child(11) { transition-delay: 0.35s; }
+    .menu-nav .menu-link:nth-child(12) { transition-delay: 0.38s; }
+    .menu-nav .menu-link:nth-child(13) { transition-delay: 0.41s; }
+    .menu-nav .menu-link:nth-child(14) { transition-delay: 0.44s; }
+    .menu-nav .menu-link:nth-child(15) { transition-delay: 0.47s; }
+
     .menu-link {
       display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 10px;
       color: var(--text-dim); text-decoration: none; font-size: 13px; font-weight: 400;
-      transition: background 0.2s ease, color 0.2s ease;
+      transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
     }
     .menu-link:active { transform: scale(0.96); }
     .menu-link i { width: 18px; font-size: 14px; color: var(--text-muted); transition: color 0.2s ease; }
@@ -375,21 +449,30 @@
     .menu-link:hover:not(.active) { background: rgba(255,255,255,0.01); color: var(--text-light); }
     .menu-link:hover:not(.active) i { color: var(--text-light); }
 
-    /* ===== CHAT LINK - NOUVEAU ===== */
     .menu-link.chat-link {
       border: 1px solid rgba(184,134,11,0.08);
       background: rgba(184,134,11,0.03);
       margin-top: 4px;
     }
-    .menu-link.chat-link i {
-      color: var(--accent);
-    }
-    .menu-link.chat-link:hover {
-      background: rgba(184,134,11,0.06);
-      border-color: rgba(184,134,11,0.15);
-    }
+    .menu-link.chat-link i { color: var(--accent); }
+    .menu-link.chat-link:hover { background: rgba(184,134,11,0.06); border-color: rgba(184,134,11,0.15); }
 
-    .menu-footer { padding: 14px 20px 10px; border-top: 1px solid rgba(184,134,11,0.03); }
+    .menu-link.about-link {
+      border: 1px solid rgba(184,134,11,0.05);
+      margin-top: 2px;
+    }
+    .menu-link.about-link i { color: var(--text-dim); }
+    .menu-link.about-link:hover { background: rgba(255,255,255,0.02); }
+
+    .menu-footer { 
+      padding: 14px 20px 10px; border-top: 1px solid rgba(184,134,11,0.03);
+      opacity: 0; transform: translateY(10px);
+      transition: opacity 0.4s ease 0.2s, transform 0.4s ease 0.2s;
+    }
+    .menu-overlay.active .menu-footer {
+      opacity: 1; transform: translateY(0);
+    }
+    
     .menu-logout {
       display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 10px;
       color: #7A4A4A; text-decoration: none; font-size: 13px; font-weight: 400;
@@ -399,6 +482,118 @@
     .menu-logout i { font-size: 14px; }
     .menu-logout:hover { background: rgba(122,74,74,0.04); color: #8A4A4A; }
     .menu-version { text-align: center; font-size: 9px; color: var(--text-muted); opacity: 0.2; margin-top: 8px; font-weight: 300; }
+
+    /* ============================================================
+       MODAL DÉCONNEXION - TAILLE RÉDUITE ET ÉLÉGANTE
+       ============================================================ */
+    .modal-overlay-confirm {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(12px);
+      z-index: 3000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-overlay-confirm.show {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-confirm {
+      background: var(--bg-surface);
+      border: 1px solid rgba(184, 134, 11, 0.12);
+      border-radius: 14px;
+      padding: 24px 20px 20px;
+      max-width: 340px;
+      width: 100%;
+      text-align: center;
+      transform: scale(0.9) translateY(20px);
+      transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+    }
+    .modal-overlay-confirm.show .modal-confirm {
+      transform: scale(1) translateY(0);
+    }
+
+    .modal-confirm .icon {
+      font-size: 32px;
+      color: var(--danger);
+      opacity: 0.3;
+      display: block;
+      margin-bottom: 8px;
+    }
+    .modal-confirm h3 {
+      font-size: 17px;
+      font-weight: 700;
+      font-family: 'Playfair Display', 'Georgia', serif;
+      color: var(--text-light);
+      margin-bottom: 4px;
+    }
+    .modal-confirm h3 span {
+      color: var(--accent);
+      font-style: italic;
+    }
+    .modal-confirm p {
+      font-size: 12px;
+      color: var(--text-dim);
+      line-height: 1.5;
+      margin-bottom: 2px;
+    }
+    .modal-confirm .sub {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+    .modal-confirm .buttons {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+    }
+    .modal-confirm .buttons .btn-cancel {
+      flex: 1;
+      padding: 8px 12px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      color: var(--text-dim);
+      font-weight: 600;
+      font-size: 12px;
+      cursor: pointer;
+      transition: var(--transition);
+      font-family: 'Inter', sans-serif;
+      max-width: 120px;
+    }
+    .modal-confirm .buttons .btn-cancel:active { transform: scale(0.96); }
+    .modal-confirm .buttons .btn-cancel:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-light);
+    }
+    .modal-confirm .buttons .btn-confirm {
+      flex: 1;
+      padding: 8px 12px;
+      background: var(--danger);
+      border: none;
+      border-radius: 10px;
+      color: #fff;
+      font-weight: 700;
+      font-size: 12px;
+      cursor: pointer;
+      transition: var(--transition);
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      max-width: 140px;
+    }
+    .modal-confirm .buttons .btn-confirm:active { transform: scale(0.96); }
+    .modal-confirm .buttons .btn-confirm:hover { background: #6A2A2A; }
 
     /* ============================================================
        TOAST
@@ -449,7 +644,10 @@
       .logo-text { font-size: 16px; }
       .actu-card { padding: 14px 16px; }
       .actu-text { font-size: 12px; }
-      .notif-badge { display: none; }
+      .modal-confirm { padding: 18px 16px; max-width: 300px; }
+      .modal-confirm h3 { font-size: 15px; }
+      .modal-confirm .buttons .btn-cancel,
+      .modal-confirm .buttons .btn-confirm { font-size: 11px; padding: 6px 10px; max-width: 100px; }
     }
     @media (min-width: 768px) {
       .container { max-width: 700px; padding: 28px 24px 60px; }
@@ -510,6 +708,20 @@
   </div>
 </div>
 
+<!-- ===== MODAL DE DÉCONNEXION ===== -->
+<div class="modal-overlay-confirm" id="confirmModal">
+  <div class="modal-confirm">
+    <span class="icon"><i class="fas fa-sign-out-alt"></i></span>
+    <h3>⚠️ Confirmer la <span>déconnexion</span></h3>
+    <p>Voulez-vous vraiment vous déconnecter ?</p>
+    <p class="sub">Vous devrez vous reconnecter pour accéder à votre compte.</p>
+    <div class="buttons">
+      <button class="btn-cancel" id="cancelConfirmBtn">Annuler</button>
+      <button class="btn-confirm" id="confirmLogoutBtn"><i class="fas fa-sign-out-alt"></i> Se déconnecter</button>
+    </div>
+  </div>
+</div>
+
 <!-- ===== MENU ===== -->
 <div class="menu-overlay" id="menuOverlay">
   <div class="menu-backdrop" id="menuBackdrop"></div>
@@ -525,22 +737,27 @@
       <button class="menu-close-btn" id="menuCloseBtn"><i class="fas fa-times"></i></button>
     </div>
     <nav class="menu-nav">
+      <!-- Navigation Principale -->
       <a href="index.html" class="menu-link active"><i class="fas fa-home"></i> Accueil</a>
       <a href="ebooks.html" class="menu-link"><i class="fas fa-book"></i> E-books</a>
       <a href="formations.html" class="menu-link"><i class="fas fa-graduation-cap"></i> Formations</a>
       <a href="boutique.html" class="menu-link"><i class="fas fa-shopping-cart"></i> Achat</a>
-      <!-- ===== MODIFICATION : Investir → Épargne ===== -->
-      <a href="epargne.html" class="menu-link"><i class="fas fa-piggy-bank"></i> Épargne</a>
-      <a href="vendre.html" class="menu-link"><i class="fas fa-store"></i> Vendre</a>
-      <a href="forum.html" class="menu-link"><i class="fas fa-comments"></i> Forum</a>
+      
+      <!-- Finance & Gains -->
+      <a href="epargne.html" class="menu-link"><i class="fas fa-trophy"></i> Défis</a>
+      <a href="activite.html" class="menu-link"><i class="fas fa-chart-pie"></i> Mon Activité</a>
       <a href="parrainage.html" class="menu-link"><i class="fas fa-users"></i> Parrainage</a>
       <a href="recharger.html" class="menu-link"><i class="fas fa-plus-circle"></i> Recharger</a>
       <a href="retrait.html" class="menu-link"><i class="fas fa-arrow-down"></i> Retrait</a>
-      <a href="activite.html" class="menu-link"><i class="fas fa-chart-pie"></i> Mon Activité</a>
-      <a href="avis.html" class="menu-link"><i class="fas fa-star"></i> Avis</a>
-      <a href="profil.html" class="menu-link"><i class="fas fa-user"></i> Mon Profil</a>
-      <!-- ===== NOUVEAU LIEN CHAT IA ===== -->
+      
+      <!-- Communauté -->
+      <a href="forum.html" class="menu-link"><i class="fas fa-comments"></i> Forum</a>
       <a href="chat.html" class="menu-link chat-link"><i class="fas fa-robot"></i> Assistant ARVEXA</a>
+      <a href="avis.html" class="menu-link"><i class="fas fa-star"></i> Avis</a>
+      
+      <!-- Compte -->
+      <a href="profil.html" class="menu-link"><i class="fas fa-user"></i> Mon Profil</a>
+      <a href="about.html" class="menu-link about-link"><i class="fas fa-info-circle"></i> À Propos</a>
     </nav>
     <div class="menu-footer">
       <a href="#" class="menu-logout" id="menuLogoutBtn"><i class="fas fa-sign-out-alt"></i> Se déconnecter</a>
@@ -553,14 +770,17 @@
 <header class="header">
   <a href="#" class="logo" id="logoLink"><div class="logo-text">ARVE<span>XA</span></div></a>
   <div class="header-actions">
-    <span class="notif-badge" id="notifBadge">
-      <i class="fas fa-circle"></i> <span id="notifStatusText">Chargement...</span>
-    </span>
     <a href="#" class="user-profile" id="userProfileBtn">
       <div class="user-avatar" id="userAvatar">A</div>
       <span class="user-name" id="userName">Chargement...</span>
     </a>
-    <a href="#" class="menu-btn" id="menuBtn"><i class="fas fa-bars"></i></a>
+    <button class="menu-btn" id="menuBtn" aria-label="Ouvrir le menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="3" y1="6" x2="21" y2="6"/>
+        <line x1="3" y1="12" x2="21" y2="12"/>
+        <line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </button>
   </div>
 </header>
 
@@ -581,67 +801,78 @@
         <span class="main-stat-label">💰 Portefeuille ARVEXA</span>
         <a href="recharger.html" class="btn-recharge"><i class="fas fa-plus"></i> Recharger</a>
       </div>
-      <div class="main-stat-value" id="statBalance">0 FCFA</div>
+      <div class="main-stat-value" id="statBalance">
+        <span class="skeleton skeleton-value"></span>
+      </div>
       <div class="main-stat-footer">
         <i class="fas fa-wallet"></i> Solde disponible
-        <span style="margin-left:auto;color:var(--success);font-size:9px;font-weight:400;" id="dailyReturnDisplay">
-          <i class="fas fa-arrow-up"></i> 0% par jour
+        <span class="daily-perf neutral" id="dailyReturnDisplay">
+          <i class="fas fa-chart-line"></i> <span id="dailyPercent">0</span>% performance
         </span>
       </div>
     </div>
   </div>
 
-  <!-- ===== QUICK STATS ===== -->
+    <!-- ===== QUICK STATS ===== -->
   <div class="quick-stats">
     <div class="quick-stat-item">
       <div class="quick-stat-icon gold"><i class="fas fa-coins"></i></div>
-      <div class="quick-stat-value" id="statRevenue">0 FCFA</div>
+      <div class="quick-stat-value" id="statRevenue">
+        <span class="skeleton skeleton-text w60"></span>
+      </div>
       <div class="quick-stat-label">Revenus</div>
     </div>
     <div class="quick-stat-item">
-      <div class="quick-stat-icon blue"><i class="fas fa-piggy-bank"></i></div>
-      <div class="quick-stat-value" id="statEpargne">0</div>
-      <div class="quick-stat-label">Épargne</div>
+      <div class="quick-stat-icon gold"><i class="fas fa-trophy"></i></div>
+      <div class="quick-stat-value" id="statDefis">
+        <span class="skeleton skeleton-text w40"></span>
+      </div>
+      <div class="quick-stat-label">Défis</div>
     </div>
     <div class="quick-stat-item">
-      <div class="quick-stat-icon green"><i class="fas fa-users"></i></div>
-      <div class="quick-stat-value" id="statReferrals">0</div>
+      <div class="quick-stat-icon gold"><i class="fas fa-users"></i></div>
+      <div class="quick-stat-value" id="statReferrals">
+        <span class="skeleton skeleton-text w30"></span>
+      </div>
       <div class="quick-stat-label">Parrainages</div>
     </div>
   </div>
 
-  <!-- ===== FORMATIONS ===== -->
+  <!-- ===== FORMATIONS GRATUITES SUR L'ACCUEIL ===== -->
   <div class="section-header">
     <div class="section-header-left">
       <div class="section-subtitle">Apprendre simplement</div>
       <h2 class="section-title">Comprendre <span>l'argent</span></h2>
     </div>
+    <a href="formations.html" class="section-link">Voir tout <i class="fas fa-arrow-right"></i></a>
   </div>
   <div class="formations-list-horizontal">
-    <a href="formations.html" class="formation-card-horizontal">
+    <a href="formations/formation_001.html" class="formation-card-horizontal">
       <div class="formation-horiz-img-wrap">
-        <img src="https://im.png" alt="Économiser" class="formation-horiz-img" loading="lazy">
-        <span class="formation-horiz-badge">Débutant</span>
+        <img src="formations/cover-ia.png" alt="IA" class="formation-horiz-img" loading="lazy"
+             onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Crect fill=%27%231A3A2A%27 width=%27100%27 height=%27100%27/%3E%3Ctext x=%2750%27 y=%2755%27 text-anchor=%27middle%27 font-size=%2740%27 fill=%27%23B8860B%27%3E🤖%3C/text%3E%3C/svg%3E'">
+        <span class="formation-horiz-badge" style="color:var(--success);">GRATUIT</span>
       </div>
       <div class="formation-horiz-content">
-        <h3 class="formation-horiz-title">Pourquoi économiser ?</h3>
-        <p class="formation-horiz-description">Apprenez à garder de l'argent pour vos projets et vos envies.</p>
+        <h3 class="formation-horiz-title">Créer un business rentable avec l'IA</h3>
+        <p class="formation-horiz-description">Apprenez à utiliser l'IA pour créer et scaler un business profitable.</p>
         <div class="formation-horiz-footer">
-          <span class="formation-horiz-price">🎁 GRATUIT</span>
+          <span class="formation-horiz-price" style="color:var(--success);">🎁 GRATUIT</span>
           <span class="formation-horiz-action">Découvrir <i class="fas fa-chevron-right"></i></span>
         </div>
       </div>
     </a>
-    <a href="formations.html" class="formation-card-horizontal">
+    <a href="formations/formation_002.html" class="formation-card-horizontal">
       <div class="formation-horiz-img-wrap">
-        <img src="https://i.png" alt="Investir" class="formation-horiz-img" loading="lazy">
-        <span class="formation-horiz-badge">Débutant</span>
+        <img src="formations/cover-site.png" alt="Site web" class="formation-horiz-img" loading="lazy"
+             onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Crect fill=%27%231A3A2A%27 width=%27100%27 height=%27100%27/%3E%3Ctext x=%2750%27 y=%2755%27 text-anchor=%27middle%27 font-size=%2740%27 fill=%27%23B8860B%27%3E🌐%3C/text%3E%3C/svg%3E'">
+        <span class="formation-horiz-badge" style="color:var(--success);">GRATUIT</span>
       </div>
       <div class="formation-horiz-content">
-        <h3 class="formation-horiz-title">Faire grossir son argent</h3>
-        <p class="formation-horiz-description">Découvrez comment votre argent peut travailler pour vous.</p>
+        <h3 class="formation-horiz-title">Créer un site web professionnel sans coder</h3>
+        <p class="formation-horiz-description">Créez votre site web sans écrire une seule ligne de code.</p>
         <div class="formation-horiz-footer">
-          <span class="formation-horiz-price">🎁 GRATUIT</span>
+          <span class="formation-horiz-price" style="color:var(--success);">🎁 GRATUIT</span>
           <span class="formation-horiz-action">Découvrir <i class="fas fa-chevron-right"></i></span>
         </div>
       </div>
@@ -672,17 +903,16 @@
       </div>
       <div class="service-arrow"><i class="fas fa-chevron-right"></i></div>
     </a>
-    <!-- ===== MODIFICATION : Investir → Épargne ===== -->
     <a href="epargne.html" class="service-item">
-      <div class="service-icon blue"><i class="fas fa-piggy-bank"></i></div>
+      <div class="service-icon gold"><i class="fas fa-trophy"></i></div>
       <div class="service-content">
-        <div class="service-title">Epargne</div>
-        <div class="service-desc">Épargnez pour vos projets et objectifs</div>
+        <div class="service-title">Défis</div>
+        <div class="service-desc">Relevez des défis et gagnez des récompenses</div>
       </div>
       <div class="service-arrow"><i class="fas fa-chevron-right"></i></div>
     </a>
     <a href="activite.html" class="service-item">
-      <div class="service-icon green"><i class="fas fa-chart-pie"></i></div>
+      <div class="service-icon gold"><i class="fas fa-chart-pie"></i></div>
       <div class="service-content">
         <div class="service-title">Mon Activité</div>
         <div class="service-desc">Suivez vos performances en temps réel</div>
@@ -705,7 +935,9 @@
           <span class="actu-badge" id="actuBadge">📢 Nouveau</span>
           <span class="actu-date" id="actuDate">Il y a 2 jours</span>
         </div>
-        <p class="actu-text" id="actuText">Bienvenue sur ARVEXA ! Commencez votre parcours d'investissement dès aujourd'hui.</p>
+        <div class="actu-content-wrapper">
+          <p class="actu-text" id="actuText">Bienvenue sur ARVEXA ! Commencez votre parcours d'investissement dès aujourd'hui.</p>
+        </div>
       </div>
       <div class="actu-card-footer">
         <span class="actu-counter" id="actuCounter">1 / 5</span>
@@ -738,65 +970,21 @@
 <div class="toast" id="toast"></div>
 
 <!-- ============================================================ -->
-<!-- ===== SCRIPTS ===== -->
-<script type="importmap">
-  {
-    "imports": {
-      "firebase/app": "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js",
-      "firebase/auth": "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js",
-      "firebase/firestore": "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js",
-      "firebase/messaging": "https://www.gstatic.com/firebasejs/12.12.1/firebase-messaging.js"
-    }
-  }
-</script>
+<!-- ===== CONFIGURATION ===== -->
+<!-- ============================================================ -->
+<script src="config.js"></script>
 
-<!-- ================================================================ -->
-<!-- ERUDA - Console mobile -->
-<!-- ================================================================ -->
-<script>
-(function() {
-  var isLocal = location.hostname === "localhost" || location.hostname === "127.0.0.1";
-  var isDebug = location.search.indexOf("debug=true") !== -1 || location.search.indexOf("eruda=true") !== -1;
-  
-  if (isLocal || isDebug) {
-    if (document.querySelector('script[data-eruda]')) return;
-    var s = document.createElement("script");
-    s.setAttribute("data-eruda", "true");
-    s.src = "https://cdn.jsdelivr.net/npm/eruda";
-    s.onload = function() {
-      if (typeof eruda !== 'undefined') {
-        eruda.init({
-          tool: ['console', 'network', 'elements', 'resources'],
-          defaults: { displaySize: 40 }
-        });
-        console.log("🐞 Eruda active - Accueil");
-      }
-    };
-    document.head.appendChild(s);
+<script type="importmap">
+{
+  "imports": {
+    "firebase/app": "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js",
+    "firebase/auth": "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js",
+    "firebase/firestore": "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js"
   }
-})();
+}
 </script>
 
 <script type="module">
-// ================================================================
-// CHARGEMENT RAPIDE - VÉRIFICATION DU CACHE SESSION
-// ================================================================
-var loadingScreen = document.getElementById('loadingScreen');
-var mainContent = document.getElementById('mainContent');
-  
-// Vérifier si le site a déjà été chargé dans cette session
-var isFirstLoad = !sessionStorage.getItem('arvexa_loaded');
-  
-if (!isFirstLoad) {
-  loadingScreen.classList.add('hide');
-  mainContent.style.display = 'block';
-  mainContent.style.opacity = '1';
-  document.body.style.overflow = '';
-} else {
-  loadingScreen.classList.remove('hide');
-  mainContent.style.display = 'none';
-}
-
 // ================================================================
 // IMPORTS FIREBASE
 // ================================================================
@@ -807,13 +995,8 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
 import { 
   getFirestore, doc, getDoc, onSnapshot, updateDoc, setDoc,
-  collection, query, orderBy, where
+  collection, query, orderBy, getDocs, addDoc, getCountFromServer
 } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
-import { 
-  getMessaging, 
-  getToken, 
-  onMessage 
-} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-messaging.js";
 
 // ================================================================
 // FIREBASE
@@ -831,22 +1014,31 @@ var firebaseConfig = {
 var app = initializeApp(firebaseConfig);
 var auth = getAuth(app);
 var db = getFirestore(app);
-var messaging = getMessaging(app);
-
-// VAPID Key
-var VAPID_KEY = "BA8jFHMi3fNPkB4iAqib8GJnrq1_8KR2u_PyQjI2q5rp6rzmaGAsZ_aHm7TP1FqvXg4ZhOUBQUrQ6jpEf9qmrlM";
 
 setPersistence(auth, browserLocalPersistence);
 
 // ================================================================
-// DOM
+// CONFIGURATION
+// ================================================================
+var ADMIN_URL = 'https://nexgen-39043.web.app/admin';
+var ADMIN_EMAIL = 'gagneavecia@gmail.com';
+
+if (typeof APP_CONFIG !== 'undefined') {
+  if (APP_CONFIG.ADMIN_URL) ADMIN_URL = APP_CONFIG.ADMIN_URL;
+  if (APP_CONFIG.ADMIN_EMAIL) ADMIN_EMAIL = APP_CONFIG.ADMIN_EMAIL;
+}
+
+// ================================================================
+// DOM - CACHÉ POUR PERFORMANCE
 // ================================================================
 var userNameEl = document.getElementById('userName');
 var userAvatarEl = document.getElementById('userAvatar');
 var statBalanceEl = document.getElementById('statBalance');
 var statRevenueEl = document.getElementById('statRevenue');
-var statEpargneEl = document.getElementById('statEpargne');
+var statDefisEl = document.getElementById('statDefis');
 var statReferralsEl = document.getElementById('statReferrals');
+var dailyPercentEl = document.getElementById('dailyPercent');
+var dailyReturnDisplay = document.getElementById('dailyReturnDisplay');
 
 var menuOverlay = document.getElementById('menuOverlay');
 var menuBtn = document.getElementById('menuBtn');
@@ -870,17 +1062,35 @@ var gainNotifMessage = document.getElementById('gainNotifMessage');
 var adminLockBtn = document.getElementById('adminLockBtn');
 var toast = document.getElementById('toast');
 
-var notifBadge = document.getElementById('notifBadge');
-var notifStatusText = document.getElementById('notifStatusText');
-
-// Bannière permission notifications
-var notifPermissionBanner = document.getElementById('notifPermissionBanner');
-var enableNotifBtn = document.getElementById('enableNotifBtn');
+var confirmModal = document.getElementById('confirmModal');
+var cancelConfirmBtn = document.getElementById('cancelConfirmBtn');
+var confirmLogoutBtn = document.getElementById('confirmLogoutBtn');
 
 var currentUser = null;
 var userData = null;
 var unsubscribeUser = null;
 var unsubscribeActualites = null;
+var isPageLoading = true;
+var dataLoaded = false;
+var isAnimating = false;
+
+// ================================================================
+// FORMAT MONNAIE - COMPLET POUR SOLDE PRINCIPAL
+// ================================================================
+function formatCurrencyFull(amount) {
+  if (!amount) return '0 FCFA';
+  return Math.round(amount).toLocaleString('fr-FR') + ' FCFA';
+}
+
+// ================================================================
+// FORMAT MONNAIE - ABRÉGÉ POUR LES STATS (REVENUS, DÉFIS, PARRAINAGES)
+// ================================================================
+function formatCurrencyAbbr(amount) {
+  if (!amount) return '0 FCFA';
+  if (amount >= 1000000) return (amount / 1000000).toFixed(1) + 'M FCFA';
+  if (amount >= 1000) return (amount / 1000).toFixed(1) + 'K FCFA';
+  return Math.round(amount).toLocaleString('fr-FR') + ' FCFA';
+}
 
 // ================================================================
 // TOAST
@@ -889,12 +1099,8 @@ function showToast(message, type) {
   type = type || 'info';
   toast.textContent = message;
   toast.className = 'toast ' + type;
-  setTimeout(function() {
-    toast.classList.add('show');
-  }, 50);
-  setTimeout(function() {
-    toast.classList.remove('show');
-  }, 3500);
+  setTimeout(function() { toast.classList.add('show'); }, 50);
+  setTimeout(function() { toast.classList.remove('show'); }, 3500);
 }
 
 // ================================================================
@@ -904,9 +1110,7 @@ function showGainNotification(title, message) {
   gainNotifTitle.innerText = title;
   gainNotifMessage.innerHTML = message;
   gainNotification.classList.add('show');
-  setTimeout(function() {
-    gainNotification.classList.remove('show');
-  }, 3500);
+  setTimeout(function() { gainNotification.classList.remove('show'); }, 3500);
   if (navigator.vibrate) navigator.vibrate(100);
 }
 
@@ -929,327 +1133,57 @@ function formatDate(dateStr) {
 }
 
 // ================================================================
-// FORMAT MONNAIE
+// CACHE PERFORMANCE
 // ================================================================
-function formatCurrency(amount) {
-  if (!amount) return '0 FCFA';
-  if (amount >= 1000000) return (amount / 1000000).toFixed(1) + 'M FCFA';
-  if (amount >= 1000) return (amount / 1000).toFixed(1) + 'K FCFA';
-  return amount.toLocaleString('fr-FR') + ' FCFA';
-}
-
-// ================================================================
-// ACTUALITÉS
-// ================================================================
-var defaultActualites = [
-  { id: 'default_1', badge: '📢 Bienvenue', badgeClass: '', text: 'Bienvenue sur ARVEXA ! Commencez votre parcours d\'investissement dès aujourd\'hui.', date: new Date().toISOString(), timestamp: Date.now() },
-  { id: 'default_2', badge: '💡 Astuce', badgeClass: 'astuce', text: 'Réinvestissez vos gains mensuels pour profiter des intérêts composés et booster vos revenus.', date: new Date(Date.now() - 86400000).toISOString(), timestamp: Date.now() - 86400000 },
-  { id: 'default_3', badge: '🎉 Promotion', badgeClass: 'promotion', text: 'Bonus de 500 FCFA offert pour tout nouveau parrainage valide jusqu\'au 31 mars 2026.', date: new Date(Date.now() - 172800000).toISOString(), timestamp: Date.now() - 172800000 },
-  { id: 'default_4', badge: '📢 Nouveau', badgeClass: '', text: 'Nouveau plan d\'épargne "Performance" disponible à partir de 150 000 FCFA avec un rendement de 18%.', date: new Date(Date.now() - 259200000).toISOString(), timestamp: Date.now() - 259200000 },
-  { id: 'default_5', badge: '✅ Mise à jour', badgeClass: 'update', text: 'L\'application ARVEXA est désormais plus rapide avec des temps de chargement réduits de 40%.', date: new Date(Date.now() - 432000000).toISOString(), timestamp: Date.now() - 432000000 }
-];
-
-var actualites = [];
-var currentActuIndex = 0;
-
-function displayActu(index) {
-  if (!actualites.length) {
-    actuText.textContent = 'Aucune actualité pour le moment. Revenez plus tard !';
-    actuBadge.textContent = '📢 Info';
-    actuBadge.className = 'actu-badge';
-    actuDate.textContent = '';
-    actuCounter.textContent = '0 / 0';
-    actuPrevBtn.disabled = true;
-    actuNextBtn.disabled = true;
-    return;
-  }
-  var actu = actualites[index];
-  if (!actu) return;
-  actuText.textContent = actu.text || 'Pas de contenu';
-  actuBadge.textContent = actu.badge || '📢 Info';
-  actuBadge.className = 'actu-badge' + (actu.badgeClass ? ' ' + actu.badgeClass : '');
-  actuDate.textContent = formatDate(actu.date || actu.createdAt);
-  actuCounter.textContent = (index + 1) + ' / ' + actualites.length;
-  actuPrevBtn.disabled = index === 0;
-  actuNextBtn.disabled = index === actualites.length - 1;
-}
-
-actuNextBtn.addEventListener('click', function() {
-  if (currentActuIndex < actualites.length - 1) {
-    currentActuIndex++;
-    displayActu(currentActuIndex);
-  }
-});
-actuPrevBtn.addEventListener('click', function() {
-  if (currentActuIndex > 0) {
-    currentActuIndex--;
-    displayActu(currentActuIndex);
-  }
-});
-
-function loadActualites() {
-  if (unsubscribeActualites) { unsubscribeActualites(); unsubscribeActualites = null; }
-  var q = query(collection(db, 'actualites'), orderBy('timestamp', 'desc'));
-  unsubscribeActualites = onSnapshot(q, function(snapshot) {
-    var data = [];
-    snapshot.forEach(function(doc) {
-      var docData = doc.data();
-      data.push({ id: doc.id, ...docData, badgeClass: docData.badgeClass || '', timestamp: docData.timestamp || docData.createdAt || Date.now() });
-    });
-    actualites = data.length > 0 ? data : defaultActualites;
-    currentActuIndex = 0;
-    displayActu(0);
-    var lastActu = actualites[0];
-    if (lastActu && 
-        sessionStorage.getItem('last_actu_id') !== lastActu.id &&
-        !lastActu.badge.includes('Bienvenue') &&
-        !lastActu.text.includes('Bienvenue')) {
-      showToast('📢 ' + lastActu.badge + ' ' + lastActu.text.substring(0, 50) + '...', 'info');
-      sessionStorage.setItem('last_actu_id', lastActu.id);
-    }
-  }, function(error) {
-    console.error('Erreur actualités:', error);
-    actualites = defaultActualites;
-    currentActuIndex = 0;
-    displayActu(0);
-  });
-}
-
-// ================================================================
-// FCM - NOTIFICATIONS PUSH (UNIQUEMENT APRÈS ACTION UTILISATEUR)
-// ================================================================
-
-// Variable pour savoir si on a déjà demandé
-var notifPermissionRequested = false;
-
-async function setupFCMNotifications() {
-  // NE PAS DEMANDER LA PERMISSION ICI
-  // On vérifie juste l'état actuel
+function getCachedPerformance() {
   try {
-    var isAdmin = currentUser && currentUser.email === 'gagneavecia@gmail.com';
-    
-    // Vérifier le statut actuel
-    if (Notification.permission === 'granted') {
-      // Déjà autorisé
-      var token = await getToken(messaging, { vapidKey: VAPID_KEY });
-      if (currentUser) {
-        var userRef = doc(db, 'users', currentUser.uid);
-        await updateDoc(userRef, {
-          fcmToken: token,
-          notificationsEnabled: true,
-          isAdmin: isAdmin,
-          lastTokenUpdate: new Date().toISOString()
-        });
-      }
-      notifBadge.className = 'notif-badge active';
-      notifStatusText.textContent = isAdmin ? '👑 Admin - Notifs actives' : '🔔 Notifications actives';
-      if (notifPermissionBanner) notifPermissionBanner.style.display = 'none';
-      return token;
+    const cached = localStorage.getItem('ARVEXA_performance_cache');
+    if (!cached) return null;
+    const data = JSON.parse(cached);
+    const timestamp = data.timestamp || 0;
+    if (Date.now() - timestamp > 300000) return null;
+    return data.percent;
+  } catch(e) { return null; }
+}
+
+function setCachedPerformance(percent) {
+  try {
+    localStorage.setItem('ARVEXA_performance_cache', JSON.stringify({
+      percent: percent,
+      timestamp: Date.now()
+    }));
+  } catch(e) {}
+}
+
+// ================================================================
+// AFFICHER LE POURCENTAGE
+// ================================================================
+function updatePerformanceDisplay(percent) {
+  if (dailyPercentEl) {
+    dailyPercentEl.textContent = percent;
+  }
+  if (dailyReturnDisplay) {
+    if (percent > 0) {
+      dailyReturnDisplay.className = 'daily-perf positive';
+      dailyReturnDisplay.style.color = '#2D7D5A';
+    } else {
+      dailyReturnDisplay.className = 'daily-perf neutral';
+      dailyReturnDisplay.style.color = '#5A5A4A';
     }
-    
-    if (Notification.permission === 'denied') {
-      notifBadge.className = 'notif-badge inactive';
-      notifStatusText.textContent = '🔕 Notifications bloquées';
-      if (notifPermissionBanner) notifPermissionBanner.style.display = 'none';
-      return null;
-    }
-    
-    // Permission par défaut (default) → Afficher le bouton
-    notifBadge.className = 'notif-badge inactive';
-    notifStatusText.textContent = '🔔 Activer les notifs';
-    if (notifPermissionBanner) notifPermissionBanner.style.display = 'block';
-    return null;
-    
-  } catch (error) {
-    console.error('❌ Erreur FCM:', error);
-    notifBadge.className = 'notif-badge inactive';
-    notifStatusText.textContent = '🔕 Erreur';
-    return null;
   }
 }
 
 // ================================================================
-// DEMANDER LA PERMISSION AU CLIC DE L'UTILISATEUR
-// ================================================================
-if (enableNotifBtn) {
-  enableNotifBtn.addEventListener('click', async function() {
-    console.log('🔔 Demande de permission notifications...');
-    
-    try {
-      var permission = await Notification.requestPermission();
-      
-      if (permission === 'granted') {
-        console.log('✅ Permission accordée');
-        
-        // Maintenant on peut récupérer le token
-        var isAdmin = currentUser && currentUser.email === 'gagneavecia@gmail.com';
-        var token = await getToken(messaging, { vapidKey: VAPID_KEY });
-        
-        if (currentUser) {
-          var userRef = doc(db, 'users', currentUser.uid);
-          await updateDoc(userRef, {
-            fcmToken: token,
-            notificationsEnabled: true,
-            isAdmin: isAdmin,
-            lastTokenUpdate: new Date().toISOString()
-          });
-        }
-        
-        notifBadge.className = 'notif-badge active';
-        notifStatusText.textContent = isAdmin ? '👑 Admin - Notifs actives' : '🔔 Notifications actives';
-        if (notifPermissionBanner) notifPermissionBanner.style.display = 'none';
-        showToast('✅ Notifications activées avec succès !', 'success');
-        
-        // S'abonner aux messages après activation
-        setupOnMessageListener();
-        
-      } else {
-        console.warn('⚠️ Permission refusée');
-        notifBadge.className = 'notif-badge inactive';
-        notifStatusText.textContent = '🔕 Notifications désactivées';
-        if (notifPermissionBanner) notifPermissionBanner.style.display = 'none';
-        showToast('⚠️ Vous avez refusé les notifications.', 'warning');
-      }
-    } catch (error) {
-      console.error('❌ Erreur demande permission:', error);
-      showToast('❌ Erreur lors de l\'activation des notifications.', 'error');
-    }
-  });
-}
-
-// ================================================================
-// ÉCOUTE DES MESSAGES EN PREMIER PLAN
-// ================================================================
-function setupOnMessageListener() {
-  onMessage(messaging, function(payload) {
-    console.log('📩 Message reçu en premier plan:', payload);
-    
-    var data = payload.data || {};
-    var type = data.type || 'default';
-    var isAdmin = currentUser && currentUser.email === 'gagneavecia@gmail.com';
-    
-    if (navigator.vibrate) {
-      navigator.vibrate([200, 100, 200]);
-    }
-    
-    // Admin reçoit toutes les notifications
-    if (isAdmin) {
-      showToast(
-        '📢 ' + (payload.notification?.title || 'ARVEXA') + '\n' + (payload.notification?.body || 'Nouvelle notification'),
-        'info'
-      );
-      return;
-    }
-    
-    // Utilisateur normal → notifications personnelles
-    switch(type) {
-      case 'daily_gain':
-        var amount = parseInt(data.amount || 0);
-        showGainNotification(
-          '💰 Gains quotidiens',
-          '+' + amount.toLocaleString('fr-FR') + ' FCFA ajoutés à votre solde !'
-        );
-        break;
-      case 'new_referral':
-        showToast('👤 NOUVEAU PARRAIN\n' + (data.userName || '') + ' a rejoint ARVEXA !', 'success');
-        break;
-      case 'deposit_confirmed':
-        showToast('✅ DÉPÔT CONFIRMÉ\n' + parseInt(data.amount || 0).toLocaleString('fr-FR') + ' FCFA crédités', 'success');
-        break;
-      case 'withdrawal_confirmed':
-        showToast('✅ RETRAIT EFFECTUÉ\n' + parseInt(data.amount || 0).toLocaleString('fr-FR') + ' FCFA envoyés', 'success');
-        break;
-      case 'purchase_confirmed':
-        showToast('✅ ACHAT CONFIRMÉ\n' + (data.productName || 'Produit') + ' acheté', 'success');
-        break;
-      default:
-        if (payload.notification?.title && payload.notification?.body) {
-          showToast('📢 ' + payload.notification.title + '\n' + payload.notification.body, 'info');
-        }
-    }
-  });
-}
-
-// ================================================================
-// MENU - SWIPE
-// ================================================================
-var touchStartX = 0, touchStartY = 0, isSwiping = false, isMenuOpen = false;
-
-function openMenu() { if (isMenuOpen) return; isMenuOpen = true; menuOverlay.classList.add('active'); document.body.style.overflow = 'hidden'; }
-function closeMenu() { if (!isMenuOpen) return; isMenuOpen = false; menuOverlay.classList.remove('active'); document.body.style.overflow = ''; }
-
-document.addEventListener('touchstart', function(e) {
-  var touch = e.changedTouches[0];
-  touchStartX = touch.screenX; touchStartY = touch.screenY; isSwiping = false;
-}, { passive: true });
-
-document.addEventListener('touchmove', function(e) {
-  if (!e.cancelable) return;
-  var touch = e.changedTouches[0];
-  var deltaX = touch.screenX - touchStartX;
-  var deltaY = touch.screenY - touchStartY;
-  if (Math.abs(deltaY) > Math.abs(deltaX) * 1.2) return;
-  if (Math.abs(deltaX) > 15) { isSwiping = true; e.preventDefault(); }
-}, { passive: false });
-
-document.addEventListener('touchend', function(e) {
-  if (!isSwiping) return;
-  var deltaX = e.changedTouches[0].screenX - touchStartX;
-  if (deltaX < -40 && !isMenuOpen) openMenu();
-  else if (deltaX > 40 && isMenuOpen) closeMenu();
-  isSwiping = false;
-}, { passive: true });
-
-menuBtn.addEventListener('click', function(e) { e.preventDefault(); e.stopPropagation(); isMenuOpen ? closeMenu() : openMenu(); });
-menuCloseBtn.addEventListener('click', function() { closeMenu(); });
-menuBackdrop.addEventListener('click', function() { closeMenu(); });
-document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeMenu(); });
-
-// ================================================================
-// ADMIN BUTTON
-// ================================================================
-function checkAdminButton(user) {
-  if (!adminLockBtn) return;
-  if (user && user.email === 'gagneavecia@gmail.com') {
-    adminLockBtn.style.display = 'flex';
-    adminLockBtn.onclick = function(e) { e.preventDefault(); e.stopPropagation(); window.location.href = 'admin/index.html'; };
-  } else {
-    adminLockBtn.style.display = 'none';
-  }
-}
-
-// ================================================================
-// DÉCONNEXION
-// ================================================================
-async function handleLogout() {
-  if (confirm('Voulez-vous vous déconnecter ?')) {
-    try {
-      await signOut(auth);
-      localStorage.removeItem('ARVEXA_current_user');
-      localStorage.removeItem('ARVEXA_user_data');
-      sessionStorage.clear();
-      showToast('✅ Déconnexion réussie', 'success');
-      setTimeout(function() { window.location.href = 'login.html'; }, 500);
-    } catch (error) {
-      console.error('Erreur déconnexion:', error);
-      showToast('❌ Erreur lors de la déconnexion', 'error');
-    }
-  }
-}
-menuLogoutBtn.addEventListener('click', handleLogout);
-
-// ================================================================
-// UPDATE UI
+// AFFICHER LES DONNÉES - RAPIDE
 // ================================================================
 function updateUI(data) {
   if (!data) return;
+  
   var prenom = data.prenom || '';
   var displayName = prenom || 'Investisseur';
   
-  // Nom et avatar
   userNameEl.textContent = displayName;
   
-  // ✅ Photo de profil
   if (data.avatarBase64) {
     userAvatarEl.style.backgroundImage = 'url(' + data.avatarBase64 + ')';
     userAvatarEl.style.backgroundSize = 'cover';
@@ -1260,7 +1194,6 @@ function updateUI(data) {
     userAvatarEl.textContent = displayName.charAt(0).toUpperCase();
   }
   
-  // Menu avatar
   if (data.avatarBase64) {
     menuAvatar.style.backgroundImage = 'url(' + data.avatarBase64 + ')';
     menuAvatar.style.backgroundSize = 'cover';
@@ -1273,123 +1206,409 @@ function updateUI(data) {
   
   menuUsername.textContent = displayName;
   menuUseremail.textContent = data.email || 'email@email.com';
-
+  
+  // ===== SOLDE PRINCIPAL - FORMAT COMPLET =====
   var balance = data.balance || 0;
-  statBalanceEl.textContent = formatCurrency(balance);
-
-  var totalRevenus = data.gainsTotal || data.totalRevenus || 0;
-  statRevenueEl.textContent = formatCurrency(totalRevenus);
-
-  // Compteur épargne : nombre d'épargnes actives
-  var epargneCount = data.epargnes ? data.epargnes.length : 0;
-  statEpargneEl.textContent = epargneCount;
-
-  statReferralsEl.textContent = data.referralsCount || 0;
-
-  // Pourcentage dynamique
-  var dailyReturn = 0;
-  if (data.investments && data.investments.length > 0) {
-    var activeInvests = data.investments.filter(function(i) { return i.status === 'active'; });
-    if (activeInvests.length > 0) {
-      var totalReturn = activeInvests.reduce(function(sum, inv) { return sum + (inv.dailyPercent || inv.dailyReturn || 0); }, 0);
-      dailyReturn = totalReturn / activeInvests.length;
-    }
+  statBalanceEl.innerHTML = formatCurrencyFull(balance);
+  
+  // ===== 3 AUTRES STATS - FORMAT ABRÉGÉ =====
+  var totalRevenus = data.gainsTotal || 0;
+  statRevenueEl.innerHTML = formatCurrencyAbbr(totalRevenus);
+  
+  var totalDefis = data.totalDefisGagnes || 0;
+  statDefisEl.innerHTML = formatCurrencyAbbr(totalDefis);
+  
+  statReferralsEl.innerHTML = data.referralsCount || 0;
+  
+  // ✅ AFFICHAGE IMMÉDIAT DU POURCENTAGE (CACHE)
+  const cachedPercent = getCachedPerformance();
+  if (cachedPercent !== null) {
+    updatePerformanceDisplay(cachedPercent);
   }
-  var displayPercent = dailyReturn > 0 ? (dailyReturn / 10).toFixed(1) : '0';
-  var statFooter = document.querySelector('.main-stat-footer');
-  if (statFooter) {
-    var span = statFooter.querySelector('span:last-child');
-    if (span) {
-      if (parseFloat(displayPercent) > 0) {
-        span.innerHTML = '<i class="fas fa-arrow-up"></i> +' + displayPercent + '% par jour';
-        span.style.color = 'var(--success)';
-      } else {
-        span.innerHTML = '<i class="fas fa-minus"></i> 0% par jour';
-        span.style.color = 'var(--text-muted)';
-      }
-    }
-  }
+  
   checkAdminButton(currentUser);
   localStorage.setItem('ARVEXA_user_data', JSON.stringify(data));
-  
-  if (isFirstLoad) {
-    setTimeout(function() {
-      loadingScreen.classList.add('hide');
-      mainContent.style.display = 'block';
-      mainContent.style.opacity = '1';
-      document.body.style.overflow = '';
-      sessionStorage.setItem('arvexa_loaded', 'true');
-    }, 600);
+  hideLoadingScreen();
+}
+
+// ================================================================
+// CALCUL DE LA PERFORMANCE GLOBALE (Basée sur le solde)
+// ================================================================
+async function calculateGlobalPerformance() {
+  if (!currentUser) return;
+
+  try {
+    // Récupérer les données utilisateur
+    const userRef = doc(db, 'users', currentUser.uid);
+    const userSnap = await getDoc(userRef);
+    
+    if (!userSnap.exists()) return;
+    
+    const userData = userSnap.data();
+    const balance = userData.balance || 0;
+    const totalGains = userData.gainsTotal || 0;
+    
+        // Calcul du pourcentage : (Gains Totaux / Solde) × 100
+    let performance = 0;
+    if (balance > 0) {
+      performance = Math.round((totalGains / balance) * 100);
+    }
+    
+    // Limiter à 200% max
+    const displayPercent = Math.min(performance, 200);
+    
+    // Mettre en cache
+    setCachedPerformance(displayPercent);
+    
+    // Mettre à jour l'affichage
+    updatePerformanceDisplay(displayPercent);
+    
+    console.debug('📊 Performance globale mise à jour:', displayPercent + '%');
+
+  } catch (error) {
+    console.warn('Erreur calcul performance globale:', error);
   }
 }
 
 // ================================================================
-// FORCE CHECK GAINS
+// ACTUALITÉS - MIGRATION VERS FIREBASE ET ANIMATION FLUIDE
 // ================================================================
-async function forceCheckAndCreditGains() {
-  if (!currentUser || !userData) return false;
-  if (!userData.investments || userData.investments.length === 0) return false;
-  var activeInvests = userData.investments.filter(function(i) { return i.status === 'active'; });
-  if (activeInvests.length === 0) return false;
+
+// Actualités par défaut pour la migration
+var defaultActualites = [
+  { 
+    id: 'actu_1', 
+    badge: '📢 Bienvenue', 
+    badgeClass: '', 
+    text: 'Bienvenue sur ARVEXA ! Commencez votre parcours d\'investissement dès aujourd\'hui.', 
+    date: new Date().toISOString(), 
+    timestamp: Date.now() 
+  },
+  { 
+    id: 'actu_2', 
+    badge: '💡 Astuce', 
+    badgeClass: 'astuce', 
+    text: 'Réinvestissez vos gains mensuels pour profiter des intérêts composés et booster vos revenus.', 
+    date: new Date(Date.now() - 86400000).toISOString(), 
+    timestamp: Date.now() - 86400000 
+  },
+  { 
+    id: 'actu_3', 
+    badge: '🎉 Promotion', 
+    badgeClass: 'promotion', 
+    text: 'Bonus de 500 FCFA offert pour tout nouveau parrainage valide jusqu\'au 31 mars 2026.', 
+    date: new Date(Date.now() - 172800000).toISOString(), 
+    timestamp: Date.now() - 172800000 
+  },
+  { 
+    id: 'actu_4', 
+    badge: '📢 Nouveau', 
+    badgeClass: '', 
+    text: 'Nouveau plan d\'épargne "Performance" disponible à partir de 150 000 FCFA avec un rendement de 18%.', 
+    date: new Date(Date.now() - 259200000).toISOString(), 
+    timestamp: Date.now() - 259200000 
+  },
+  { 
+    id: 'actu_5', 
+    badge: '✅ Mise à jour', 
+    badgeClass: 'update', 
+    text: 'L\'application ARVEXA est désormais plus rapide avec des temps de chargement réduits de 40%.', 
+    date: new Date(Date.now() - 432000000).toISOString(), 
+    timestamp: Date.now() - 432000000 
+  }
+];
+
+var actualites = [];
+var currentActuIndex = 0;
+
+// Fonction de migration des actualités vers Firebase
+async function migrateActualitesToFirebase() {
   try {
-    var userRef = doc(db, "users", currentUser.uid);
-    var userDoc = await getDoc(userRef);
-    if (!userDoc.exists()) return false;
-    var data = userDoc.data();
-    var active = (data.investments || []).filter(function(i) { return i.status === 'active'; });
-    if (active.length === 0) return false;
-    var totalGain = 0, gainDetails = [], updated = false;
-    var now = new Date();
-    var updatedInvests = data.investments.slice();
-    for (var i = 0; i < updatedInvests.length; i++) {
-      var inv = updatedInvests[i];
-      if (inv.status === 'active') {
-        var last = new Date(inv.lastPayout || inv.createdAt || now);
-        var hours = (now - last) / (1000 * 3600);
-        if (hours >= 24) {
-          var days = Math.floor(hours / 24);
-          var remaining = inv.totalDays - inv.currentDay + 1;
-          var actual = Math.min(days, remaining);
-          if (actual > 0) {
-            var gain = inv.dailyReturn * actual;
-            totalGain += gain;
-            gainDetails.push({ pack: inv.packName || 'Investissement', gain: gain, days: actual });
-            inv.totalEarned = (inv.totalEarned || 0) + gain;
-            inv.currentDay += actual;
-            inv.lastPayout = now.toISOString();
-            updatedInvests[i] = inv;
-            updated = true;
-          }
-        }
+    // Vérifier si des actualités existent déjà
+    const actuCollection = collection(db, 'actualites');
+    const snapshot = await getDocs(actuCollection);
+    
+    if (snapshot.empty) {
+      console.log('📰 Migration des actualités vers Firebase...');
+      
+      // Ajouter chaque actualité par défaut
+      for (const actu of defaultActualites) {
+        await addDoc(actuCollection, {
+          badge: actu.badge,
+          badgeClass: actu.badgeClass || '',
+          text: actu.text,
+          date: actu.date,
+          timestamp: actu.timestamp,
+          createdAt: new Date().toISOString()
+        });
       }
+      
+      console.log('✅ Migration des actualités terminée !');
+      showToast('✅ Actualités initialisées avec succès', 'success');
+    } else {
+      console.log('📰 Les actualités existent déjà dans Firebase');
     }
-    if (updated && totalGain > 0) {
-      var newBalance = (data.balance || 0) + totalGain;
-      await updateDoc(userRef, {
-        balance: newBalance,
-        gainsTotal: (data.gainsTotal || 0) + totalGain,
-        investments: updatedInvests,
-        lastGainDate: now.toISOString()
+  } catch (error) {
+    console.warn('Erreur lors de la migration des actualités:', error);
+  }
+}
+
+// Animation fluide des actualités
+function displayActuWithAnimation(index, direction) {
+  if (isAnimating) return;
+  if (!actualites.length) {
+    actuText.textContent = 'Aucune actualité pour le moment. Revenez plus tard !';
+    actuBadge.textContent = '📢 Info';
+    actuBadge.className = 'actu-badge';
+    actuDate.textContent = '';
+    actuCounter.textContent = '0 / 0';
+    actuPrevBtn.disabled = true;
+    actuNextBtn.disabled = true;
+    return;
+  }
+  
+  var actu = actualites[index];
+  if (!actu) return;
+  
+  isAnimating = true;
+  
+  // Appliquer l'animation de sortie
+  actuText.classList.remove('slide-in');
+  actuText.classList.add('slide-out');
+  
+  setTimeout(function() {
+    // Mettre à jour le contenu
+    actuText.textContent = actu.text || 'Pas de contenu';
+    actuBadge.textContent = actu.badge || '📢 Info';
+    actuBadge.className = 'actu-badge' + (actu.badgeClass ? ' ' + actu.badgeClass : '');
+    actuDate.textContent = formatDate(actu.date || actu.createdAt);
+    actuCounter.textContent = (index + 1) + ' / ' + actualites.length;
+    actuPrevBtn.disabled = index === 0;
+    actuNextBtn.disabled = index === actualites.length - 1;
+    
+    // Animation d'entrée
+    actuText.classList.remove('slide-out');
+    actuText.classList.add('slide-in');
+    
+    setTimeout(function() {
+      isAnimating = false;
+    }, 400);
+  }, 300);
+}
+
+function displayActu(index) {
+  displayActuWithAnimation(index, index > currentActuIndex ? 'left' : 'right');
+}
+
+actuNextBtn.addEventListener('click', function() {
+  if (currentActuIndex < actualites.length - 1 && !isAnimating) {
+    currentActuIndex++;
+    displayActu(currentActuIndex);
+  }
+});
+
+actuPrevBtn.addEventListener('click', function() {
+  if (currentActuIndex > 0 && !isAnimating) {
+    currentActuIndex--;
+    displayActu(currentActuIndex);
+  }
+});
+
+// Charger les actualités depuis Firebase
+function loadActualites() {
+  if (unsubscribeActualites) { 
+    unsubscribeActualites(); 
+    unsubscribeActualites = null; 
+  }
+  
+  var q = query(collection(db, 'actualites'), orderBy('timestamp', 'desc'));
+  
+  unsubscribeActualites = onSnapshot(q, function(snapshot) {
+    var data = [];
+    snapshot.forEach(function(snap) {
+      var docData = snap.data();
+      data.push({ 
+        id: snap.id, 
+        ...docData, 
+        badgeClass: docData.badgeClass || '', 
+        timestamp: docData.timestamp || docData.createdAt || Date.now() 
       });
-      var detailText = gainDetails.map(function(d) { return d.pack + ': +' + d.gain.toLocaleString('fr-FR') + ' FCFA'; }).join(', ');
-      showGainNotification('💰 Gains quotidiens', (detailText || '+' + totalGain.toLocaleString('fr-FR') + ' FCFA') + ' ajoutés à votre solde !');
-      return true;
+    });
+    
+    if (data.length > 0) {
+      actualites = data;
+    } else {
+      // Si aucune donnée, utiliser les défauts
+      actualites = defaultActualites;
     }
-    return false;
-  } catch (error) { console.error("❌ Erreur gains:", error); return false; }
+    
+    currentActuIndex = 0;
+    // Afficher sans animation au chargement
+    if (actualites.length > 0) {
+      var actu = actualites[0];
+      actuText.textContent = actu.text || 'Pas de contenu';
+      actuBadge.textContent = actu.badge || '📢 Info';
+      actuBadge.className = 'actu-badge' + (actu.badgeClass ? ' ' + actu.badgeClass : '');
+      actuDate.textContent = formatDate(actu.date || actu.createdAt);
+      actuCounter.textContent = '1 / ' + actualites.length;
+      actuPrevBtn.disabled = true;
+      actuNextBtn.disabled = actualites.length <= 1;
+      actuText.classList.add('slide-in');
+    }
+  }, function(error) {
+    console.warn('Erreur actualités:', error);
+    // Fallback sur les défauts
+    actualites = defaultActualites;
+    currentActuIndex = 0;
+    if (actualites.length > 0) {
+      var actu = actualites[0];
+      actuText.textContent = actu.text || 'Pas de contenu';
+      actuBadge.textContent = actu.badge || '📢 Info';
+      actuBadge.className = 'actu-badge' + (actu.badgeClass ? ' ' + actu.badgeClass : '');
+      actuDate.textContent = formatDate(actu.date || actu.createdAt);
+      actuCounter.textContent = '1 / ' + actualites.length;
+      actuPrevBtn.disabled = true;
+      actuNextBtn.disabled = actualites.length <= 1;
+    }
+  });
 }
 
 // ================================================================
-// CHARGER LE NOMBRE D'ÉPARGNES
+// MENU SWIPE - ANIMATION FLUIDE
 // ================================================================
-function loadEpargnesCount(uid) {
+var touchStartX = 0, touchStartY = 0, isMenuOpen = false;
+var SWIPE_THRESHOLD = 30;
+var EDGE_THRESHOLD = 20;
+
+function openMenu() { 
+  if (isMenuOpen) return; 
+  isMenuOpen = true; 
+  menuOverlay.classList.add('active'); 
+  document.body.style.overflow = 'hidden'; 
+}
+
+function closeMenu() { 
+  if (!isMenuOpen) return; 
+  isMenuOpen = false; 
+  menuOverlay.classList.remove('active'); 
+  document.body.style.overflow = ''; 
+}
+
+document.addEventListener('touchstart', function(e) {
+  var touch = e.changedTouches[0];
+  touchStartX = touch.screenX;
+  touchStartY = touch.screenY;
+}, { passive: true });
+
+document.addEventListener('touchmove', function(e) {
+  if (!e.cancelable) return;
+  var touch = e.changedTouches[0];
+  var deltaX = touch.screenX - touchStartX;
+  var deltaY = touch.screenY - touchStartY;
+  
+  if (Math.abs(deltaY) > Math.abs(deltaX) * 1.2) return;
+  
+  // Ouvrir en glissant de droite à gauche (edge swipe)
+  if (touchStartX > window.innerWidth - EDGE_THRESHOLD && deltaX < -SWIPE_THRESHOLD && !isMenuOpen) {
+    e.preventDefault();
+    openMenu();
+  }
+  
+  // Fermer en glissant de gauche à droite
+  if (isMenuOpen && deltaX > SWIPE_THRESHOLD) {
+    e.preventDefault();
+    closeMenu();
+  }
+}, { passive: false });
+
+menuBtn.addEventListener('click', function(e) { 
+  e.preventDefault(); 
+  isMenuOpen ? closeMenu() : openMenu(); 
+});
+
+menuCloseBtn.addEventListener('click', closeMenu);
+menuBackdrop.addEventListener('click', closeMenu);
+document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeMenu(); });
+
+// ================================================================
+// MODAL DÉCONNEXION - TAILLE RÉDUITE
+// ================================================================
+function openConfirmModal() { 
+  confirmModal.classList.add('show'); 
+  document.body.style.overflow = 'hidden'; 
+}
+
+function closeConfirmModal() { 
+  confirmModal.classList.remove('show'); 
+  document.body.style.overflow = ''; 
+}
+
+cancelConfirmBtn.addEventListener('click', closeConfirmModal);
+confirmModal.addEventListener('click', function(e) { if (e.target === confirmModal) closeConfirmModal(); });
+
+confirmLogoutBtn.addEventListener('click', async function() {
+  try {
+    await signOut(auth);
+    localStorage.removeItem('ARVEXA_current_user');
+    localStorage.removeItem('ARVEXA_user_data');
+    sessionStorage.clear();
+    closeConfirmModal();
+    showToast('✅ Déconnexion réussie', 'success');
+    setTimeout(function() { window.location.href = 'login.html'; }, 500);
+  } catch (error) {
+    console.error('Erreur déconnexion:', error);
+    showToast('❌ Erreur lors de la déconnexion', 'error');
+    closeConfirmModal();
+  }
+});
+
+menuLogoutBtn.addEventListener('click', function(e) {
+  e.preventDefault();
+  openConfirmModal();
+});
+
+// ================================================================
+// ADMIN BUTTON
+// ================================================================
+function checkAdminButton(user) {
+  if (!adminLockBtn) return;
+  if (user && user.email === ADMIN_EMAIL) {
+    adminLockBtn.style.display = 'flex';
+    adminLockBtn.onclick = function(e) { e.preventDefault(); e.stopPropagation(); window.location.href = 'admin/index.html'; };
+  } else {
+    adminLockBtn.style.display = 'none';
+  }
+}
+
+// ================================================================
+// ÉCRAN DE CHARGEMENT
+// ================================================================
+function hideLoadingScreen() {
+  if (dataLoaded) return;
+  dataLoaded = true;
+  var loadingScreen = document.getElementById('loadingScreen');
+  if (loadingScreen) {
+    loadingScreen.classList.add('hide');
+    setTimeout(function() {
+      loadingScreen.style.display = 'none';
+    }, 400);
+  }
+}
+
+// ================================================================
+// CHARGER LES STATISTIQUES DES DÉFIS
+// ================================================================
+function loadDefisStats(uid) {
   if (!uid) return;
-  var q = query(collection(db, 'epargnes'), where('userId', '==', uid));
-  onSnapshot(q, function(snapshot) {
-    var count = snapshot.size;
-    statEpargneEl.textContent = count;
+  var userRef = doc(db, 'users', uid);
+  onSnapshot(userRef, function(snap) {
+    if (snap.exists()) {
+      var data = snap.data();
+      var totalDefis = data.totalDefisGagnes || 0;
+      statDefisEl.innerHTML = formatCurrencyAbbr(totalDefis);
+    }
   }, function(error) {
-    console.error('Erreur chargement épargnes:', error);
+    console.error('Erreur chargement défis:', error);
   });
 }
 
@@ -1404,46 +1623,93 @@ function listenToUser(uid) {
       userData = snap.data();
       updateUI(userData);
       localStorage.setItem('ARVEXA_user_data', JSON.stringify(userData));
-      if (!isFirstLoad) setTimeout(function() { forceCheckAndCreditGains(); }, 1500);
+      // Mettre à jour la performance globale
+      setTimeout(function() { calculateGlobalPerformance(); }, 1000);
     }
-  }, function(error) { console.error('Erreur onSnapshot:', error); });
+  }, function(error) { 
+    if (error.code !== 'aborted' && error.code !== 'cancelled') {
+      console.warn('Erreur onSnapshot:', error);
+    }
+  });
 }
 
 // ================================================================
-// AUTH
+// CACHE POUR RETOUR ARRIÈRE INSTANTANÉ
+// ================================================================
+window.addEventListener('pageshow', function(event) {
+  if (event.persisted) {
+    console.debug('📱 Page chargée depuis le cache');
+    var cachedUser = localStorage.getItem('ARVEXA_current_user');
+    var cachedData = localStorage.getItem('ARVEXA_user_data');
+    
+    if (cachedUser && cachedData) {
+      try {
+        var data = JSON.parse(cachedData);
+        updateUI(data);
+        console.debug('✅ Données chargées depuis localStorage');
+        hideLoadingScreen();
+      } catch(e) {}
+    }
+  }
+});
+
+// ================================================================
+// AUTH - OPTIMISÉ AVEC CACHE PRIORITAIRE
 // ================================================================
 var sessionUid = sessionStorage.getItem('session_uid');
 
+function loadFromCache() {
+  var cachedData = localStorage.getItem('ARVEXA_user_data');
+  if (cachedData) {
+    try {
+      var data = JSON.parse(cachedData);
+      userData = data;
+      updateUI(data);
+      console.debug('✅ Affichage rapide depuis le cache');
+      hideLoadingScreen();
+      
+      // ✅ Afficher le pourcentage depuis le cache
+      const cachedPercent = getCachedPerformance();
+      if (cachedPercent !== null) {
+        updatePerformanceDisplay(cachedPercent);
+      }
+      return true;
+    } catch(e) {}
+  }
+  return false;
+}
+
+// ✅ CHARGEMENT COMPLET
 onAuthStateChanged(auth, async function(user) {
   if (user) {
     currentUser = user;
     localStorage.setItem('ARVEXA_current_user', user.uid);
     
+    var cachedLoaded = loadFromCache();
+    
     if (sessionUid === user.uid) {
-      console.log("✅ Session déjà validée, chargement rapide");
-      var cached = localStorage.getItem('ARVEXA_user_data');
-      if (cached) {
-        try {
-          userData = JSON.parse(cached);
-          updateUI(userData);
-        } catch(e) {}
-      }
+      console.debug("✅ Session déjà validée, chargement rapide");
       listenToUser(user.uid);
       loadActualites();
-      loadEpargnesCount(user.uid); // ✅ AJOUTÉ
-      setTimeout(function() { forceCheckAndCreditGains(); }, 2000);
-      await setupFCMNotifications();
+      loadDefisStats(user.uid);
+      // Migrer les actualités si nécessaire
+      setTimeout(function() { 
+        migrateActualitesToFirebase();
+        calculateGlobalPerformance(); 
+      }, 2000);
+      isPageLoading = false;
       return;
     }
 
     try {
       var userRef = doc(db, 'users', user.uid);
       var docSnap = await getDoc(userRef);
+      
       if (!docSnap.exists()) {
         var newUser = {
           uid: user.uid, email: user.email || '', prenom: user.displayName?.split(' ')[0] || 'Investisseur',
           nom: user.displayName?.split(' ').slice(1).join(' ') || '', fullName: user.displayName || 'Investisseur',
-          balance: 0, gainsTotal: 0, totalDepots: 0, totalRetraits: 0, epargnes: [],
+          balance: 0, gainsTotal: 0, totalDepots: 0, totalRetraits: 0, totalDefisGagnes: 0,
           referralsCount: 0, referralEarnings: 0, status: 'active', role: 'user',
           createdAt: new Date().toISOString(), lastLogin: new Date().toISOString(),
           hasDeposited: false, isUnlocked: false
@@ -1454,39 +1720,56 @@ onAuthStateChanged(auth, async function(user) {
         userData = docSnap.data();
         await updateDoc(userRef, { lastLogin: new Date().toISOString() });
       }
+      
       sessionStorage.setItem('session_uid', user.uid);
+      
       updateUI(userData);
       listenToUser(user.uid);
       loadActualites();
-      loadEpargnesCount(user.uid); // ✅ AJOUTÉ
-      setTimeout(function() { forceCheckAndCreditGains(); }, 2000);
-      await setupFCMNotifications();
+      loadDefisStats(user.uid);
+      
+      // Migrer les actualités et calculer la performance
+      setTimeout(function() { 
+        migrateActualitesToFirebase();
+        calculateGlobalPerformance(); 
+      }, 2000);
+      
+      isPageLoading = false;
+      
     } catch (error) {
-      console.error('Erreur Firestore:', error);
-      var cached = localStorage.getItem('ARVEXA_user_data');
-      if (cached) {
-        try {
-          userData = JSON.parse(cached);
-          updateUI(userData);
-        } catch(e) {}
-      }
+      console.warn('Erreur Firestore:', error);
       loadActualites();
-      if (isFirstLoad) {
-        setTimeout(function() {
-          loadingScreen.classList.add('hide');
-          mainContent.style.display = 'block';
-          mainContent.style.opacity = '1';
-          document.body.style.overflow = '';
-          sessionStorage.setItem('arvexa_loaded', 'true');
-        }, 800);
-      }
+      isPageLoading = false;
     }
+    
+    setTimeout(hideLoadingScreen, 2000);
+    
   } else {
-    var savedUid = localStorage.getItem('ARVEXA_current_user');
-    if (savedUid) {
-      setTimeout(function() { if (!auth.currentUser) { window.location.href = 'login.html'; } }, 2000);
+    if (isPageLoading) {
+      console.debug("⏳ Page en chargement, attente avant redirection...");
+      setTimeout(function() {
+        if (!auth.currentUser) {
+          var savedUid = localStorage.getItem('ARVEXA_current_user');
+          if (savedUid) {
+            if (!auth.currentUser) {
+              window.location.href = 'login.html';
+            }
+          } else {
+            window.location.href = 'login.html';
+          }
+        }
+      }, 3000);
     } else {
-      window.location.href = 'login.html';
+      var savedUid = localStorage.getItem('ARVEXA_current_user');
+      if (savedUid) {
+        setTimeout(function() { 
+          if (!auth.currentUser) { 
+            window.location.href = 'login.html'; 
+          } 
+        }, 2000);
+      } else {
+        window.location.href = 'login.html';
+      }
     }
   }
 });
@@ -1497,22 +1780,13 @@ onAuthStateChanged(auth, async function(user) {
 document.getElementById('userProfileBtn').addEventListener('click', function(e) { e.preventDefault(); window.location.href = 'profil.html'; });
 document.getElementById('logoLink').addEventListener('click', function(e) { e.preventDefault(); window.location.href = 'index.html'; });
 
-// ================================================================
-// SERVICE WORKER - VERSION CORRIGÉE POUR /ARVEXA/
-// ================================================================
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./firebase-messaging-sw.js', { scope: './' })
-    .then(function(reg) {
-      console.log('✅ SW enregistré pour /ARVEXA/');
-      addLog('✅ Service Worker enregistré', 'success');
-    })
-    .catch(function(err) {
-      console.log('❌ SW erreur:', err);
-      addLog('❌ Service Worker erreur: ' + err.message, 'error');
-    });
-}
-
-console.log("🚀 ARVEXA - Page d'accueil avec Épargne et Chat IA");
+console.debug("🚀 ARVEXA - Page d'accueil optimisée (v3.1)");
+console.debug("✅ Solde principal: format complet (50 000 FCFA)");
+console.debug("✅ Stats: format abrégé (50k FCFA)");
+console.debug("✅ Performance globale: basée sur le solde total");
+console.debug("✅ Actualités: stockées dans Firebase avec animation fluide");
+console.debug("✅ Modal déconnexion: taille réduite et élégante");
+console.debug("✅ Menu: animation fluide et réorganisation des liens");
 </script>
 </body>
 </html>
